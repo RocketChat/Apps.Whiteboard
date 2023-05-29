@@ -6,7 +6,8 @@ import {
     IModify,
     IPersistence,
     IRead,
-    IMessageBuilder
+    IMessageBuilder,
+    IModifyCreator
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { ExecutorProps } from "../definitions/ExecutorProps";
@@ -36,14 +37,23 @@ export class CommandUtility implements ExecutorProps{
     }
 
     private async handleCreateBoardCommand(){
-        console.log("handleCreateBoardCommand");
+        const creator: IModifyCreator = this.modify.getCreator()
+        const sender: IUser = (await this.read.getUserReader().getAppUser()) as IUser
+        const room: IRoom = this.context.getRoom()
+        const messageTemplate: IMessage = {
+          text: 'Whiteboard created!',
+          sender,
+          room
+        }
+        const messageBuilder: IMessageBuilder = creator.startMessage(messageTemplate)
+        await creator.finish(messageBuilder)
     }
     public async resolveCommand(){
         switch(this.command[0]){
-            case "createBoard":
+            case "create":
                 await this.handleCreateBoardCommand();
                 break;
-            default: console.log('Invalid command')
+            default: "Please enter a valid command."
                 break;
         }
     }

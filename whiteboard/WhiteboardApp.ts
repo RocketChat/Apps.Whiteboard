@@ -16,8 +16,9 @@ export class WhiteboardApp extends App {
         configuration: IConfigurationExtend,
         environmentRead: IEnvironmentRead
     ): Promise<void> {
-        const whiteboardBoardCommand: WhiteboardCommand =
-            new WhiteboardCommand();
+        const whiteboardBoardCommand: WhiteboardCommand = new WhiteboardCommand(
+            this
+        );
         await configuration.slashCommands.provideSlashCommand(
             whiteboardBoardCommand
         );
