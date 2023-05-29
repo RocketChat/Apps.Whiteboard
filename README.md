@@ -1,4 +1,4 @@
-# Whiteboard-App
+# Whiteboard
 Whiteboard Integration App for Rocket.Chat
 
 ## Getting Started

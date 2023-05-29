@@ -1,0 +1,16 @@
+{
+    "id": "c986f058-d8d5-496f-9c1c-06e39a95b229",
+    "version": "0.0.1",
+    "requiredApiVersion": "^1.19.0",
+    "iconFile": "icon.png",
+    "author": {
+        "name": "Vinayak Sharma",
+        "homepage": "n/a",
+        "support": "n/a"
+    },
+    "name": "Whiteboard",
+    "nameSlug": "whiteboard",
+    "classFile": "WhiteboardApp.ts",
+    "description": "Whiteboard Integration App for Rocket.Chat",
+    "implements": []
+}
