@@ -36,7 +36,7 @@ export async function CreateBoardModal({
 
     const value = {
         appId: "whiteboard-app",
-        id: "block-id",
+        id: "create-board-modal",
         type: UIKitSurfaceType.MODAL,
         title: block.newPlainTextObject("Create Whiteboard"),
         blocks: block.getBlocks(),
