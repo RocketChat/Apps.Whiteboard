@@ -5,14 +5,11 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
-import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
+import { UIKitViewCloseInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
+import { storeInteractionRoomData } from "../persistence/roomInteraction";
 import { ModalsEnum } from "../enum/Modals";
-import {
-    storeInteractionRoomData,
-    getInteractionRoomData,
-} from "../persistence/roomInteraction";
 
-export class ExecuteViewSubmitHandler {
+export class ExecuteViewClosedHandler {
     constructor(
         private readonly app: WhiteboardApp,
         private readonly read: IRead,
@@ -21,8 +18,8 @@ export class ExecuteViewSubmitHandler {
         private readonly persistence: IPersistence
     ) {}
 
-    public async run(context: UIKitViewSubmitInteractionContext) {
-        const { user, view } = context.getInteractionData();
+    public async run(context: UIKitViewCloseInteractionContext) {
+        const { user, view, room } = context.getInteractionData();
 
         try {
             switch (view.id) {
@@ -30,6 +27,7 @@ export class ExecuteViewSubmitHandler {
                     if (user.id) {
                         //Use the persistence functions to store the room data
                     }
+                    break;
             }
         } catch (err) {
             console.log(err);
