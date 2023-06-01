@@ -12,6 +12,7 @@ import {
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
 
+//This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
     constructor(
         private readonly app: WhiteboardApp,
@@ -29,6 +30,10 @@ export class ExecuteViewSubmitHandler {
                 case ModalsEnum.CREATE_BOARD_MODAL:
                     if (user.id) {
                         //Use the persistence functions to store the room data
+                        const { roomId } = await getInteractionRoomData(
+                            this.read.getPersistenceReader(),
+                            user.id
+                        );
                     }
             }
         } catch (err) {

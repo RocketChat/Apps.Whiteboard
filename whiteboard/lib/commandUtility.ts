@@ -48,8 +48,10 @@ export class CommandUtility implements ExecutorProps {
             sender,
             room,
         };
-        const messageBuilder: IMessageBuilder =
-            creator.startMessage(messageTemplate);
+        const messageBuilder: IMessageBuilder = creator
+            .startMessage(messageTemplate)
+            .setRoom(room);
+
         const triggerId = this.context.getTriggerId();
         if (triggerId) {
             const modal = await CreateBoardModal({
@@ -57,15 +59,19 @@ export class CommandUtility implements ExecutorProps {
                 read: this.read,
                 persistence: this.persistence,
                 http: this.http,
+                slashCommandContext: this.context,
             });
-            await this.modify.getUiController().openModalView(
-                modal,
-                {
-                    triggerId,
-                },
-                this.context.getSender()
-            );
-            await creator.finish(messageBuilder);
+
+            await Promise.all([
+                this.modify.getUiController().openModalView(
+                    modal,
+                    {
+                        triggerId,
+                    },
+                    this.context.getSender()
+                ),
+                creator.finish(messageBuilder),
+            ]);
         }
     }
     public async resolveCommand() {
