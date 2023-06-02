@@ -14,6 +14,9 @@ import {
 } from "../persistence/roomInteraction";
 import { IUIKitModalViewParam } from "@rocket.chat/apps-engine/definition/uikit/UIKitInteractionResponder";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
+import { ModalsEnum } from "../enum/Modals";
+import { AppEnum } from "../enum/App";
+import { TextObjectType } from "@rocket.chat/apps-engine/definition/uikit";
 
 export async function CreateBoardModal({
     modify,
@@ -51,22 +54,26 @@ export async function CreateBoardModal({
     }
 
     block.addInputBlock({
-        blockId: "board-name",
+        blockId: ModalsEnum.BOARD_INPUT_BLOCK_ID,
+        label: block.newPlainTextObject(ModalsEnum.BOARD_INPUT_LABEL),
         element: block.newPlainTextInputElement({
-            actionId: "board-name",
-            placeholder: block.newPlainTextObject("Board Name"),
+            actionId: ModalsEnum.BOARD_NAME_ACTION_ID,
+            placeholder: {
+                text: ModalsEnum.BOARD_NAME,
+                type: TextObjectType.PLAINTEXT,
+            },
         }),
-        label: block.newPlainTextObject("Board Name"),
     });
 
     const value = {
-        appId: "whiteboard-app",
-        id: "create-board-modal",
+        appId: AppEnum.APP_ID,
+        id: ModalsEnum.CREATE_BOARD_MODAL,
         type: UIKitSurfaceType.MODAL,
-        title: block.newPlainTextObject("Create Whiteboard"),
+        title: block.newPlainTextObject(ModalsEnum.CREATE_BOARD_TITLE),
         blocks: block.getBlocks(),
         submit: block.newButtonElement({
-            text: block.newPlainTextObject("Submit"),
+            text: block.newPlainTextObject(ModalsEnum.SUBMIT_ACTION_ID),
+            actionId: ModalsEnum.SUBMIT_ACTION_ID,
         }),
     };
     return value;
