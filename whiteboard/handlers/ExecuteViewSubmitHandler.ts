@@ -11,6 +11,7 @@ import {
     storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
+import { sendMessage } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -28,12 +29,18 @@ export class ExecuteViewSubmitHandler {
         try {
             switch (view.id) {
                 case ModalsEnum.CREATE_BOARD_MODAL:
-                    if (user.id) {
+                    if (user.id && view.state) {
                         //Use the persistence functions to store the room data
                         const { roomId } = await getInteractionRoomData(
                             this.read.getPersistenceReader(),
                             user.id
                         );
+                        if (roomId) {
+                            const boardname =
+                                view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
+                                    ModalsEnum.BOARD_NAME_ACTION_ID
+                                ];
+                        }
                     }
             }
         } catch (err) {
