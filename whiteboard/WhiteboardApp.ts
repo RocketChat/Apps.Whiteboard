@@ -54,7 +54,7 @@ export class WhiteboardApp extends App {
             modify,
             persistence
         );
-        await handler.run(context);
+        await handler.run(context,persistence);
     }
 
     public async extendConfiguration(

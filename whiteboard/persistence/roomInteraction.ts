@@ -12,7 +12,8 @@ import {
 export const storeInteractionRoomData = async (
     persistence: IPersistence,
     userId: string,
-    roomId: string
+    roomId: string,
+    boardname?: string
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
@@ -20,7 +21,7 @@ export const storeInteractionRoomData = async (
     );
     await persistence.updateByAssociation(
         association,
-        { roomId: roomId },
+        { roomId: roomId, boardname: boardname, userId: userId },
         true
     );
 };

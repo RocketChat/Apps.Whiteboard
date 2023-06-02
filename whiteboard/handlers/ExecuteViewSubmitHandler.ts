@@ -11,7 +11,7 @@ import {
     storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
-import { sendMessage } from "../lib/messages";
+import { sendDirectMessage } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -23,7 +23,10 @@ export class ExecuteViewSubmitHandler {
         private readonly persistence: IPersistence
     ) {}
 
-    public async run(context: UIKitViewSubmitInteractionContext) {
+    public async run(
+        context: UIKitViewSubmitInteractionContext,
+        persistence: IPersistence
+    ) {
         const { user, view } = context.getInteractionData();
 
         try {
@@ -40,6 +43,22 @@ export class ExecuteViewSubmitHandler {
                                 view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
+                            // await storeInteractionRoomData(
+                            //     persistence,
+                            //     user.id,
+                            //     roomId,
+                            //     boardname
+                            // );
+
+                            //send message "board created"
+                            const message = "Board Created";
+                            await sendDirectMessage(
+                                this.read,
+                                this.modify,
+                                user,
+                                message,
+                                persistence
+                            );
                         }
                     }
             }
