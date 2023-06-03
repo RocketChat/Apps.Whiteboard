@@ -6,10 +6,7 @@ import {
     IModify,
     IPersistence,
     IRead,
-    IMessageBuilder,
-    IModifyCreator,
 } from "@rocket.chat/apps-engine/definition/accessors";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
 import { CreateBoardModal } from "../modals/CreateBoardModal";
@@ -38,20 +35,6 @@ export class CommandUtility implements ExecutorProps {
     }
 
     private async handleCreateBoardCommand() {
-        const creator: IModifyCreator = this.modify.getCreator();
-        const sender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        const room: IRoom = this.context.getRoom();
-        const messageTemplate: IMessage = {
-            text: "Whiteboard created!",
-            sender,
-            room,
-        };
-        const messageBuilder: IMessageBuilder = creator
-            .startMessage(messageTemplate)
-            .setRoom(room);
-
         const triggerId = this.context.getTriggerId();
         if (triggerId) {
             const modal = await CreateBoardModal({
@@ -70,7 +53,6 @@ export class CommandUtility implements ExecutorProps {
                     },
                     this.context.getSender()
                 ),
-                creator.finish(messageBuilder),
             ]);
         }
     }

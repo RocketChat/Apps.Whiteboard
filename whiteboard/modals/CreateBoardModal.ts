@@ -35,24 +35,6 @@ export async function CreateBoardModal({
 }): Promise<IUIKitModalViewParam> {
     const block = modify.getCreator().getBlockBuilder();
 
-    const room = slashCommandContext?.getRoom();
-    const user = slashCommandContext?.getSender();
-
-    if (user?.id) {
-        let roomId;
-        if (room?.id) {
-            roomId = room.id;
-            await storeInteractionRoomData(persistence, user.id, roomId);
-        } else {
-            roomId = (
-                await getInteractionRoomData(
-                    read.getPersistenceReader(),
-                    user.id
-                )
-            ).roomId;
-        }
-    }
-
     block.addInputBlock({
         blockId: ModalsEnum.BOARD_INPUT_BLOCK_ID,
         label: block.newPlainTextObject(ModalsEnum.BOARD_INPUT_LABEL),

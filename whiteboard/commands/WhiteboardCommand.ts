@@ -4,17 +4,12 @@ import {
 } from "@rocket.chat/apps-engine/definition/slashcommands";
 import {
     IHttp,
-    IMessageBuilder,
     IModify,
-    IModifyCreator,
     IPersistence,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
 import { CommandUtility } from "../lib/commandUtility";
-import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 export class WhiteboardCommand implements ISlashCommand {
     public constructor(private readonly app: WhiteboardApp) {}

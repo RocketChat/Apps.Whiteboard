@@ -11,7 +11,7 @@ import {
     storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
-import { sendDirectMessage, sendNotification } from "../lib/messages";
+import { sendMessage } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -20,7 +20,7 @@ export class ExecuteViewSubmitHandler {
         private readonly read: IRead,
         private readonly http: IHttp,
         private readonly persistence: IPersistence,
-        private readonly modify: IModify,
+        private readonly modify: IModify
     ) {}
 
     public async run(context: UIKitViewSubmitInteractionContext) {
@@ -49,12 +49,11 @@ export class ExecuteViewSubmitHandler {
                             console.log(this.modify);
 
                             if (room) {
-                                await sendNotification(
-                                    this.read,
+                                await sendMessage(
                                     this.modify,
-                                    user,
                                     room,
-                                    `**${boardname}** whiteboard created!`
+                                    user,
+                                    `**${boardname}** whiteboard created! by @${user.username}`
                                 );
                             }
                         }
