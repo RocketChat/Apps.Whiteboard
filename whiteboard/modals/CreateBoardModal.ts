@@ -19,11 +19,11 @@ import { AppEnum } from "../enum/App";
 import { TextObjectType } from "@rocket.chat/apps-engine/definition/uikit";
 
 export async function CreateBoardModal({
-    modify,
-    read,
-    persistence,
-    http,
     slashCommandContext,
+    read,
+    modify,
+    http,
+    persistence,
     uikitcontext,
 }: {
     modify: IModify;

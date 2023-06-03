@@ -19,13 +19,13 @@ export class ExecuteViewSubmitHandler {
         private readonly app: WhiteboardApp,
         private readonly read: IRead,
         private readonly http: IHttp,
+        private readonly persistence: IPersistence,
         private readonly modify: IModify,
-        private readonly persistence: IPersistence
     ) {}
 
     public async run(context: UIKitViewSubmitInteractionContext) {
         const { user, view } = context.getInteractionData();
-        
+
         try {
             switch (view.id) {
                 case ModalsEnum.CREATE_BOARD_MODAL:
@@ -44,14 +44,18 @@ export class ExecuteViewSubmitHandler {
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
                             //send message board created
+                            console.log(this.persistence);
+                            console.log("\n");
+                            console.log(this.modify);
+
                             if (room) {
-                                await sendNotification(
-                                    this.read,
-                                    this.modify,
-                                    user,
-                                    room,
-                                    `Board ${boardname} created!`
-                                );
+                                const msg = this.modify
+                                    .getCreator()
+                                    .startMessage()
+                                    .setRoom(room)
+                                    .setSender(user)
+                                    .setText(`Board ${boardname} created`);
+                                await this.modify.getCreator().finish(msg);
                             }
                         }
                     }

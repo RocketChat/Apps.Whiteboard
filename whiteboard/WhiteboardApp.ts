@@ -63,15 +63,15 @@ export class WhiteboardApp extends App {
         context: UIKitViewSubmitInteractionContext,
         read: IRead,
         http: IHttp,
+        persistence: IPersistence,
         modify: IModify,
-        persistence: IPersistence
     ) {
         const handler = new ExecuteViewSubmitHandler(
             this,
             read,
             http,
+            persistence,
             modify,
-            persistence
         );
         await handler.run(context);
     }

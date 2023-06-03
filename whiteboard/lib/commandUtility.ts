@@ -55,11 +55,11 @@ export class CommandUtility implements ExecutorProps {
         const triggerId = this.context.getTriggerId();
         if (triggerId) {
             const modal = await CreateBoardModal({
-                modify: this.modify,
-                read: this.read,
-                persistence: this.persistence,
-                http: this.http,
                 slashCommandContext: this.context,
+                read: this.read,
+                modify: this.modify,
+                http: this.http,
+                persistence: this.persistence,
             });
 
             await Promise.all([
