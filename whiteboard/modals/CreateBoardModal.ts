@@ -72,8 +72,11 @@ export async function CreateBoardModal({
         title: block.newPlainTextObject(ModalsEnum.CREATE_BOARD_TITLE),
         blocks: block.getBlocks(),
         submit: block.newButtonElement({
-            text: block.newPlainTextObject(ModalsEnum.SUBMIT_ACTION_ID),
             actionId: ModalsEnum.SUBMIT_ACTION_ID,
+            text: {
+                type: TextObjectType.PLAINTEXT,
+                text: ModalsEnum.SUBMIT,
+            },
         }),
     };
     return value;
