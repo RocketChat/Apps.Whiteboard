@@ -6,14 +6,12 @@ import {
     IModify,
     IPersistence,
     IRead,
-    IMessageBuilder,
-    IModifyCreator
 } from "@rocket.chat/apps-engine/definition/accessors";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
+import { CreateBoardModal } from "../modals/CreateBoardModal";
 
-export class CommandUtility implements ExecutorProps{
+export class CommandUtility implements ExecutorProps {
     sender: IUser;
     room: IRoom;
     command: string[];
@@ -36,24 +34,35 @@ export class CommandUtility implements ExecutorProps{
         this.app = props.app;
     }
 
-    private async handleCreateBoardCommand(){
-        const creator: IModifyCreator = this.modify.getCreator()
-        const sender: IUser = (await this.read.getUserReader().getAppUser()) as IUser
-        const room: IRoom = this.context.getRoom()
-        const messageTemplate: IMessage = {
-          text: 'Whiteboard created!',
-          sender,
-          room
+    private async handleCreateBoardCommand() {
+        const triggerId = this.context.getTriggerId();
+        if (triggerId) {
+            const modal = await CreateBoardModal({
+                slashCommandContext: this.context,
+                read: this.read,
+                modify: this.modify,
+                http: this.http,
+                persistence: this.persistence,
+            });
+
+            await Promise.all([
+                this.modify.getUiController().openModalView(
+                    modal,
+                    {
+                        triggerId,
+                    },
+                    this.context.getSender()
+                ),
+            ]);
         }
-        const messageBuilder: IMessageBuilder = creator.startMessage(messageTemplate)
-        await creator.finish(messageBuilder)
     }
-    public async resolveCommand(){
-        switch(this.command[0]){
+    public async resolveCommand() {
+        switch (this.command[0]) {
             case "create":
                 await this.handleCreateBoardCommand();
                 break;
-            default: "Please enter a valid command."
+            default:
+                "Please enter a valid command.";
                 break;
         }
     }
