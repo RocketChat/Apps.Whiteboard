@@ -15,8 +15,10 @@ import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import {
     UIKitViewSubmitInteractionContext,
     UIKitViewCloseInteractionContext,
+    UIKitBlockInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ExecuteViewClosedHandler } from "./handlers/ExecuteViewClosedHandler";
+import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -40,6 +42,23 @@ export class WhiteboardApp extends App {
         await handler.run(context);
     }
 
+    public async executeBlockActionHandler(
+        context: UIKitBlockInteractionContext,
+        read: IRead,
+        http: IHttp,
+        modify: IModify,
+        persistence: IPersistence
+    ) {
+        const handler = new ExecuteBlockActionHandler(
+            this,
+            read,
+            http,
+            modify,
+            persistence
+        );
+        await handler.run(context);
+    }
+
     public async executeViewSubmitHandler(
         context: UIKitViewSubmitInteractionContext,
         read: IRead,
@@ -54,7 +73,7 @@ export class WhiteboardApp extends App {
             modify,
             persistence
         );
-        await handler.run(context,persistence);
+        await handler.run(context);
     }
 
     public async extendConfiguration(

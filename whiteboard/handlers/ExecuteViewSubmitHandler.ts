@@ -25,7 +25,6 @@ export class ExecuteViewSubmitHandler {
 
     public async run(
         context: UIKitViewSubmitInteractionContext,
-        persistence: IPersistence
     ) {
         const { user, view } = context.getInteractionData();
 
@@ -43,22 +42,7 @@ export class ExecuteViewSubmitHandler {
                                 view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
-                            await storeInteractionRoomData(
-                                persistence,
-                                user.id,
-                                roomId,
-                                boardname
-                            );
-
-                            //send message "board created"
-                            // const message = "Board Created";
-                            // await sendDirectMessage(
-                            //     this.read,
-                            //     this.modify,
-                            //     user,
-                            //     message,
-                            //     persistence
-                            // );
+                            //send message board created
                         }
                     }
             }
