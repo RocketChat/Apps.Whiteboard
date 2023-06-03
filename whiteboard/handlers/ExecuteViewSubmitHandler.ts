@@ -49,13 +49,13 @@ export class ExecuteViewSubmitHandler {
                             console.log(this.modify);
 
                             if (room) {
-                                const msg = this.modify
-                                    .getCreator()
-                                    .startMessage()
-                                    .setRoom(room)
-                                    .setSender(user)
-                                    .setText(`Board ${boardname} created`);
-                                await this.modify.getCreator().finish(msg);
+                                await sendNotification(
+                                    this.read,
+                                    this.modify,
+                                    user,
+                                    room,
+                                    `**${boardname}** whiteboard created!`
+                                );
                             }
                         }
                     }
