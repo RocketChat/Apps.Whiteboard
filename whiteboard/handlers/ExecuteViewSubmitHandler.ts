@@ -11,7 +11,7 @@ import {
     storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
-import { sendDirectMessage } from "../lib/messages";
+import { sendDirectMessage, sendNotification } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -23,11 +23,9 @@ export class ExecuteViewSubmitHandler {
         private readonly persistence: IPersistence
     ) {}
 
-    public async run(
-        context: UIKitViewSubmitInteractionContext,
-    ) {
+    public async run(context: UIKitViewSubmitInteractionContext) {
         const { user, view } = context.getInteractionData();
-
+        
         try {
             switch (view.id) {
                 case ModalsEnum.CREATE_BOARD_MODAL:
@@ -38,13 +36,29 @@ export class ExecuteViewSubmitHandler {
                             user.id
                         );
                         if (roomId) {
+                            const room = await this.read
+                                .getRoomReader()
+                                .getById(roomId);
                             const boardname =
                                 view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
                             //send message board created
+                            if (room) {
+                                await sendNotification(
+                                    this.read,
+                                    this.modify,
+                                    user,
+                                    room,
+                                    `Board ${boardname} created!`
+                                );
+                            }
                         }
                     }
+                    break;
+                default:
+                    console.log("View Id not found");
+                    break;
             }
         } catch (err) {
             console.log(err);
