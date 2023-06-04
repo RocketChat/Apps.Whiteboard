@@ -46,7 +46,7 @@ export class CommandUtility implements ExecutorProps {
             });
 
             await Promise.all([
-                this.modify.getUiController().openModalView(
+                this.modify.getUiController().openSurfaceView(
                     modal,
                     {
                         triggerId,

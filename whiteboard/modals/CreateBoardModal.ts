@@ -7,16 +7,17 @@ import {
     IModify,
     IPersistence,
     IRead,
+    IUIKitSurfaceViewParam,
 } from "@rocket.chat/apps-engine/definition/accessors";
-import {
-    storeInteractionRoomData,
-    getInteractionRoomData,
-} from "../persistence/roomInteraction";
-import { IUIKitModalViewParam } from "@rocket.chat/apps-engine/definition/uikit/UIKitInteractionResponder";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
 import { ModalsEnum } from "../enum/Modals";
-import { AppEnum } from "../enum/App";
-import { TextObjectType } from "@rocket.chat/apps-engine/definition/uikit";
+import { Block,TextObject } from "@rocket.chat/ui-kit";
+import {
+    getButton,
+    getDividerBlock,
+    getInputBox,
+    getSectionBlock,
+} from "../helpers/blockBuilder";
 
 export async function CreateBoardModal({
     slashCommandContext,
@@ -32,34 +33,44 @@ export async function CreateBoardModal({
     http: IHttp;
     slashCommandContext?: SlashCommandContext;
     uikitcontext?: UIKitInteractionContext;
-}): Promise<IUIKitModalViewParam> {
-    const block = modify.getCreator().getBlockBuilder();
+}): Promise<IUIKitSurfaceViewParam> {
 
-    block.addInputBlock({
-        blockId: ModalsEnum.BOARD_INPUT_BLOCK_ID,
-        label: block.newPlainTextObject(ModalsEnum.BOARD_INPUT_LABEL),
-        element: block.newPlainTextInputElement({
-            actionId: ModalsEnum.BOARD_NAME_ACTION_ID,
-            placeholder: {
-                text: ModalsEnum.BOARD_NAME,
-                type: TextObjectType.PLAINTEXT,
-            },
-        }),
-    });
+    const block: Block[] = [];
+
+    let boardInputBlock = await getInputBox(
+        ModalsEnum.BOARD_INPUT_LABEL,
+        ModalsEnum.BOARD_INPUT_PLACEHOLDER,
+        ModalsEnum.BOARD_INPUT_BLOCK_ID,
+        ModalsEnum.BOARD_NAME_ACTION_ID,
+        ""
+    );
+    block.push(boardInputBlock);
+
+    let dividerBlock = await getDividerBlock();
+    block.push(dividerBlock);
+    let closeButton = await getButton(
+        ModalsEnum.CLOSE,
+        ModalsEnum.CLOSE_BLOCK_ID,
+        ModalsEnum.CLOSE_ACTION_ID,
+        "danger"
+    );
+    let submitButton = await getButton(
+        ModalsEnum.SUBMIT,
+        ModalsEnum.SUBMIT_BLOCK_ID,
+        ModalsEnum.SUBMIT_ACTION_ID,
+        "primary"
+    );
 
     const value = {
-        appId: AppEnum.APP_ID,
         id: ModalsEnum.CREATE_BOARD_MODAL,
         type: UIKitSurfaceType.MODAL,
-        title: block.newPlainTextObject(ModalsEnum.CREATE_BOARD_TITLE),
-        blocks: block.getBlocks(),
-        submit: block.newButtonElement({
-            actionId: ModalsEnum.SUBMIT_ACTION_ID,
-            text: {
-                type: TextObjectType.PLAINTEXT,
-                text: ModalsEnum.SUBMIT,
-            },
-        }),
-    };
+        title:{
+            type:'plain_text' as const,
+            text:ModalsEnum.CREATE_BOARD_TITLE
+        },
+        close:closeButton,
+        submit:submitButton,
+        blocks: block,
+    }
     return value;
 }

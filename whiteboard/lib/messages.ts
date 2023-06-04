@@ -4,10 +4,6 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { IRoom, RoomType } from "@rocket.chat/apps-engine/definition/rooms";
-import {
-    BlockBuilder,
-    IBlock,
-} from "@rocket.chat/apps-engine/definition/uikit";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
 
@@ -44,8 +40,7 @@ export async function sendMessage(
     modify: IModify,
     room: IRoom,
     sender: IUser,
-    message: string,
-    blocks?: BlockBuilder | IBlock[]
+    message: string
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -56,9 +51,6 @@ export async function sendMessage(
         .setParseUrls(false)
         .setText(message);
 
-    if (blocks !== undefined) {
-        msg.setBlocks(blocks);
-    }
     return await modify.getCreator().finish(msg);
 }
 
@@ -82,8 +74,7 @@ export async function sendNotification(
     modify: IModify,
     user: IUser,
     room: IRoom,
-    message: string,
-    blocks?: BlockBuilder
+    message: string
 ): Promise<void> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
 
@@ -94,10 +85,6 @@ export async function sendNotification(
         .setRoom(room)
         .setText(message);
 
-    if (blocks) {
-        msg.setBlocks(blocks);
-    }
-
     return read.getNotifier().notifyUser(user, msg.getMessage());
 }
 
@@ -106,8 +93,7 @@ export async function sendDirectMessage(
     modify: IModify,
     user: IUser,
     message: string,
-    persistence: IPersistence,
-    blocks?: BlockBuilder | [IBlock]
+    persistence: IPersistence
 ): Promise<string> {
     const appUser = (await read.getUserReader().getAppUser()) as IUser;
     const targetRoom = (await getDirect(
@@ -123,7 +109,7 @@ export async function sendDirectMessage(
         return "";
     }
 
-    return await sendMessage(modify, targetRoom, appUser, message, blocks);
+    return await sendMessage(modify, targetRoom, appUser, message);
 }
 
 export function isUserHighHierarchy(user: IUser): boolean {
