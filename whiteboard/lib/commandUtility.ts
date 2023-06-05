@@ -16,6 +16,12 @@ import {
     getInteractionRoomData,
     storeInteractionRoomData,
 } from "../persistence/roomInteraction";
+import { storeBoardName } from "../persistence/boardInteraction";
+import {
+    storeAuthData,
+    getAuthData,
+    clearAuthData,
+} from "../persistence/authorization";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -64,19 +70,10 @@ export class CommandUtility implements ExecutorProps {
     }
 
     private async handleRemoveAuthCommand() {
-        const roomData = await getInteractionRoomData(
-            this.read.getPersistenceReader(),
-            this.sender.id
-        );
-        const authStatus = roomData.auth_status;
+        const authStatus = await this.handleAuthStatus();
+        console.log(authStatus);
         if (authStatus === true) {
-            await storeInteractionRoomData(
-                this.persistence,
-                this.sender.id,
-                this.room.id,
-                "",
-                false
-            );
+            await clearAuthData(this.persistence, this.sender.id, this.room.id);
             sendMessage(
                 this.modify,
                 this.room,
@@ -94,11 +91,11 @@ export class CommandUtility implements ExecutorProps {
     }
 
     private async handleAuthStatus() {
-        const roomData = await getInteractionRoomData(
+        const authData = await getAuthData(
             this.read.getPersistenceReader(),
             this.sender.id
         );
-        const authStatus = roomData.auth_status;
+        const authStatus = authData.auth_status;
         return authStatus;
     }
 

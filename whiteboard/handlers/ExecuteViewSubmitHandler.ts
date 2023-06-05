@@ -11,6 +11,8 @@ import {
     storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
+import { storeBoardName } from "../persistence/boardInteraction";
+import { storeAuthData } from "../persistence/authorization";
 import { sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 
@@ -47,7 +49,7 @@ export class ExecuteViewSubmitHandler {
                             //send message board created
 
                             if (room) {
-                                await storeInteractionRoomData(
+                                await storeBoardName(
                                     this.persistence,
                                     user.id,
                                     roomId,
@@ -76,13 +78,11 @@ export class ExecuteViewSubmitHandler {
                                 .getRoomReader()
                                 .getById(roomId);
                             if (room) {
-                                const boardname = "";
                                 const Auth_Status = true;
-                                await storeInteractionRoomData(
+                                await storeAuthData(
                                     this.persistence,
                                     user.id,
                                     roomId,
-                                    boardname,
                                     Auth_Status
                                 );
 
