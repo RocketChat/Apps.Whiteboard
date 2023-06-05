@@ -116,3 +116,25 @@ export function isUserHighHierarchy(user: IUser): boolean {
     const clearanceList = ["admin", "owner", "moderator"];
     return user.roles.some((role) => clearanceList.includes(role));
 }
+
+export async function helperMessage(
+    modify: IModify,
+    room: IRoom,
+    appUser: IUser
+) {
+    const text = `*Whiteboard App Commands*
+    \`/whiteboard auth\` - Provide User Details to whiteboard app
+    \`/whiteboard remove-auth\` - Remove User Details from whiteboard app
+    \`/whiteboard create\` - Create a new whiteboard
+    \`/whiteboard help\` - Display this message
+    `;
+
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(appUser)
+        .setRoom(room)
+        .setText(text);
+
+    return await modify.getCreator().finish(msg);
+}

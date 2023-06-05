@@ -12,6 +12,7 @@ import {
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
 import { sendMessage } from "../lib/messages";
+import { AppEnum } from "../enum/App";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -44,11 +45,14 @@ export class ExecuteViewSubmitHandler {
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
                             //send message board created
-                            console.log(this.persistence);
-                            console.log("\n");
-                            console.log(this.modify);
 
                             if (room) {
+                                await storeInteractionRoomData(
+                                    this.persistence,
+                                    user.id,
+                                    roomId,
+                                    boardname
+                                );
                                 await sendMessage(
                                     this.modify,
                                     room,
@@ -59,6 +63,40 @@ export class ExecuteViewSubmitHandler {
                         }
                     }
                     break;
+
+                case ModalsEnum.AUTH_MODAL:
+                    if (user.id && view.state) {
+                        //Use the persistence functions to store the room data
+                        const { roomId } = await getInteractionRoomData(
+                            this.read.getPersistenceReader(),
+                            user.id
+                        );
+                        if (roomId) {
+                            const room = await this.read
+                                .getRoomReader()
+                                .getById(roomId);
+                            if (room) {
+                                const boardname = "";
+                                const Auth_Status = true;
+                                await storeInteractionRoomData(
+                                    this.persistence,
+                                    user.id,
+                                    roomId,
+                                    boardname,
+                                    Auth_Status
+                                );
+
+                                await sendMessage(
+                                    this.modify,
+                                    room,
+                                    user,
+                                    `**${AppEnum.APP_ID}** authorized! by @${user.username}`
+                                );
+                            }
+                        }
+                    }
+                    break;
+
                 default:
                     console.log("View Id not found");
                     break;
