@@ -19,7 +19,7 @@ import {
     getSectionBlock,
 } from "../helpers/blockBuilder";
 
-export async function CreateBoardModal({
+export async function AuthModal({
     slashCommandContext,
     read,
     modify,
@@ -37,34 +37,30 @@ export async function CreateBoardModal({
 
     const block: Block[] = [];
 
-    let boardInputBlock = await getInputBox(
-        ModalsEnum.BOARD_INPUT_LABEL,
-        ModalsEnum.BOARD_INPUT_PLACEHOLDER,
-        ModalsEnum.BOARD_INPUT_BLOCK_ID,
-        ModalsEnum.BOARD_NAME_ACTION_ID,
-        ""
+    let authTextBlock = await getSectionBlock(
+        ModalsEnum.AUTH_LABEL,
     );
-    block.push(boardInputBlock);
+    block.push(authTextBlock);
 
     let closeButton = await getButton(
-        ModalsEnum.CLOSE,
+        ModalsEnum.CANCEL,
         ModalsEnum.CLOSE_BLOCK_ID,
         ModalsEnum.CLOSE_ACTION_ID,
         "danger"
     );
     let submitButton = await getButton(
-        ModalsEnum.SUBMIT,
+        ModalsEnum.AUTHORIZE,
         ModalsEnum.SUBMIT_BLOCK_ID,
         ModalsEnum.SUBMIT_ACTION_ID,
         "primary"
     );
 
     const value = {
-        id: ModalsEnum.CREATE_BOARD_MODAL,
+        id: ModalsEnum.AUTH_MODAL,
         type: UIKitSurfaceType.MODAL,
         title:{
             type:'plain_text' as const,
-            text:ModalsEnum.CREATE_BOARD_TITLE
+            text:ModalsEnum.AUTH_TITLE
         },
         close:closeButton,
         submit:submitButton,

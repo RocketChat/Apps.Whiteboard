@@ -10,6 +10,7 @@ import {
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
 import { CreateBoardModal } from "../modals/CreateBoardModal";
+import { AuthModal } from "../modals/AuthModal";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -32,6 +33,29 @@ export class CommandUtility implements ExecutorProps {
         this.http = props.http;
         this.persistence = props.persistence;
         this.app = props.app;
+    }
+
+    private async handleAuth() {
+        const triggerId = this.context.getTriggerId();
+        if (triggerId) {
+            const modal = await AuthModal({
+                slashCommandContext: this.context,
+                read: this.read,
+                modify: this.modify,
+                http: this.http,
+                persistence: this.persistence,
+            });
+
+            await Promise.all([
+                this.modify.getUiController().openSurfaceView(
+                    modal,
+                    {
+                        triggerId,
+                    },
+                    this.context.getSender()
+                ),
+            ]);
+        }
     }
 
     private async handleCreateBoardCommand() {
