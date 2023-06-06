@@ -15,6 +15,7 @@ import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
+import { getAuth } from "../lib/post/postDetails";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -85,6 +86,15 @@ export class ExecuteViewSubmitHandler {
                                     roomId,
                                     Auth_Status
                                 );
+
+                                await getAuth({
+                                    http: this.http,
+                                    modify: this.modify,
+                                    persistence: this.persistence,
+                                    read: this.read,
+                                    user: user,
+                                    room: roomId,
+                                });
 
                                 await sendMessage(
                                     this.modify,
