@@ -37,4 +37,9 @@ export async function getAuth({
     };
     const response = await http.post(url, request);
     console.log("response", response);
+    if (response.statusCode == HttpStatusCode.OK) {
+        return true;
+    } else {
+        throw new Error("Server error");
+    }
 }

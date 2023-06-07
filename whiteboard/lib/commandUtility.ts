@@ -48,6 +48,9 @@ export class CommandUtility implements ExecutorProps {
 
     private async handleAuthCommand() {
         const triggerId = this.context.getTriggerId();
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
         if (triggerId) {
             const modal = await AuthModal({
                 slashCommandContext: this.context,
@@ -57,34 +60,51 @@ export class CommandUtility implements ExecutorProps {
                 persistence: this.persistence,
             });
 
-            await Promise.all([
-                this.modify.getUiController().openSurfaceView(
-                    modal,
-                    {
-                        triggerId,
-                    },
-                    this.context.getSender()
-                ),
-            ]);
+            const Auth_Status = await getAuthData(
+                this.read.getPersistenceReader(),
+                this.sender.id
+            );
+            if (Auth_Status.auth_status === true) {
+                sendMessage(
+                    this.modify,
+                    this.room,
+                    appSender,
+                    "**whiteboard-app** already authenticated"
+                );
+            } else {
+                await Promise.all([
+                    this.modify.getUiController().openSurfaceView(
+                        modal,
+                        {
+                            triggerId,
+                        },
+                        this.context.getSender()
+                    ),
+                ]);
+            }
         }
     }
 
     private async handleRemoveAuthCommand() {
         const authStatus = await this.handleAuthStatus();
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
         console.log(authStatus);
         if (authStatus === true) {
             await clearAuthData(this.persistence, this.sender.id, this.room.id);
             sendMessage(
                 this.modify,
                 this.room,
-                this.sender,
-                "**whiteboard-app** authentication removed"
+                appSender,
+                "**whiteboard-app** authentication removed by @" +
+                    this.sender.username
             );
         } else {
             sendMessage(
                 this.modify,
                 this.room,
-                this.sender,
+                appSender,
                 "You are not authenticated"
             );
         }
@@ -101,6 +121,9 @@ export class CommandUtility implements ExecutorProps {
 
     private async handleCreateBoardCommand() {
         const triggerId = this.context.getTriggerId();
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
         const authStatus = await this.handleAuthStatus();
         if (authStatus === true) {
             if (triggerId) {
@@ -126,7 +149,7 @@ export class CommandUtility implements ExecutorProps {
             sendMessage(
                 this.modify,
                 this.room,
-                this.sender,
+                appSender,
                 "Please authenticate yourself first !!!"
             );
         }
@@ -146,11 +169,14 @@ export class CommandUtility implements ExecutorProps {
                 helperMessage(this.modify, this.room, this.sender);
                 break;
             default:
+                const appSender: IUser = (await this.read
+                    .getUserReader()
+                    .getAppUser()) as IUser;
                 await Promise.all([
                     sendMessage(
                         this.modify,
                         this.room,
-                        this.sender,
+                        appSender,
                         "Please enter a valid command !!!"
                     ),
                     helperMessage(this.modify, this.room, this.sender),

@@ -13,9 +13,10 @@ import {
 } from "../persistence/roomInteraction";
 import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
-import { sendMessage } from "../lib/messages";
+import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { getAuth } from "../lib/post/postDetails";
+import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -29,6 +30,9 @@ export class ExecuteViewSubmitHandler {
 
     public async run(context: UIKitViewSubmitInteractionContext) {
         const { user, view } = context.getInteractionData();
+        const AppSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
 
         try {
             switch (view.id) {
@@ -59,7 +63,7 @@ export class ExecuteViewSubmitHandler {
                                 await sendMessage(
                                     this.modify,
                                     room,
-                                    user,
+                                    AppSender,
                                     `**${boardname}** whiteboard created! by @${user.username}`
                                 );
                             }
@@ -79,15 +83,7 @@ export class ExecuteViewSubmitHandler {
                                 .getRoomReader()
                                 .getById(roomId);
                             if (room) {
-                                const Auth_Status = true;
-                                await storeAuthData(
-                                    this.persistence,
-                                    user.id,
-                                    roomId,
-                                    Auth_Status
-                                );
-
-                                await getAuth({
+                                const auth = await getAuth({
                                     http: this.http,
                                     modify: this.modify,
                                     persistence: this.persistence,
@@ -96,12 +92,29 @@ export class ExecuteViewSubmitHandler {
                                     room: roomId,
                                 });
 
-                                await sendMessage(
-                                    this.modify,
-                                    room,
-                                    user,
-                                    `**${AppEnum.APP_ID}** authorized! by @${user.username}`
-                                );
+                                if (auth == true) {
+                                    const Auth_Status = true;
+                                    await storeAuthData(
+                                        this.persistence,
+                                        user.id,
+                                        roomId,
+                                        Auth_Status
+                                    );
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${AppEnum.APP_ID}** authorized by @${user.username}`
+                                    );
+                                } else {
+                                    await sendNotification(
+                                        this.read,
+                                        this.modify,
+                                        AppSender,
+                                        room,
+                                        `**${AppEnum.APP_ID}** authorization failed`
+                                    );
+                                }
                             }
                         }
                     }
