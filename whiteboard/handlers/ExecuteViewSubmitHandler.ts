@@ -15,7 +15,7 @@ import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
-import { getAuth } from "../lib/post/postDetails";
+import { createBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 
 //This class will handle all the view submit interactions
@@ -60,12 +60,30 @@ export class ExecuteViewSubmitHandler {
                                     roomId,
                                     boardname
                                 );
-                                await sendMessage(
-                                    this.modify,
-                                    room,
-                                    AppSender,
-                                    `**${boardname}** whiteboard created! by @${user.username}`
-                                );
+                                const createResult = await createBoard({
+                                    http: this.http,
+                                    modify: this.modify,
+                                    persistence: this.persistence,
+                                    read: this.read,
+                                    user: user,
+                                    room: roomId,
+                                    boardname: boardname,
+                                });
+                                if (createResult == true) {
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${boardname}** whiteboard created! by @${user.username}`
+                                    );
+                                } else {
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${boardname}** whiteboard creation failed! by @${user.username}`
+                                    );
+                                }
                             }
                         }
                     }
