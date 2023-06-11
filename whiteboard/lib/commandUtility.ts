@@ -90,7 +90,6 @@ export class CommandUtility implements ExecutorProps {
         const appSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
-        console.log(authStatus);
         if (authStatus === true) {
             await clearAuthData(this.persistence, this.sender.id, this.room.id);
             sendMessage(

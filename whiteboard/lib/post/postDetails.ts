@@ -23,12 +23,14 @@ export async function getAuth({
     user: IUser;
     room: string;
 }) {
-    const { id, username } = user;
+    const { id } = user;
     const url = AuthUrl;
     const request = {
+        data: {
+            userId: id,
+        },
         headers: {
             "Content-Type": "application/json",
-            "x-auth-token": `${id}`,
         },
     };
     const response = await http.post(url, request);
@@ -63,14 +65,12 @@ export async function createBoard({
     if (auth == true) {
         const request = {
             data: {
-                name: username,
-                type: "post",
+                userId: id,
+                userName: username,
+                boardName: boardname,
             },
             headers: {
                 "Content-Type": "application/json",
-                "x-user-id": `${id}`,
-                "x-user-name": `${username}`,
-                "x-board-name": `${boardname}`,
             },
         };
         const response = await http.post(url, request);
