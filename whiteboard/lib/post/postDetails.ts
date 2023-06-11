@@ -7,6 +7,7 @@ import {
 import { AuthUrl, CreateBoardUrl } from "../constants";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { HttpStatusCode } from "@rocket.chat/apps-engine/definition/accessors";
+import { getAuthData } from "../../persistence/authorization";
 
 export async function getAuth({
     http,
@@ -61,8 +62,10 @@ export async function createBoard({
 }) {
     const { id, username } = user;
     const url = CreateBoardUrl;
-    const auth = await getAuth({ http, modify, persistence, read, user, room });
-    if (auth == true) {
+    const auth = await getAuthData(read.getPersistenceReader(), id);
+    const { auth_status } = auth;
+
+    if (auth_status === true) {
         const request = {
             data: {
                 userId: id,
