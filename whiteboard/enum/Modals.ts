@@ -16,4 +16,6 @@ export enum ModalsEnum {
     AUTH_LABEL = "Do you want to authorize this app to use your account details?",
     AUTH_MODAL = "auth-modal",
     AUTH_TITLE = "Authorization",
+    DELETE_BOARD_TITLE = "Delete Whiteboard",
+    DELETE_BOARD_MODAL = "delete-board-modal",
 }

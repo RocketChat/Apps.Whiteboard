@@ -15,7 +15,7 @@ import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
-import { createBoard, getAuth } from "../lib/post/postDetails";
+import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 
 //This class will handle all the view submit interactions
@@ -51,7 +51,6 @@ export class ExecuteViewSubmitHandler {
                                 view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
                                     ModalsEnum.BOARD_NAME_ACTION_ID
                                 ];
-                            //send message board created
 
                             if (room) {
                                 await storeBoardName(
@@ -69,12 +68,19 @@ export class ExecuteViewSubmitHandler {
                                     room: roomId,
                                     boardname: boardname,
                                 });
-                                if (createResult == true) {
+                                if (createResult == "success") {
                                     await sendMessage(
                                         this.modify,
                                         room,
                                         AppSender,
                                         `**${boardname}** whiteboard created! by @${user.username}`
+                                    );
+                                } else if (createResult == "conflict") {
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${boardname}** whiteboard already exists!`
                                     );
                                 } else {
                                     await sendMessage(
@@ -82,6 +88,52 @@ export class ExecuteViewSubmitHandler {
                                         room,
                                         AppSender,
                                         `**${boardname}** whiteboard creation failed! by @${user.username}`
+                                    );
+                                }
+                            }
+                        }
+                    }
+                    break;
+
+                case ModalsEnum.DELETE_BOARD_MODAL:
+                    if (user.id && view.state) {
+                        const { roomId } = await getInteractionRoomData(
+                            this.read.getPersistenceReader(),
+                            user.id
+                        );
+                        if (roomId) {
+                            const room = await this.read
+                                .getRoomReader()
+                                .getById(roomId);
+                            const boardname =
+                                view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
+                                    ModalsEnum.BOARD_NAME_ACTION_ID
+                                ];
+
+                            if (room) {
+                                const deleteResult = await deleteBoard({
+                                    http: this.http,
+                                    modify: this.modify,
+                                    persistence: this.persistence,
+                                    read: this.read,
+                                    user: user,
+                                    room: roomId,
+                                    boardname: boardname,
+                                });
+
+                                if (deleteResult == true) {
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${boardname}** whiteboard deleted! by @${user.username}`
+                                    );
+                                } else {
+                                    await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `**${boardname}** whiteboard deletion failed! by @${user.username}`
                                     );
                                 }
                             }

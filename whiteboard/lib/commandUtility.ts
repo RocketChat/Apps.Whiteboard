@@ -22,6 +22,7 @@ import {
     getAuthData,
     clearAuthData,
 } from "../persistence/authorization";
+import { DeleteBoardModal } from "../modals/DeleteBoardModal";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -153,6 +154,43 @@ export class CommandUtility implements ExecutorProps {
             );
         }
     }
+
+    private async handleDeleteBoardCommand() {
+        const triggerId = this.context.getTriggerId();
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
+        const authStatus = await this.handleAuthStatus();
+        if (authStatus === true) {
+            if (triggerId) {
+                const modal = await DeleteBoardModal({
+                    slashCommandContext: this.context,
+                    read: this.read,
+                    modify: this.modify,
+                    http: this.http,
+                    persistence: this.persistence,
+                });
+
+                await Promise.all([
+                    this.modify.getUiController().openSurfaceView(
+                        modal,
+                        {
+                            triggerId,
+                        },
+                        this.context.getSender()
+                    ),
+                ]);
+            }
+        } else {
+            sendMessage(
+                this.modify,
+                this.room,
+                appSender,
+                "Please authenticate yourself first !!!"
+            );
+        }
+    }
+
     public async resolveCommand() {
         switch (this.command[0]) {
             case "auth":
@@ -163,6 +201,9 @@ export class CommandUtility implements ExecutorProps {
                 break;
             case "create":
                 await this.handleCreateBoardCommand();
+                break;
+            case "delete":
+                await this.handleDeleteBoardCommand();
                 break;
             case "help":
                 helperMessage(this.modify, this.room, this.sender);
