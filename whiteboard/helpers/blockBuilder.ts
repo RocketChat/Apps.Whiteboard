@@ -10,6 +10,8 @@ import {
     StaticSelectElement,
 } from "@rocket.chat/ui-kit";
 import { AppEnum } from "../enum/App";
+import { PreviewBlock, PreviewBlockWithPreview } from "@rocket.chat/ui-kit";
+import { LayoutBlockType } from "@rocket.chat/ui-kit/dist/esm/blocks/LayoutBlockType";
 
 export async function getInputBox(
     labelText: string,
@@ -168,6 +170,41 @@ export async function getActionsBlock(
         type: "actions",
         blockId: blockId,
         elements: elements,
+    };
+    return block;
+}
+
+export async function getPreviewBlock(
+    url: string,
+    title: string,
+    description: string,
+    dimensions?: {
+        width: number;
+        height: number;
+    }
+): Promise<PreviewBlockWithPreview> {
+    const block: PreviewBlockWithPreview = {
+        preview: {
+            url: url,
+            dimensions: {
+                width: dimensions?.width || 123,
+                height: dimensions?.height || 456,
+            },
+        },
+        type: LayoutBlockType.PREVIEW,
+        title: [
+            {
+                type: "plain_text",
+                text: title,
+            },
+        ],
+        description: [
+            {
+                type: "plain_text",
+                text: description,
+            },
+        ],
+        thumb: undefined,
     };
     return block;
 }
