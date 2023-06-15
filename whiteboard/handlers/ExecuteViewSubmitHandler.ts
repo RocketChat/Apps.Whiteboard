@@ -79,14 +79,21 @@ export class ExecuteViewSubmitHandler {
                                             height: 500,
                                         }
                                     );
-
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${boardname}** whiteboard created! by @${user.username}`,
-                                        block
-                                    );
+                                    await Promise.all([
+                                        sendMessage(
+                                            this.modify,
+                                            room,
+                                            AppSender,
+                                            `**${boardname}** whiteboard created! by @${user.username}`
+                                        ),
+                                        sendMessage(
+                                            this.modify,
+                                            room,
+                                            AppSender,
+                                            "",
+                                            block
+                                        ),
+                                    ]);
                                 } else if (createResult == "conflict") {
                                     await sendMessage(
                                         this.modify,

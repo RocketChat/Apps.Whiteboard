@@ -42,7 +42,7 @@ export async function sendMessage(
     room: IRoom,
     sender: IUser,
     message: string,
-    block?:Array<Block>
+    blocks?: Array<Block>
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -53,8 +53,8 @@ export async function sendMessage(
         .setParseUrls(false)
         .setText(message);
 
-    if (block) {
-        msg.setBlocks(block);
+    if (blocks !== undefined) {
+        msg.setBlocks(blocks);
     }
 
     return await modify.getCreator().finish(msg);
