@@ -1,4 +1,5 @@
-const MarkboardApiBaseUrl = "http://localhost:4000/rocketchat";
+import { AppEnum } from "../enum/App";
+const MarkboardApiBaseUrl = `${AppEnum.MARKBOARD_HOST}/rocketchat`;
 
 export const ApiVersion = {
     V2: "v2",

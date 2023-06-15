@@ -187,8 +187,8 @@ export async function getPreviewBlock(
         preview: {
             url: url,
             dimensions: {
-                width: dimensions?.width || 123,
-                height: dimensions?.height || 456,
+                width: dimensions?.width || 500,
+                height: dimensions?.height || 500,
             },
         },
         type: LayoutBlockType.PREVIEW,
@@ -204,6 +204,8 @@ export async function getPreviewBlock(
                 text: description,
             },
         ],
+        externalUrl: url,
+        oembedUrl: url,
         thumb: undefined,
     };
     return block;

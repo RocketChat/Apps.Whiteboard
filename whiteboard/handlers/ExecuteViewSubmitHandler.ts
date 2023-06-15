@@ -17,6 +17,7 @@ import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
+import { PreviewBlock } from "../blocks/PreviewBlock";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -69,11 +70,22 @@ export class ExecuteViewSubmitHandler {
                                     boardname: boardname,
                                 });
                                 if (createResult == "success") {
+                                    const block = await PreviewBlock(
+                                        `${AppEnum.MARKBOARD_HOST}/board/${boardname}`,
+                                        `${boardname} Whiteboard`,
+                                        "Whiteboard Preview",
+                                        {
+                                            width: 500,
+                                            height: 500,
+                                        }
+                                    );
+
                                     await sendMessage(
                                         this.modify,
                                         room,
                                         AppSender,
-                                        `**${boardname}** whiteboard created! by @${user.username}`
+                                        `**${boardname}** whiteboard created! by @${user.username}`,
+                                        block
                                     );
                                 } else if (createResult == "conflict") {
                                     await sendMessage(

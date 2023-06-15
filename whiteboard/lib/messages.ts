@@ -6,6 +6,7 @@ import {
 import { IRoom, RoomType } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
+import { Block, TextObject } from "@rocket.chat/ui-kit";
 
 export async function getDirect(
     read: IRead,
@@ -40,7 +41,8 @@ export async function sendMessage(
     modify: IModify,
     room: IRoom,
     sender: IUser,
-    message: string
+    message: string,
+    block?:Array<Block>
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -50,6 +52,10 @@ export async function sendMessage(
         .setGroupable(false)
         .setParseUrls(false)
         .setText(message);
+
+    if (block) {
+        msg.setBlocks(block);
+    }
 
     return await modify.getCreator().finish(msg);
 }
