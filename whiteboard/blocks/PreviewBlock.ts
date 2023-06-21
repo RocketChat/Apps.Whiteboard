@@ -1,5 +1,5 @@
 import { getPreviewBlock } from "../helpers/blockBuilder";
-import { Block, TextObject } from "@rocket.chat/ui-kit";
+import { Block } from "@rocket.chat/ui-kit";
 
 export async function PreviewBlock(
     url: string,

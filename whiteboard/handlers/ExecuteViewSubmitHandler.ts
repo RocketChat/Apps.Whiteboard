@@ -8,7 +8,6 @@ import { WhiteboardApp } from "../WhiteboardApp";
 import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { ModalsEnum } from "../enum/Modals";
 import {
-    storeInteractionRoomData,
     getInteractionRoomData,
 } from "../persistence/roomInteraction";
 import { storeBoardName } from "../persistence/boardInteraction";
@@ -18,6 +17,7 @@ import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { PreviewBlock } from "../blocks/PreviewBlock";
+import { getIframe } from "../lib/get/getIframe";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -70,30 +70,39 @@ export class ExecuteViewSubmitHandler {
                                     boardname: boardname,
                                 });
                                 if (createResult == "success") {
-                                    const block = await PreviewBlock(
-                                        `${AppEnum.MARKBOARD_HOST}/board/${boardname}`,
-                                        `${boardname} Whiteboard`,
-                                        "Whiteboard Preview",
-                                        {
-                                            width: 500,
-                                            height: 500,
-                                        }
-                                    );
-                                    await Promise.all([
-                                        sendMessage(
-                                            this.modify,
-                                            room,
-                                            AppSender,
-                                            `**${boardname}** whiteboard created! by @${user.username}`
-                                        ),
-                                        sendMessage(
-                                            this.modify,
-                                            room,
-                                            AppSender,
-                                            "",
-                                            block
-                                        ),
-                                    ]);
+                                    const iframe = await getIframe({
+                                        http: this.http,
+                                        boardname: boardname,
+                                    });
+                                    if (iframe) {
+                                        const url = iframe.url;
+                                        const content = iframe.content;
+
+                                        const block = await PreviewBlock(
+                                            url,
+                                            `${boardname} Whiteboard`,
+                                            "Whiteboard Preview",
+                                            {
+                                                width: 500,
+                                                height: 500,
+                                            }
+                                        );
+                                        await Promise.all([
+                                            sendMessage(
+                                                this.modify,
+                                                room,
+                                                AppSender,
+                                                `**${boardname}** whiteboard created! by @${user.username}`
+                                            ),
+                                            sendMessage(
+                                                this.modify,
+                                                room,
+                                                AppSender,
+                                                "",
+                                                block
+                                            ),
+                                        ]);
+                                    }
                                 } else if (createResult == "conflict") {
                                     await sendMessage(
                                         this.modify,

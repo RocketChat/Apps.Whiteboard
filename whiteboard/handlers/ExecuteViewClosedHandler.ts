@@ -6,7 +6,6 @@ import {
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
 import { UIKitViewCloseInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
-import { storeInteractionRoomData } from "../persistence/roomInteraction";
 import { ModalsEnum } from "../enum/Modals";
 
 export class ExecuteViewClosedHandler {

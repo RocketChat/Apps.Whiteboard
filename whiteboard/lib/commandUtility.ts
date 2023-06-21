@@ -13,17 +13,10 @@ import { CreateBoardModal } from "../modals/CreateBoardModal";
 import { AuthModal } from "../modals/AuthModal";
 import { helperMessage, sendMessage } from "./messages";
 import {
-    getInteractionRoomData,
-    storeInteractionRoomData,
-} from "../persistence/roomInteraction";
-import { storeBoardName } from "../persistence/boardInteraction";
-import {
-    storeAuthData,
     getAuthData,
     clearAuthData,
 } from "../persistence/authorization";
 import { DeleteBoardModal } from "../modals/DeleteBoardModal";
-import { PreviewBlock } from "../blocks/PreviewBlock";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -192,6 +185,13 @@ export class CommandUtility implements ExecutorProps {
         }
     }
 
+    private async helperMessage() {
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
+        await helperMessage(this.modify, this.room, appSender);
+    }
+
     public async resolveCommand() {
         switch (this.command[0]) {
             case "auth":
@@ -207,7 +207,7 @@ export class CommandUtility implements ExecutorProps {
                 await this.handleDeleteBoardCommand();
                 break;
             case "help":
-                helperMessage(this.modify, this.room, this.sender);
+                await this.helperMessage();
                 break;
             default:
                 const appSender: IUser = (await this.read
@@ -220,7 +220,7 @@ export class CommandUtility implements ExecutorProps {
                         appSender,
                         "Please enter a valid command !!!"
                     ),
-                    helperMessage(this.modify, this.room, this.sender),
+                    this.helperMessage(),
                 ]);
                 break;
         }
