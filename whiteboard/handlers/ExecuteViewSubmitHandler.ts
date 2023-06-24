@@ -7,9 +7,7 @@ import {
 import { WhiteboardApp } from "../WhiteboardApp";
 import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { ModalsEnum } from "../enum/Modals";
-import {
-    getInteractionRoomData,
-} from "../persistence/roomInteraction";
+import { getInteractionRoomData } from "../persistence/roomInteraction";
 import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendNotification, sendMessage } from "../lib/messages";
@@ -76,32 +74,34 @@ export class ExecuteViewSubmitHandler {
                                     });
                                     if (iframe) {
                                         const url = iframe.url;
-                                        const content = iframe.content;
-
-                                        const block = await PreviewBlock(
-                                            url,
-                                            `${boardname} Whiteboard`,
-                                            "Whiteboard Preview",
-                                            {
-                                                width: 500,
-                                                height: 500,
-                                            }
-                                        );
-                                        await Promise.all([
-                                            sendMessage(
-                                                this.modify,
-                                                room,
-                                                AppSender,
-                                                `**${boardname}** whiteboard created! by @${user.username}`
-                                            ),
-                                            sendMessage(
-                                                this.modify,
-                                                room,
-                                                AppSender,
-                                                "",
-                                                block
-                                            ),
-                                        ]);
+                                        const content = iframe.iframeHtml;
+                                        if (url && content) {
+                                            const block = await PreviewBlock(
+                                                url,
+                                                `${boardname} Whiteboard`,
+                                                content,
+                                                "Whiteboard Preview",
+                                                {
+                                                    width: 500,
+                                                    height: 500,
+                                                }
+                                            );
+                                            await Promise.all([
+                                                sendMessage(
+                                                    this.modify,
+                                                    room,
+                                                    AppSender,
+                                                    `**${boardname}** whiteboard created! by @${user.username}`
+                                                ),
+                                                sendMessage(
+                                                    this.modify,
+                                                    room,
+                                                    AppSender,
+                                                    "",
+                                                    block
+                                                ),
+                                            ]);
+                                        }
                                     }
                                 } else if (createResult == "conflict") {
                                     await sendMessage(

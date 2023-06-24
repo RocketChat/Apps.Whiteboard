@@ -19,7 +19,10 @@ export async function getIframe({
     };
     const response = await http.get(url, request);
     if (response.statusCode == HttpStatusCode.OK && response.content) {
-        return response;
+        const responseBody = JSON.parse(response.content);
+        const iframeHtml = responseBody.html;
+        const url = responseBody.provider_url;
+        return { iframeHtml, url };
     } else {
         return undefined;
     }
