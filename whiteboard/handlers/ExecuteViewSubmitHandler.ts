@@ -79,7 +79,6 @@ export class ExecuteViewSubmitHandler {
                                             const block = await PreviewBlock(
                                                 url,
                                                 `${boardname} Whiteboard`,
-                                                content,
                                                 "Whiteboard Preview",
                                                 {
                                                     width: 500,
@@ -97,8 +96,7 @@ export class ExecuteViewSubmitHandler {
                                                     this.modify,
                                                     room,
                                                     AppSender,
-                                                    "",
-                                                    block
+                                                    url,
                                                 ),
                                             ]);
                                         }

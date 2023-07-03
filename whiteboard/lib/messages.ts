@@ -49,8 +49,7 @@ export async function sendMessage(
         .startMessage()
         .setSender(sender)
         .setRoom(room)
-        .setGroupable(false)
-        .setParseUrls(false)
+        .setParseUrls(true)
         .setText(message);
 
     if (blocks !== undefined) {
