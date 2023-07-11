@@ -10,7 +10,7 @@ import { ModalsEnum } from "../enum/Modals";
 import { getInteractionRoomData } from "../persistence/roomInteraction";
 import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
-import { sendNotification, sendMessage } from "../lib/messages";
+import { sendNotification, sendMessage, sendLink } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
@@ -92,7 +92,7 @@ export class ExecuteViewSubmitHandler {
                                                     AppSender,
                                                     `**${boardname}** whiteboard created! by @${user.username}`
                                                 ),
-                                                sendMessage(
+                                                sendLink(
                                                     this.modify,
                                                     room,
                                                     AppSender,
