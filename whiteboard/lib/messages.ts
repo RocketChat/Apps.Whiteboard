@@ -6,6 +6,7 @@ import {
 import { IRoom, RoomType } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
+import { Block, TextObject } from "@rocket.chat/ui-kit";
 
 export async function getDirect(
     read: IRead,
@@ -40,16 +41,42 @@ export async function sendMessage(
     modify: IModify,
     room: IRoom,
     sender: IUser,
-    message: string
+    message: string,
+    blocks?: Array<Block>
 ): Promise<string> {
     const msg = modify
         .getCreator()
         .startMessage()
         .setSender(sender)
         .setRoom(room)
-        .setGroupable(false)
         .setParseUrls(false)
         .setText(message);
+
+    if (blocks !== undefined) {
+        msg.setBlocks(blocks);
+    }
+
+    return await modify.getCreator().finish(msg);
+}
+
+export async function sendLink(
+    modify: IModify,
+    room: IRoom,
+    sender: IUser,
+    message: string,
+    blocks?: Array<Block>
+): Promise<string> {
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(sender)
+        .setRoom(room)
+        .setParseUrls(true)
+        .setText(message);
+
+    if (blocks !== undefined) {
+        msg.setBlocks(blocks);
+    }
 
     return await modify.getCreator().finish(msg);
 }
@@ -115,4 +142,27 @@ export async function sendDirectMessage(
 export function isUserHighHierarchy(user: IUser): boolean {
     const clearanceList = ["admin", "owner", "moderator"];
     return user.roles.some((role) => clearanceList.includes(role));
+}
+
+export async function helperMessage(
+    modify: IModify,
+    room: IRoom,
+    appUser: IUser
+) {
+    const text = `*Whiteboard App Commands*
+    \`/whiteboard auth\` - Provide User Details to whiteboard app
+    \`/whiteboard remove-auth\` - Remove User Details from whiteboard app
+    \`/whiteboard create\` - Create a new whiteboard
+    \`/whiteboard delete\` - Delete a whiteboard
+    \`/whiteboard help\` - Display this message
+    `;
+
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(appUser)
+        .setRoom(room)
+        .setText(text);
+
+    return await modify.getCreator().finish(msg);
 }

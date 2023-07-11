@@ -19,7 +19,7 @@ import {
     getSectionBlock,
 } from "../helpers/blockBuilder";
 
-export async function CreateBoardModal({
+export async function DeleteBoardModal({
     slashCommandContext,
     read,
     modify,
@@ -60,11 +60,11 @@ export async function CreateBoardModal({
     );
 
     const value = {
-        id: ModalsEnum.CREATE_BOARD_MODAL,
+        id: ModalsEnum.DELETE_BOARD_MODAL,
         type: UIKitSurfaceType.MODAL,
         title:{
             type:'plain_text' as const,
-            text:ModalsEnum.CREATE_BOARD_TITLE
+            text:ModalsEnum.DELETE_BOARD_TITLE
         },
         close:closeButton,
         submit:submitButton,

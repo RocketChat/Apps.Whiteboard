@@ -7,60 +7,39 @@ import {
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
 
-//functions needed to persist room data while modal and other UI interactions
+//functions needed to persist board data while modal and other UI interactions
 
-export const storeInteractionRoomData = async (
+export const storeBoardName = async (
     persistence: IPersistence,
     userId: string,
     roomId: string,
+    boardname: [string]
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
+        `${userId}#BoardName`
     );
     await persistence.updateByAssociation(
         association,
         {
             userId: userId,
             roomId: roomId,
+            boardname: boardname,
         },
         true
     );
 };
 
-
-export const clearBoardName = async (
-    persistence: IPersistence,
-    userId: string
-): Promise<void> => {
-    const association = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
-    );
-    await persistence.removeByAssociation(association);
-};
-
-export const getInteractionRoomData = async (
+export const getBoardName = async (
     persistenceRead: IPersistenceRead,
     userId: string
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
+        `${userId}#BoardName`
     );
     const result = (await persistenceRead.readByAssociation(
         association
     )) as Array<any>;
     return result && result.length ? result[0] : null;
-};
-
-export const clearInteractionRoomData = async (
-    persistence: IPersistence,
-    userId: string
-): Promise<void> => {
-    const association = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
-    );
-    await persistence.removeByAssociation(association);
 };

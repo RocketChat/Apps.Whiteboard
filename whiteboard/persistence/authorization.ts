@@ -7,46 +7,36 @@ import {
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
 
-//functions needed to persist room data while modal and other UI interactions
+//functions needed to persist auth data while modal and other UI interactions
 
-export const storeInteractionRoomData = async (
+export const storeAuthData = async (
     persistence: IPersistence,
     userId: string,
     roomId: string,
+    auth_status: boolean
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
+        `${userId}#AuthStatus`
     );
     await persistence.updateByAssociation(
         association,
         {
             userId: userId,
             roomId: roomId,
+            auth_status: auth_status,
         },
         true
     );
 };
 
-
-export const clearBoardName = async (
-    persistence: IPersistence,
-    userId: string
-): Promise<void> => {
-    const association = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
-    );
-    await persistence.removeByAssociation(association);
-};
-
-export const getInteractionRoomData = async (
+export const getAuthData = async (
     persistenceRead: IPersistenceRead,
     userId: string
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
+        `${userId}#AuthStatus`
     );
     const result = (await persistenceRead.readByAssociation(
         association
@@ -54,13 +44,18 @@ export const getInteractionRoomData = async (
     return result && result.length ? result[0] : null;
 };
 
-export const clearInteractionRoomData = async (
+export const clearAuthData = async (
     persistence: IPersistence,
-    userId: string
+    userId: string,
+    roomId: string
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#RoomId`
+        `${userId}#AuthStatus`
     );
-    await persistence.removeByAssociation(association);
+    await persistence.updateByAssociation(association, {
+        userId: userId,
+        roomId: roomId,
+        auth_status: false,
+    });
 };
