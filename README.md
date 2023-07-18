@@ -1,6 +1,13 @@
 # Whiteboard
 Whiteboard Integration App for Rocket.Chat
 
+## Local Setup Guide
+- First `cd client` folder and run `npm install` to install all packages
+- Run `npm build` to build webpack bundle for excalidraw react app
+- Run `npm build:excalidraw` to execute build.js script to write build scripts to excalidraw.ts and excalidraw html to excalidrawContent.ts
+- Run `cd ../whiteboard/` and ` $  rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}` ,add `--update` flag to if you want update your app changes
+To verify successful build you can view endpoint `/excalidraw` in whiteboard-app settings and access the react app through url provided
+
 ## Getting Started
 Now that you have generated a blank default Rocket.Chat App, what are you supposed to do next?
 Start developing! Open up your favorite editor, our recommended one is Visual Studio code,

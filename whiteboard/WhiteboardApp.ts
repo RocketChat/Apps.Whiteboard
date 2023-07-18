@@ -31,6 +31,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/api";
 import { Buffer } from "buffer";
 import { compressedString } from "./excalidraw";
+import { excalidrawContent } from "./excalidrawContent";
 
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -119,30 +120,7 @@ export class ExcalidrawEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        const content = `
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Document</title>
-            <style>
-            body {
-              margin: 0;
-              padding: 0;
-            }
-            .main-Excalidraw {
-              height: 100vh;
-              width: 100vw;
-            }
-          </style>
-        </head>
-        <body>
-            <div id="root"></div>
-            <script src="bundle.js"></script>
-        </body>
-        </html>`;
-
+        const content = excalidrawContent;
         return {
             status: 200,
             headers: {

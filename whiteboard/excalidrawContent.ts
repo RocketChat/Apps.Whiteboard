@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+export const excalidrawContent=`<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -19,4 +19,4 @@
     <div id="root"></div>
     <script src="bundle.js"></script>
 </body>
-</html>
+</html>`

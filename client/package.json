@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "webpack serve",
     "build": "webpack --mode development",
-    "compress": "node build.js"
+    "build:excalidraw": "node scripts/build.js"
   },
   "dependencies": {
     "@excalidraw/excalidraw": "^0.15.2",
