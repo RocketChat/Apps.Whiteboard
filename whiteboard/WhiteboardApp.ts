@@ -19,6 +19,19 @@ import {
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ExecuteViewClosedHandler } from "./handlers/ExecuteViewClosedHandler";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
+import {
+    ApiSecurity,
+    ApiVisibility,
+} from "@rocket.chat/apps-engine/definition/api";
+import {
+    ApiEndpoint,
+    IApiEndpointInfo,
+    IApiRequest,
+    IApiResponse,
+} from "@rocket.chat/apps-engine/definition/api";
+import { Buffer } from "buffer";
+import { compressedString } from "./excalidraw";
+import { excalidrawContent } from "./excalidrawContent";
 
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
@@ -64,14 +77,14 @@ export class WhiteboardApp extends App {
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
-        modify: IModify,
+        modify: IModify
     ) {
         const handler = new ExecuteViewSubmitHandler(
             this,
             read,
             http,
             persistence,
-            modify,
+            modify
         );
         await handler.run(context);
     }
@@ -86,5 +99,59 @@ export class WhiteboardApp extends App {
         await configuration.slashCommands.provideSlashCommand(
             whiteboardBoardCommand
         );
+        await configuration.api.provideApi({
+            visibility: ApiVisibility.PUBLIC,
+            security: ApiSecurity.UNSECURE,
+            endpoints: [
+                new ExcalidrawEndpoint(this),
+                new BundleJsEndpoint(this),
+            ],
+        });
+    }
+}
+export class ExcalidrawEndpoint extends ApiEndpoint {
+    public path = "excalidraw";
+
+    public async get(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        const content = excalidrawContent;
+        return {
+            status: 200,
+            headers: {
+                "Content-Type": "text/html",
+                "Content-Security-Policy": "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content,
+        };
+    }
+}
+
+export class BundleJsEndpoint extends ApiEndpoint {
+    public path = "bundle.js";
+
+    public async get(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        const content = Buffer.from(compressedString, "base64");
+        return {
+            status: 200,
+            headers: {
+                "Content-Type": "text/javascript",
+                "Content-Encoding": "br",
+            },
+            content,
+
+        };
     }
 }
