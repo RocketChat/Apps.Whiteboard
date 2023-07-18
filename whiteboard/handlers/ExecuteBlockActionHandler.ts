@@ -25,24 +25,17 @@ export class ExecuteBlockActionHandler {
         const data = context.getInteractionData();
 
         try {
-            const { actionId } = data;
+            const { blockId, user, actionId } = data;
             switch (actionId) {
-                case ModalsEnum.SUBMIT_ACTION_ID: {
-                    console.log("Submit action triggered");
-                    return {
-                        success: true,
-                    };
-                }
+                case ModalsEnum.PREVIEW_BUTTON_ACTION_ID:
+                    console.log("Preview block clicked");
+                    return context.getInteractionResponder().successResponse();
                 default:
-                    return {
-                        success: false,
-                    };
+                    return context.getInteractionResponder().successResponse();
             }
         } catch (err) {
             console.log(err);
-            return {
-                success: false,
-            };
+            return context.getInteractionResponder().errorResponse();
         }
     }
 }

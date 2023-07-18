@@ -16,8 +16,9 @@ import {
     UIKitViewSubmitInteractionContext,
     UIKitViewCloseInteractionContext,
     UIKitBlockInteractionContext,
+    IUIKitResponse,
+    UIKitActionButtonInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import { ExecuteViewClosedHandler } from "./handlers/ExecuteViewClosedHandler";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 import {
     ApiSecurity,
@@ -32,27 +33,9 @@ import {
 import { Buffer } from "buffer";
 import { compressedString } from "./excalidraw";
 import { excalidrawContent } from "./excalidrawContent";
-
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
-    }
-
-    public async executeViewClosedHandler(
-        context: UIKitViewCloseInteractionContext,
-        read: IRead,
-        http: IHttp,
-        modify: IModify,
-        persistence: IPersistence
-    ) {
-        const handler = new ExecuteViewClosedHandler(
-            this,
-            read,
-            http,
-            modify,
-            persistence
-        );
-        await handler.run(context);
     }
 
     public async executeBlockActionHandler(
@@ -61,7 +44,7 @@ export class WhiteboardApp extends App {
         http: IHttp,
         modify: IModify,
         persistence: IPersistence
-    ) {
+    ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
             this,
             read,
@@ -69,7 +52,7 @@ export class WhiteboardApp extends App {
             modify,
             persistence
         );
-        await handler.run(context);
+        return await handler.run(context);
     }
 
     public async executeViewSubmitHandler(
@@ -125,7 +108,8 @@ export class ExcalidrawEndpoint extends ApiEndpoint {
             status: 200,
             headers: {
                 "Content-Type": "text/html",
-                "Content-Security-Policy": "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
             },
             content,
         };
@@ -151,7 +135,6 @@ export class BundleJsEndpoint extends ApiEndpoint {
                 "Content-Encoding": "br",
             },
             content,
-
         };
     }
 }

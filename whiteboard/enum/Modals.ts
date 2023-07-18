@@ -20,4 +20,7 @@ export enum ModalsEnum {
     DELETE_BOARD_MODAL = "delete-board-modal",
     PREVIEW_BLOCK_ID = "preview-block-id",
     PREVIEW_BLOCK_TITLE = "Whiteboard Preview",
+    PREVIEW_BUTTON_ACTION_ID = "preview-button-action-id",
+    EDIT_BUTTON_ACTION_ID = "edit-button-action-id",
+    SAVE_BUTTON_ACTION_ID = "save-button-action-id",
 }

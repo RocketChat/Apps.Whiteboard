@@ -125,11 +125,11 @@ export class CommandUtility implements ExecutorProps {
             const previewBlock = await PreviewBlock(
                 appUser.username,
                 "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
-                `whiteboard`,
+                `Whiteboard Preview`,
                 "Excalidraw Whiteboard",
                 {
                     width: 500,
-                    height: 500,
+                    height: 316,
                 }
             );
             await Promise.all([

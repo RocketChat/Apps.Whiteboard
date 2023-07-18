@@ -49,28 +49,6 @@ export async function sendMessage(
         .startMessage()
         .setSender(sender)
         .setRoom(room)
-        .setParseUrls(false)
-        .setText(message);
-
-    if (blocks !== undefined) {
-        msg.setBlocks(blocks);
-    }
-
-    return await modify.getCreator().finish(msg);
-}
-
-export async function sendLink(
-    modify: IModify,
-    room: IRoom,
-    sender: IUser,
-    message: string,
-    blocks?: Array<Block>
-): Promise<string> {
-    const msg = modify
-        .getCreator()
-        .startMessage()
-        .setSender(sender)
-        .setRoom(room)
         .setParseUrls(true)
         .setText(message);
 
