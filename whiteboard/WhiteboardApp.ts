@@ -93,7 +93,7 @@ export class WhiteboardApp extends App {
     }
 }
 export class ExcalidrawEndpoint extends ApiEndpoint {
-    public path = "excalidraw";
+    public path = `/board/:id`;
 
     public async get(
         request: IApiRequest,

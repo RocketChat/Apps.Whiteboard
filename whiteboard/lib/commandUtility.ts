@@ -17,6 +17,10 @@ import { DeleteBoardModal } from "../modals/DeleteBoardModal";
 import { ModalsEnum } from "../enum/Modals";
 import { PreviewBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
+import {
+    getBoardRecord,
+    storeBoardRecord,
+} from "../persistence/boardInteraction";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -116,31 +120,41 @@ export class CommandUtility implements ExecutorProps {
     private async handleNewBoardCommand({
         context,
         read,
+        modify,
+        http,
+        persistence,
     }: WhiteboardSlashCommandContext) {
         const app = (await read.getUserReader().getAppUser())!;
         const appUser = context.getSender()!;
 
         const room = context.getRoom();
         if (room) {
+            const randomBoardId = Date.now().toString(36);
             const previewBlock = await PreviewBlock(
                 appUser.username,
                 "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
                 `Whiteboard Preview`,
                 "Excalidraw Whiteboard",
+                randomBoardId,
                 {
                     width: 500,
                     height: 316,
                 }
             );
             await Promise.all([
-                sendMessage(
-                    this.modify,
-                    room,
-                    app,
-                    ` `,
-                    previewBlock
+                sendMessage(this.modify, room, app, ` `, previewBlock),
+                storeBoardRecord(
+                    persistence,
+                    appUser.id,
+                    room.id,
+                    randomBoardId
                 ),
             ]);
+            const record = await getBoardRecord(
+                read.getPersistenceReader(),
+                appUser.id
+            );
+            console.log(record);
         }
     }
 

@@ -8,14 +8,12 @@ import { WhiteboardApp } from "../WhiteboardApp";
 import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { ModalsEnum } from "../enum/Modals";
 import { getInteractionRoomData } from "../persistence/roomInteraction";
-import { storeBoardName } from "../persistence/boardInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { PreviewBlock } from "../blocks/UtilityBlock";
-import { getIframe } from "../lib/get/getIframe";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {

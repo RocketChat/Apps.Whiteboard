@@ -24,6 +24,7 @@ export async function PreviewBlock(
     url: string,
     title: string,
     description: string,
+    randomBoardId: string,
     dimnesions: {
         width: number;
         height: number;
@@ -45,7 +46,7 @@ export async function PreviewBlock(
         ModalsEnum.PREVIEW_BUTTON_ACTION_ID,
         "Edit",
         ButtonStyle.PRIMARY,
-        "http://localhost:3000/api/apps/public/c986f058-d8d5-496f-9c1c-06e39a95b229/excalidraw"
+        `http://localhost:3000/api/apps/public/c986f058-d8d5-496f-9c1c-06e39a95b229/board/${randomBoardId}`
     );
 
     const savebutton = await getButton(
@@ -53,10 +54,13 @@ export async function PreviewBlock(
         "save",
         ModalsEnum.PREVIEW_BUTTON_ACTION_ID,
         "Save",
-        ButtonStyle.DANGER,
-    )
+        ButtonStyle.DANGER
+    );
 
-    const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [editbutton,savebutton]);
+    const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [
+        editbutton,
+        savebutton,
+    ]);
     block.push(actionBlock);
     return block;
 }

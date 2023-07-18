@@ -9,11 +9,11 @@ import {
 
 //functions needed to persist board data while modal and other UI interactions
 
-export const storeBoardName = async (
+export const storeBoardRecord = async (
     persistence: IPersistence,
     userId: string,
     roomId: string,
-    boardname: [string]
+    boardId: string
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
@@ -24,13 +24,13 @@ export const storeBoardName = async (
         {
             userId: userId,
             roomId: roomId,
-            boardname: boardname,
+            board: { boardId, elements: [], files: {} },
         },
         true
     );
 };
 
-export const getBoardName = async (
+export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
     userId: string
 ): Promise<any> => {
