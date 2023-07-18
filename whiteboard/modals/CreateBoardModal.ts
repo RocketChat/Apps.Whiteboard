@@ -60,11 +60,11 @@ export async function CreateBoardModal({
     );
 
     const value = {
-        id: ModalsEnum.CREATE_BOARD_MODAL,
+        id: ModalsEnum.NEW_BOARD_MODAL,
         type: UIKitSurfaceType.MODAL,
         title:{
             type:'plain_text' as const,
-            text:ModalsEnum.CREATE_BOARD_TITLE
+            text:ModalsEnum.NEW_BOARD_TITLE
         },
         close:closeButton,
         submit:submitButton,

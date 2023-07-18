@@ -12,11 +12,11 @@ import { WhiteboardApp } from "../WhiteboardApp";
 import { CreateBoardModal } from "../modals/CreateBoardModal";
 import { AuthModal } from "../modals/AuthModal";
 import { helperMessage, sendMessage } from "./messages";
-import {
-    getAuthData,
-    clearAuthData,
-} from "../persistence/authorization";
+import { getAuthData, clearAuthData } from "../persistence/authorization";
 import { DeleteBoardModal } from "../modals/DeleteBoardModal";
+import { ModalsEnum } from "../enum/Modals";
+import { PreviewBlock } from "../blocks/UtilityBlock";
+import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -113,39 +113,34 @@ export class CommandUtility implements ExecutorProps {
         return authStatus;
     }
 
-    private async handleCreateBoardCommand() {
-        const triggerId = this.context.getTriggerId();
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        const authStatus = await this.handleAuthStatus();
-        if (authStatus === true) {
-            if (triggerId) {
-                const modal = await CreateBoardModal({
-                    slashCommandContext: this.context,
-                    read: this.read,
-                    modify: this.modify,
-                    http: this.http,
-                    persistence: this.persistence,
-                });
+    private async handleNewBoardCommand({
+        context,
+        read,
+    }: WhiteboardSlashCommandContext) {
+        const app = (await read.getUserReader().getAppUser())!;
+        const appUser = context.getSender()!;
 
-                await Promise.all([
-                    this.modify.getUiController().openSurfaceView(
-                        modal,
-                        {
-                            triggerId,
-                        },
-                        this.context.getSender()
-                    ),
-                ]);
-            }
-        } else {
-            sendMessage(
-                this.modify,
-                this.room,
-                appSender,
-                "Please authenticate yourself first !!!"
+        const room = context.getRoom();
+        if (room) {
+            const previewBlock = await PreviewBlock(
+                appUser.username,
+                "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+                `whiteboard`,
+                "Excalidraw Whiteboard",
+                {
+                    width: 500,
+                    height: 500,
+                }
             );
+            await Promise.all([
+                sendMessage(
+                    this.modify,
+                    room,
+                    app,
+                    ` `,
+                    previewBlock
+                ),
+            ]);
         }
     }
 
@@ -192,7 +187,7 @@ export class CommandUtility implements ExecutorProps {
         await helperMessage(this.modify, this.room, appSender);
     }
 
-    public async resolveCommand() {
+    public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
             case "auth":
                 this.handleAuthCommand();
@@ -200,8 +195,8 @@ export class CommandUtility implements ExecutorProps {
             case "remove-auth":
                 await this.handleRemoveAuthCommand();
                 break;
-            case "create":
-                await this.handleCreateBoardCommand();
+            case "new":
+                await this.handleNewBoardCommand(context);
                 break;
             case "delete":
                 await this.handleDeleteBoardCommand();

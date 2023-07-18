@@ -14,7 +14,7 @@ import { sendNotification, sendMessage, sendLink } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { PreviewBlock } from "../blocks/PreviewBlock";
+import { PreviewBlock } from "../blocks/UtilityBlock";
 import { getIframe } from "../lib/get/getIframe";
 
 //This class will handle all the view submit interactions
@@ -35,92 +35,6 @@ export class ExecuteViewSubmitHandler {
 
         try {
             switch (view.id) {
-                case ModalsEnum.CREATE_BOARD_MODAL:
-                    if (user.id && view.state) {
-                        //Use the persistence functions to store the room data
-                        const { roomId } = await getInteractionRoomData(
-                            this.read.getPersistenceReader(),
-                            user.id
-                        );
-                        if (roomId) {
-                            const room = await this.read
-                                .getRoomReader()
-                                .getById(roomId);
-                            const boardname =
-                                view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
-                                    ModalsEnum.BOARD_NAME_ACTION_ID
-                                ];
-
-                            if (room) {
-                                await storeBoardName(
-                                    this.persistence,
-                                    user.id,
-                                    roomId,
-                                    boardname
-                                );
-                                const createResult = await createBoard({
-                                    http: this.http,
-                                    modify: this.modify,
-                                    persistence: this.persistence,
-                                    read: this.read,
-                                    user: user,
-                                    room: roomId,
-                                    boardname: boardname,
-                                });
-                                if (createResult == "success") {
-                                    const iframe = await getIframe({
-                                        http: this.http,
-                                        boardname: boardname,
-                                    });
-                                    if (iframe) {
-                                        const url = iframe.url;
-                                        const content = iframe.iframeHtml;
-                                        if (url && content) {
-                                            const block = await PreviewBlock(
-                                                url,
-                                                `${boardname} Whiteboard`,
-                                                "Whiteboard Preview",
-                                                {
-                                                    width: 500,
-                                                    height: 500,
-                                                }
-                                            );
-                                            await Promise.all([
-                                                sendMessage(
-                                                    this.modify,
-                                                    room,
-                                                    AppSender,
-                                                    `**${boardname}** whiteboard created! by @${user.username}`
-                                                ),
-                                                sendLink(
-                                                    this.modify,
-                                                    room,
-                                                    AppSender,
-                                                    url,
-                                                ),
-                                            ]);
-                                        }
-                                    }
-                                } else if (createResult == "conflict") {
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${boardname}** whiteboard already exists!`
-                                    );
-                                } else {
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${boardname}** whiteboard creation failed! by @${user.username}`
-                                    );
-                                }
-                            }
-                        }
-                    }
-                    break;
-
                 case ModalsEnum.DELETE_BOARD_MODAL:
                     if (user.id && view.state) {
                         const { roomId } = await getInteractionRoomData(

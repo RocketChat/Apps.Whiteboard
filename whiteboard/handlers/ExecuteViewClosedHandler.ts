@@ -22,7 +22,7 @@ export class ExecuteViewClosedHandler {
 
         try {
             switch (view.id) {
-                case ModalsEnum.CREATE_BOARD_MODAL:
+                case ModalsEnum.NEW_BOARD_MODAL:
                     if (user.id) {
                         //Use the persistence functions to store the room data
                     }
