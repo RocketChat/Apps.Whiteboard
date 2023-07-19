@@ -32,20 +32,20 @@ export async function previewBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
-    const previewBlock = await getPreviewBlock(imageURL, title, boardURL,dimnesions);
-    block.push(previewBlock);
+    // const previewBlock = await getPreviewBlock(imageURL, title, boardURL,dimnesions);
+    // block.push(previewBlock);
 
-    const editbutton = await getButton(
-        "Edit Board",
-        "edit",
-        ModalsEnum.PREVIEW_BUTTON_ACTION_ID,
-        "Edit",
+    const openbutton = await getButton(
+        "Open Board",
+        "open",
+        ModalsEnum.OPEN_BUTTON_ACTION_ID,
+        "Open",
         ButtonStyle.PRIMARY,
         boardURL
     );
 
     const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [
-        editbutton,
+        openbutton,
     ]);
     block.push(actionBlock);
     return block;

@@ -7,6 +7,7 @@ import { IRoom, RoomType } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
 import { Block, TextObject } from "@rocket.chat/ui-kit";
+import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 
 export async function getDirect(
     read: IRead,
@@ -42,7 +43,7 @@ export async function sendMessage(
     room: IRoom,
     sender: IUser,
     message: string,
-    blocks?: Array<Block>
+    blocks?: Array<Block>,
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -50,7 +51,31 @@ export async function sendMessage(
         .setSender(sender)
         .setRoom(room)
         .setParseUrls(true)
-        .setText(message);
+        .setText(message)
+
+    if (blocks !== undefined) {
+        msg.setBlocks(blocks);
+    }
+
+    return await modify.getCreator().finish(msg);
+}
+
+export async function sendMessageWithAttachment(
+    modify: IModify,
+    room: IRoom,
+    sender: IUser,
+    message: string,
+    attachments: Array<IMessageAttachment>,
+    blocks?: Array<Block>,
+): Promise<string> {
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(sender)
+        .setRoom(room)
+        .setParseUrls(true)
+        .setText(message)
+        .setAttachments(attachments);
 
     if (blocks !== undefined) {
         msg.setBlocks(blocks);

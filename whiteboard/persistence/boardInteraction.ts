@@ -17,14 +17,14 @@ export const storeBoardRecord = async (
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
+        `${boardId}#BoardName`
     );
     await persistence.updateByAssociation(
         association,
         {
             userId: userId,
             roomId: roomId,
-            board: { boardId, elements: [], files: {} },
+            board: { boardId, elements: [], files: {}, state: {} },
         },
         true
     );
@@ -32,11 +32,11 @@ export const storeBoardRecord = async (
 
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
-    userId: string
+    boardId: string
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
+        `${boardId}#BoardName`
     );
     const result = (await persistenceRead.readByAssociation(
         association

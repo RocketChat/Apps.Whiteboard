@@ -11,7 +11,11 @@ import { ExecutorProps } from "../definitions/ExecutorProps";
 import { ExcalidrawEndpoint, WhiteboardApp } from "../WhiteboardApp";
 import { CreateBoardModal } from "../modals/CreateBoardModal";
 import { AuthModal } from "../modals/AuthModal";
-import { helperMessage, sendMessage } from "./messages";
+import {
+    helperMessage,
+    sendMessage,
+    sendMessageWithAttachment,
+} from "./messages";
 import { getAuthData, clearAuthData } from "../persistence/authorization";
 import { DeleteBoardModal } from "../modals/DeleteBoardModal";
 import { ModalsEnum } from "../enum/Modals";
@@ -22,6 +26,10 @@ import {
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "../utilts";
+import {
+    MessageActionType,
+    MessageProcessingType,
+} from "@rocket.chat/apps-engine/definition/messages";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -133,8 +141,12 @@ export class CommandUtility implements ExecutorProps {
         const boardEndpoint = endpoints[0];
         if (room) {
             const randomBoardId = randomId();
-            const boardURL=`${boardEndpoint.computedPath}?id=${randomBoardId}`;
-            console.log(boardURL);
+            const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
+            const baseUrl = await read
+                .getEnvironmentReader()
+                .getServerSettings()
+                .getValueById("Site_Url");
+
             const preview = await previewBlock(
                 appUser.username,
                 "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
@@ -147,8 +159,23 @@ export class CommandUtility implements ExecutorProps {
                     height: 316,
                 }
             );
+            const attachments = [
+                {
+                    collapsed: true,
+                    color: "#00000000",
+                    imageUrl:
+                        "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
+                },
+            ];
             await Promise.all([
-                sendMessage(this.modify, room, appUser, ``, preview),
+                sendMessageWithAttachment(
+                    this.modify,
+                    room,
+                    appUser,
+                    `Whiteboard created by @${sender.username}`,
+                    attachments,
+                    preview
+                ),
                 storeBoardRecord(
                     persistence,
                     appUser.id,
@@ -158,7 +185,7 @@ export class CommandUtility implements ExecutorProps {
             ]);
             const record = await getBoardRecord(
                 read.getPersistenceReader(),
-                appUser.id
+                randomBoardId
             );
             console.log(record);
         }

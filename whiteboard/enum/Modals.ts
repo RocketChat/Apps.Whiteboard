@@ -21,6 +21,7 @@ export enum ModalsEnum {
     PREVIEW_BLOCK_ID = "preview-block-id",
     PREVIEW_BLOCK_TITLE = "Whiteboard Preview",
     PREVIEW_BUTTON_ACTION_ID = "preview-button-action-id",
-    EDIT_BUTTON_ACTION_ID = "edit-button-action-id",
+    OPEN_BUTTON_ACTION_ID = "open-button-action-id",
     SAVE_BUTTON_ACTION_ID = "save-button-action-id",
+    RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
 }

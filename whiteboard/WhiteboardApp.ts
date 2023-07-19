@@ -33,9 +33,27 @@ import {
 import { Buffer } from "buffer";
 import { compressedString } from "./excalidraw";
 import { excalidrawContent } from "./excalidrawContent";
+import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
+    }
+
+    public async executeActionButtonHandler(
+        context: UIKitActionButtonInteractionContext,
+        read: IRead,
+        http: IHttp,
+        modify: IModify,
+        persistence: IPersistence
+    ): Promise<IUIKitResponse> {
+        const handler = new ExecuteActionButtonHandler(
+            this,
+            read,
+            http,
+            modify,
+            persistence
+        );
+        return await handler.run(context);
     }
 
     public async executeBlockActionHandler(
@@ -140,8 +158,34 @@ export class BundleJsEndpoint extends ApiEndpoint {
     }
 }
 
-export class UpdateBoardEndpoint extends ApiEndpoint{
-    public path = `board/:id/update`;
+export class GetBoardEndpoint extends ApiEndpoint {
+    public path = `board/get`;
+
+    public async get(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        console.log(request.content);
+        return {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content: {
+                success: true,
+            },
+        };
+    }
+}
+
+export class UpdateBoardEndpoint extends ApiEndpoint {
+    public path = `board/update`;
 
     public async post(
         request: IApiRequest,
@@ -151,14 +195,16 @@ export class UpdateBoardEndpoint extends ApiEndpoint{
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-
-
+        console.log(request.content);
         return {
             status: 200,
             headers: {
-                "Content-Type": "text/html",
+                "Content-Type": "application/json",
                 "Content-Security-Policy":
                     "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content: {
+                success: true,
             },
         };
     }
