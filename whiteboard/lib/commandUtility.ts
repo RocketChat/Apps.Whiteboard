@@ -8,19 +8,20 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { ExecutorProps } from "../definitions/ExecutorProps";
-import { WhiteboardApp } from "../WhiteboardApp";
+import { ExcalidrawEndpoint, WhiteboardApp } from "../WhiteboardApp";
 import { CreateBoardModal } from "../modals/CreateBoardModal";
 import { AuthModal } from "../modals/AuthModal";
 import { helperMessage, sendMessage } from "./messages";
 import { getAuthData, clearAuthData } from "../persistence/authorization";
 import { DeleteBoardModal } from "../modals/DeleteBoardModal";
 import { ModalsEnum } from "../enum/Modals";
-import { PreviewBlock } from "../blocks/UtilityBlock";
+import { previewBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
     getBoardRecord,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
+import { randomId } from "../utilts";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
@@ -118,31 +119,36 @@ export class CommandUtility implements ExecutorProps {
     }
 
     private async handleNewBoardCommand({
+        app,
         context,
         read,
         modify,
         http,
         persistence,
     }: WhiteboardSlashCommandContext) {
-        const app = (await read.getUserReader().getAppUser())!;
-        const appUser = context.getSender()!;
-
+        const appUser = (await read.getUserReader().getAppUser())!;
+        const sender = context.getSender()!;
         const room = context.getRoom();
+        const endpoints = app.getAccessors().providedApiEndpoints;
+        const boardEndpoint = endpoints[0];
         if (room) {
-            const randomBoardId = Date.now().toString(36);
-            const previewBlock = await PreviewBlock(
+            const randomBoardId = randomId();
+            const boardURL=`${boardEndpoint.computedPath}?id=${randomBoardId}`;
+            console.log(boardURL);
+            const preview = await previewBlock(
                 appUser.username,
                 "https://images.unsplash.com/photo-1444464666168-49d633b86797?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxzZWFyY2h8Mnx8YmlyZHxlbnwwfHwwfHx8MA%3D%3D&w=1000&q=80",
-                `Whiteboard Preview`,
-                "Excalidraw Whiteboard",
+                `Untitled Whiteboard`,
+                boardURL,
                 randomBoardId,
+
                 {
                     width: 500,
                     height: 316,
                 }
             );
             await Promise.all([
-                sendMessage(this.modify, room, app, ` `, previewBlock),
+                sendMessage(this.modify, room, appUser, ``, preview),
                 storeBoardRecord(
                     persistence,
                     appUser.id,

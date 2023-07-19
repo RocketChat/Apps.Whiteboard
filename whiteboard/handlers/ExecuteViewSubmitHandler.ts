@@ -13,7 +13,6 @@ import { sendNotification, sendMessage } from "../lib/messages";
 import { AppEnum } from "../enum/App";
 import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { PreviewBlock } from "../blocks/UtilityBlock";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {

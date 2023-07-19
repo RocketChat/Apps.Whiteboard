@@ -87,13 +87,14 @@ export class WhiteboardApp extends App {
             security: ApiSecurity.UNSECURE,
             endpoints: [
                 new ExcalidrawEndpoint(this),
+                new UpdateBoardEndpoint(this),
                 new BundleJsEndpoint(this),
             ],
         });
     }
 }
 export class ExcalidrawEndpoint extends ApiEndpoint {
-    public path = `/board/:id`;
+    public path = `board`;
 
     public async get(
         request: IApiRequest,
@@ -135,6 +136,30 @@ export class BundleJsEndpoint extends ApiEndpoint {
                 "Content-Encoding": "br",
             },
             content,
+        };
+    }
+}
+
+export class UpdateBoardEndpoint extends ApiEndpoint{
+    public path = `board/:id/update`;
+
+    public async post(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+
+
+        return {
+            status: 200,
+            headers: {
+                "Content-Type": "text/html",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
         };
     }
 }

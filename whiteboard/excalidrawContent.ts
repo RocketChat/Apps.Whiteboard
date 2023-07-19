@@ -17,6 +17,6 @@ export const excalidrawContent=`<!DOCTYPE html>
 </head>
 <body>
     <div id="root"></div>
-    <script src="http://localhost:3000/api/apps/public/c986f058-d8d5-496f-9c1c-06e39a95b229/bundle.js"></script>
+    <script src="bundle.js"></script>
 </body>
 </html>`

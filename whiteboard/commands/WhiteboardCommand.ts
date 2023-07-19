@@ -12,6 +12,7 @@ import { WhiteboardApp } from "../WhiteboardApp";
 import { CommandUtility } from "../lib/commandUtility";
 
 export interface WhiteboardSlashCommandContext {
+    app: WhiteboardApp;
     context: SlashCommandContext;
     read: IRead;
     modify: IModify;
@@ -54,6 +55,7 @@ export class WhiteboardCommand implements ISlashCommand {
         });
 
         await commandUtility.resolveCommand({
+            app: this.app,
             context,
             read,
             modify,

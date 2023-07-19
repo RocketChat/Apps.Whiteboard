@@ -19,11 +19,11 @@ import {
 } from "@rocket.chat/ui-kit";
 import { ModalsEnum } from "../enum/Modals";
 
-export async function PreviewBlock(
+export async function previewBlock(
     username: string,
-    url: string,
+    imageURL: string,
     title: string,
-    description: string,
+    boardURL: string,
     randomBoardId: string,
     dimnesions: {
         width: number;
@@ -32,12 +32,7 @@ export async function PreviewBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
-    const previewBlock = await getPreviewBlock(
-        url,
-        title,
-        description,
-        dimnesions
-    );
+    const previewBlock = await getPreviewBlock(imageURL, title, boardURL,dimnesions);
     block.push(previewBlock);
 
     const editbutton = await getButton(
@@ -46,20 +41,11 @@ export async function PreviewBlock(
         ModalsEnum.PREVIEW_BUTTON_ACTION_ID,
         "Edit",
         ButtonStyle.PRIMARY,
-        `http://localhost:3000/api/apps/public/c986f058-d8d5-496f-9c1c-06e39a95b229/board/${randomBoardId}`
-    );
-
-    const savebutton = await getButton(
-        "Save Board",
-        "save",
-        ModalsEnum.PREVIEW_BUTTON_ACTION_ID,
-        "Save",
-        ButtonStyle.DANGER
+        boardURL
     );
 
     const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [
         editbutton,
-        savebutton,
     ]);
     block.push(actionBlock);
     return block;

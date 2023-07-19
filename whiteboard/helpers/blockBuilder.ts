@@ -177,7 +177,7 @@ export async function getActionsBlock(
 export async function getPreviewBlock(
     url: string,
     title: string,
-    description: string,
+    boardURL: string,
     dimensions?: {
         width: number;
         height: number;
@@ -198,14 +198,9 @@ export async function getPreviewBlock(
                 text: title,
             },
         ],
-        description: [
-            {
-                type: "plain_text",
-                text: description,
-            },
-        ],
-        externalUrl: url,
-        oembedUrl: url,
+        description: [],
+        externalUrl: boardURL,
+        oembedUrl: boardURL,
         thumb: undefined,
     };
     return block;
