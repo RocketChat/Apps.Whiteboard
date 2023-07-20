@@ -1,76 +1,140 @@
 import { Excalidraw, WelcomeScreen } from "@excalidraw/excalidraw";
-import { useEffect, useState } from "react";
+import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
+import {
+  AppState,
+  BinaryFiles,
+  ExcalidrawAPIRefValue,
+  ExcalidrawImperativeAPI,
+} from "@excalidraw/excalidraw/types/types";
+import { useEffect, useState, useRef, useMemo, Ref } from "react";
+import debounce from "lodash.debounce";
+
+export interface BoardData {
+  boardId: string;
+  boardData: {
+    elements: readonly ExcalidrawElement[];
+    appState: AppState;
+    files: BinaryFiles;
+  };
+  cover: string;
+  title: string;
+}
+
+function getBoardData(baseURL: string, boardId: string) {
+  return fetch(`${baseURL}/board/get?id=${boardId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+  }).then((res) => res.json());
+}
+
+async function postBoardData(baseURL: string, board: BoardData) {
+//   const { boardData: board, boardId } = boardData
+//   const resp = await getBoardData(baseURL, boardId);
+//   const { boardData: remoteBoard } = resp.data
+
+//   const remoteElements = Array.isArray(remoteBoard?.elements)
+//     ? remoteBoard!.elements
+//     : [];
+//   const elements = reconcileElements(
+//     board.elements,
+//     remoteElements,
+//     localAppState
+//   );
+//   const files = Object.assign({}, board.files, remoteBoard?.files);
+//   const result = await Services.get("board").saveBoard({
+//     ...board,
+//     elements,
+//     files,
+//   });
+
+  fetch(`${baseURL}/board/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+    body: JSON.stringify(board),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log("Update Data Success", data));
+}
+
+const createOnChange = (baseURL: string, boardId: string) =>
+  debounce(
+    (
+      elements: readonly ExcalidrawElement[],
+      state: AppState,
+      files: BinaryFiles
+    ) => {
+      console.log({
+        boardId,
+        boardData: { elements, appState: state, files },
+        cover: "",
+        title: "",
+      });
+      postBoardData(baseURL, {
+        boardId,
+        boardData: { elements, appState: state, files },
+        cover: "",
+        title: "",
+      });
+    },
+    1000
+  );
+
+const resolvablePromise = () => {
+  let resolve;
+  let reject;
+  const promise = new Promise((_resolve, _reject) => {
+    resolve = _resolve;
+    reject = _reject;
+  });
+  (promise as any).resolve = resolve;
+  (promise as any).reject = reject;
+  return promise;
+};
 
 function App() {
   const fullURL = window.location.href;
   const urlParams = new URLSearchParams(window.location.search);
-  const boardId = urlParams.get("id");
-
+  const boardId = urlParams.get("id") ?? "";
   const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
-
-  const [boardData, setBoardData] = useState<any>(null);
+  const [excalidrawAPI, setExcalidrawAPI] =
+    useState<ExcalidrawAPIRefValue | null>(null);
 
   useEffect(() => {
-    getBoardData();
-  }, []);
-
-  function saveBoardData(elements: any, state: any, files: any) {
-    setBoardData(elements);
-  }
-
-  function postBoardData() {
-    console.log(boardData);
-    if (boardData) {
-      fetch(`${baseURL}/board/update`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          "Content-Security-Policy": "default-src 'self'",
-        },
-        body: JSON.stringify({
-          boardId: boardId,
-          boardData: boardData,
-        }),
-      })
-        .then((res) => res.json())
-        .then((data) => console.log(data));
-    }
-  }
-
-  function getBoardData() {
-    fetch(`${baseURL}/board/get`, {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-        "Content-Security-Policy": "default-src 'self'",
-      },
-    })
-      .then((res) => res.json())
-      .then((data) => {
-        console.log(data);
-        setBoardData(data);
+    console.log("excalidrawAPI updated", excalidrawAPI);
+    if (excalidrawAPI != null) {
+      getBoardData(baseURL, boardId).then((resp) => {
+        const { boardData } = resp.data;
+        console.log({
+          excalidrawAPI,
+          boardData,
+        });
+        (window as any).excalidrawAPI = excalidrawAPI;
+        (excalidrawAPI as any)?.updateScene({
+          ...boardData,
+          collaborators: [],
+          commitHistory: true,
+        });
       });
-  }
-
-  useEffect(() => {
-    const timer = setTimeout(() => {
-      postBoardData();
-    }, 1000);
-    return () => clearTimeout(timer);
-  }, [boardData]);
+    }
+  }, [excalidrawAPI]);
 
   return (
-    <>
-      <div className="main-Excalidraw">
-        <Excalidraw
-          onChange={(elements, state, files) =>
-            saveBoardData(elements, state, files)
-          }
-        >
-          <WelcomeScreen />
-        </Excalidraw>
-      </div>
-    </>
+    <div className="main-Excalidraw">
+      <Excalidraw
+        ref={(api) => setExcalidrawAPI(api)}
+        onChange={createOnChange(baseURL, boardId)}
+      >
+        <WelcomeScreen />
+      </Excalidraw>
+    </div>
   );
 }
 

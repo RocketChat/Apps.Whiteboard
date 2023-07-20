@@ -180,14 +180,14 @@ export class CommandUtility implements ExecutorProps {
                     persistence,
                     appUser.id,
                     room.id,
-                    randomBoardId
+                    randomBoardId,
+                    {
+                        elements: [],
+                        appState: {},
+                        files: [],
+                    }
                 ),
             ]);
-            const record = await getBoardRecord(
-                read.getPersistenceReader(),
-                randomBoardId
-            );
-            console.log(record);
         }
     }
 

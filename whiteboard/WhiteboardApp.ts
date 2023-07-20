@@ -34,6 +34,10 @@ import { Buffer } from "buffer";
 import { compressedString } from "./excalidraw";
 import { excalidrawContent } from "./excalidrawContent";
 import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
+import {
+    getBoardRecord,
+    storeBoardRecord,
+} from "./persistence/boardInteraction";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -107,6 +111,7 @@ export class WhiteboardApp extends App {
                 new ExcalidrawEndpoint(this),
                 new UpdateBoardEndpoint(this),
                 new BundleJsEndpoint(this),
+                new GetBoardEndpoint(this),
             ],
         });
     }
@@ -169,7 +174,14 @@ export class GetBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log(request.content);
+        const boardId = request.query.id;
+
+        const boardData = await getBoardRecord(
+            read.getPersistenceReader(),
+            boardId
+        );
+        console.log("Get request id and data", request.query.id);
+        const { id, ...rest } = boardData;
         return {
             status: 200,
             headers: {
@@ -178,6 +190,10 @@ export class GetBoardEndpoint extends ApiEndpoint {
                     "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
             },
             content: {
+                data: {
+                    ...rest,
+                    boardId: id,
+                },
                 success: true,
             },
         };
@@ -195,8 +211,16 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log(request.content);
-        return {
+        console.log("Update", request.content);
+
+        const boardId = request.content.boardId;
+        const boardData = request.content.boardData;
+        const userId = request.content.userId;
+        const roomId = request.content.roomId;
+
+        await storeBoardRecord(persis, userId, roomId, boardId, boardData);
+
+        return this.json({
             status: 200,
             headers: {
                 "Content-Type": "application/json",
@@ -206,6 +230,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             content: {
                 success: true,
             },
-        };
+        });
     }
 }
