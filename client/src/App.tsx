@@ -63,7 +63,7 @@ async function postBoardData(baseURL: string, board: BoardData) {
   })
     .then((res) => res.json())
     .then((data) => console.log("Update Data Success", data));
-}
+} 
 
 const createOnChange = (baseURL: string, boardId: string) =>
   debounce(
@@ -85,32 +85,20 @@ const createOnChange = (baseURL: string, boardId: string) =>
       });
 
       const svg = exportToSvgResult.outerHTML;
-      const blob = new Blob([svg], { type: "image/svg+xml" });
-      const url = URL.createObjectURL(blob);
 
-      console.log(url);
+      const svgBase64 = btoa(svg);
+      const svgBase64String = `data:image/svg+xml;base64,${svgBase64}`;
+      console.log("svgBase64String", svgBase64String);
 
       postBoardData(baseURL, {
         boardId,
         boardData: { elements, appState: state, files },
-        cover: url,
+        cover: svgBase64String,
         title: "",
       });
     },
     1000
   );
-
-// const resolvablePromise = () => {
-//   let resolve;
-//   let reject;
-//   const promise = new Promise((_resolve, _reject) => {
-//     resolve = _resolve;
-//     reject = _reject;
-//   });
-//   (promise as any).resolve = resolve;
-//   (promise as any).reject = reject;
-//   return promise;
-// };
 
 function App() {
   const fullURL = window.location.href;

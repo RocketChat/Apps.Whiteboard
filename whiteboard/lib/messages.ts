@@ -65,7 +65,7 @@ export async function sendMessageWithAttachment(
     room: IRoom,
     sender: IUser,
     message: string,
-    attachments: Array<IMessageAttachment>,
+    attachments?: Array<IMessageAttachment>,
     blocks?: Array<Block>,
 ): Promise<string> {
     const msg = modify
@@ -75,8 +75,10 @@ export async function sendMessageWithAttachment(
         .setRoom(room)
         .setParseUrls(true)
         .setText(message)
-        .setAttachments(attachments);
 
+    if (attachments !== undefined) {
+        msg.setAttachments(attachments);
+    }
     if (blocks !== undefined) {
         msg.setBlocks(blocks);
     }

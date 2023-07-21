@@ -15,6 +15,7 @@ export const storeBoardRecord = async (
     roomId: string,
     boardId: string,
     boardData: any,
+    messageId:string,
     cover: string,
     title: string
 ): Promise<void> => {
@@ -33,6 +34,7 @@ export const storeBoardRecord = async (
                 appState: boardData.appState,
                 files: boardData.files,
             },
+            messageId,
             cover,
             title,
         },
@@ -53,3 +55,4 @@ export const getBoardRecord = async (
     )) as Array<any>;
     return result && result.length ? result[0] : null;
 };
+

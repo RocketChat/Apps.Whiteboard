@@ -7,6 +7,7 @@ import {
     IModify,
     IPersistence,
     IRead,
+    IPersistenceRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
@@ -38,6 +39,9 @@ import {
     getBoardRecord,
     storeBoardRecord,
 } from "./persistence/boardInteraction";
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
+import { sendMessageWithAttachment } from "./lib/messages";
+import { previewBlock } from "./blocks/UtilityBlock";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -180,7 +184,6 @@ export class GetBoardEndpoint extends ApiEndpoint {
             read.getPersistenceReader(),
             boardId
         );
-        console.log("Get request id and data", request.query.id);
         const { id, ...rest } = boardData;
         return {
             status: 200,
@@ -211,8 +214,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log("Update", request.content);
-
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
@@ -220,16 +221,37 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const userId = request.content.userId;
         const roomId = request.content.roomId;
 
+        console.log("cover", cover);
+        const boardata = await getBoardRecord(
+            read.getPersistenceReader(),
+            boardId
+        );
+        const msgId = boardata.messageId;
+
         await storeBoardRecord(
             persis,
             userId,
             roomId,
             boardId,
             boardData,
+            msgId,
             cover,
             title
         );
-        const previewBlockMessage =modify.getUpdater();
+        const user = await read.getUserReader().getById(userId);
+
+        const previewMsg = (await modify.getUpdater().message(msgId, user))
+            .setEditor(user)
+            .setAttachments([
+                {
+                    collapsed: true,
+                    color: "#00000000",
+                    imageUrl: cover,
+                },
+            ]);
+
+        const attachments = previewMsg.getMessage().attachments;
+        console.log("previewMsg", attachments);
 
         return this.json({
             status: 200,
