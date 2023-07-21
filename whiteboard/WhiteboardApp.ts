@@ -227,7 +227,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             boardId
         );
         const msgId = boardata.messageId;
-
         await storeBoardRecord(
             persis,
             userId,
@@ -239,19 +238,29 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             title
         );
         const user = await read.getUserReader().getById(userId);
+        const room = await read.getRoomReader().getById(roomId);
 
-        const previewMsg = (await modify.getUpdater().message(msgId, user))
-            .setEditor(user)
-            .setAttachments([
-                {
-                    collapsed: true,
-                    color: "#00000000",
-                    imageUrl: cover,
-                },
-            ]);
-
-        const attachments = previewMsg.getMessage().attachments;
-        console.log("previewMsg", attachments);
+        if (room) {
+            const previewMsg = (await modify.getUpdater().message(msgId, user))
+                .setSender(user)
+                .setRoom(room)
+                .setEditor(user)
+                .setBlocks(
+                    await previewBlock(
+                        user.username,
+                        cover,
+                        title,
+                        `https://whiteboard.rocket.chat/board/${boardId}`,
+                        boardId,
+                        {
+                            width: 400,
+                            height: 200,
+                        }
+                    )
+                );
+            const attachments = previewMsg.getMessage().attachments;
+            console.log("previewMsg", attachments);
+        }
 
         return this.json({
             status: 200,

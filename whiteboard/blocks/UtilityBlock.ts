@@ -3,6 +3,7 @@ import {
     getPreviewBlock,
     getButton,
     getActionsBlock,
+    getContextBlock,
 } from "../helpers/blockBuilder";
 import {
     ActionsBlock,
@@ -32,19 +33,34 @@ export async function previewBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
-    // const previewBlock = await getPreviewBlock(imageURL, title, boardURL,dimnesions);
-    // block.push(previewBlock);
+    const previewBlock = await getPreviewBlock(
+        imageURL,
+        title,
+        boardURL,
+        dimnesions
+    );
+    block.push(previewBlock);
 
     const openbutton = await getButton(
-        "Open Board",
-        "open",
+        "Edit Board",
+        "edit",
         ModalsEnum.OPEN_BUTTON_ACTION_ID,
         "Open",
         ButtonStyle.PRIMARY,
         boardURL
     );
 
+    const renameButton = await getButton(
+        "Rename Board",
+        "edit",
+        ModalsEnum.OPEN_BUTTON_ACTION_ID,
+        "Open",
+        undefined,
+        boardURL
+    );
+
     const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [
+        renameButton,
         openbutton,
     ]);
     block.push(actionBlock);
