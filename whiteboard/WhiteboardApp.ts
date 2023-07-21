@@ -201,7 +201,7 @@ export class GetBoardEndpoint extends ApiEndpoint {
 }
 
 export class UpdateBoardEndpoint extends ApiEndpoint {
-    public path = `board/update`;
+    public path = `board/update/*`;
 
     public async post(
         request: IApiRequest,
@@ -215,10 +215,21 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
 
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
+        const cover = request.content.cover;
+        const title = request.content.title;
         const userId = request.content.userId;
         const roomId = request.content.roomId;
 
-        await storeBoardRecord(persis, userId, roomId, boardId, boardData);
+        await storeBoardRecord(
+            persis,
+            userId,
+            roomId,
+            boardId,
+            boardData,
+            cover,
+            title
+        );
+        const previewBlockMessage =modify.getUpdater();
 
         return this.json({
             status: 200,

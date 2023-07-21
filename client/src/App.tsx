@@ -8,6 +8,7 @@ import {
 } from "@excalidraw/excalidraw/types/types";
 import { useEffect, useState, useRef, useMemo, Ref } from "react";
 import debounce from "lodash.debounce";
+import { exportToSvg } from "@excalidraw/excalidraw";
 
 export interface BoardData {
   boardId: string;
@@ -32,26 +33,26 @@ function getBoardData(baseURL: string, boardId: string) {
 }
 
 async function postBoardData(baseURL: string, board: BoardData) {
-//   const { boardData: board, boardId } = boardData
-//   const resp = await getBoardData(baseURL, boardId);
-//   const { boardData: remoteBoard } = resp.data
+  //   const { boardData: board, boardId } = boardData
+  //   const resp = await getBoardData(baseURL, boardId);
+  //   const { boardData: remoteBoard } = resp.data
 
-//   const remoteElements = Array.isArray(remoteBoard?.elements)
-//     ? remoteBoard!.elements
-//     : [];
-//   const elements = reconcileElements(
-//     board.elements,
-//     remoteElements,
-//     localAppState
-//   );
-//   const files = Object.assign({}, board.files, remoteBoard?.files);
-//   const result = await Services.get("board").saveBoard({
-//     ...board,
-//     elements,
-//     files,
-//   });
+  //   const remoteElements = Array.isArray(remoteBoard?.elements)
+  //     ? remoteBoard!.elements
+  //     : [];
+  //   const elements = reconcileElements(
+  //     board.elements,
+  //     remoteElements,
+  //     localAppState
+  //   );
+  //   const files = Object.assign({}, board.files, remoteBoard?.files);
+  //   const result = await Services.get("board").saveBoard({
+  //     ...board,
+  //     elements,
+  //     files,
+  //   });
 
-  fetch(`${baseURL}/board/update`, {
+  fetch(`${baseURL}/board/update/`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -66,7 +67,7 @@ async function postBoardData(baseURL: string, board: BoardData) {
 
 const createOnChange = (baseURL: string, boardId: string) =>
   debounce(
-    (
+    async (
       elements: readonly ExcalidrawElement[],
       state: AppState,
       files: BinaryFiles
@@ -77,27 +78,39 @@ const createOnChange = (baseURL: string, boardId: string) =>
         cover: "",
         title: "",
       });
+      const exportToSvgResult = await exportToSvg({
+        elements,
+        appState: state,
+        files,
+      });
+
+      const svg = exportToSvgResult.outerHTML;
+      const blob = new Blob([svg], { type: "image/svg+xml" });
+      const url = URL.createObjectURL(blob);
+
+      console.log(url);
+
       postBoardData(baseURL, {
         boardId,
         boardData: { elements, appState: state, files },
-        cover: "",
+        cover: url,
         title: "",
       });
     },
     1000
   );
 
-const resolvablePromise = () => {
-  let resolve;
-  let reject;
-  const promise = new Promise((_resolve, _reject) => {
-    resolve = _resolve;
-    reject = _reject;
-  });
-  (promise as any).resolve = resolve;
-  (promise as any).reject = reject;
-  return promise;
-};
+// const resolvablePromise = () => {
+//   let resolve;
+//   let reject;
+//   const promise = new Promise((_resolve, _reject) => {
+//     resolve = _resolve;
+//     reject = _reject;
+//   });
+//   (promise as any).resolve = resolve;
+//   (promise as any).reject = reject;
+//   return promise;
+// };
 
 function App() {
   const fullURL = window.location.href;
