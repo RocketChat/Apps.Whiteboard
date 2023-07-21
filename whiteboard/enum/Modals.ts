@@ -1,5 +1,5 @@
 export enum ModalsEnum {
-    CREATE_BOARD_MODAL = "create-board-modal",
+    NEW_BOARD_MODAL = "new-board-modal",
     BOARD_INPUT_BLOCK_ID = "board-input-block-id",
     BOARD_INPUT_LABEL = "Board Name",
     BOARD_NAME_ACTION_ID = "board-name-action-id",
@@ -12,7 +12,7 @@ export enum ModalsEnum {
     CLOSE = "Close",
     CLOSE_ACTION_ID = "close-action-id",
     CLOSE_BLOCK_ID = "close-block-id",
-    CREATE_BOARD_TITLE = "Create Whiteboard",
+    NEW_BOARD_TITLE = "Create New Whiteboard",
     AUTH_LABEL = "Do you want to authorize this app to use your account details?",
     AUTH_MODAL = "auth-modal",
     AUTH_TITLE = "Authorization",
@@ -20,4 +20,8 @@ export enum ModalsEnum {
     DELETE_BOARD_MODAL = "delete-board-modal",
     PREVIEW_BLOCK_ID = "preview-block-id",
     PREVIEW_BLOCK_TITLE = "Whiteboard Preview",
+    PREVIEW_BUTTON_ACTION_ID = "preview-button-action-id",
+    OPEN_BUTTON_ACTION_ID = "open-button-action-id",
+    SAVE_BUTTON_ACTION_ID = "save-button-action-id",
+    RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
 }

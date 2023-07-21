@@ -9,37 +9,50 @@ import {
 
 //functions needed to persist board data while modal and other UI interactions
 
-export const storeBoardName = async (
+export const storeBoardRecord = async (
     persistence: IPersistence,
     userId: string,
     roomId: string,
-    boardname: [string]
+    boardId: string,
+    boardData: any,
+    messageId:string,
+    cover: string,
+    title: string
 ): Promise<void> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
+        `${boardId}#BoardName`
     );
     await persistence.updateByAssociation(
         association,
         {
             userId: userId,
             roomId: roomId,
-            boardname: boardname,
+            id: boardId,
+            boardData:{
+                elements: boardData.elements,
+                appState: boardData.appState,
+                files: boardData.files,
+            },
+            messageId,
+            cover,
+            title,
         },
         true
     );
 };
 
-export const getBoardName = async (
+export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
-    userId: string
+    boardId: string
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
-        `${userId}#BoardName`
+        `${boardId}#BoardName`
     );
     const result = (await persistenceRead.readByAssociation(
         association
     )) as Array<any>;
     return result && result.length ? result[0] : null;
 };
+

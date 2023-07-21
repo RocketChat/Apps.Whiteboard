@@ -11,6 +11,15 @@ import {
 import { WhiteboardApp } from "../WhiteboardApp";
 import { CommandUtility } from "../lib/commandUtility";
 
+export interface WhiteboardSlashCommandContext {
+    app: WhiteboardApp;
+    context: SlashCommandContext;
+    read: IRead;
+    modify: IModify;
+    http: IHttp;
+    persistence: IPersistence;
+}
+
 export class WhiteboardCommand implements ISlashCommand {
     public constructor(private readonly app: WhiteboardApp) {}
     public command = "whiteboard";
@@ -45,6 +54,13 @@ export class WhiteboardCommand implements ISlashCommand {
             app: this.app,
         });
 
-        await commandUtility.resolveCommand();
+        await commandUtility.resolveCommand({
+            app: this.app,
+            context,
+            read,
+            modify,
+            http,
+            persistence,
+        });
     }
 }

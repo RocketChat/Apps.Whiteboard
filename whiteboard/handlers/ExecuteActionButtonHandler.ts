@@ -7,11 +7,11 @@ import {
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
     IUIKitResponse,
-    UIKitBlockInteractionContext,
+    UIKitActionButtonInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ModalsEnum } from "../enum/Modals";
 
-export class ExecuteBlockActionHandler {
+export class ExecuteActionButtonHandler {
     constructor(
         private readonly app: WhiteboardApp,
         private readonly read: IRead,
@@ -20,15 +20,15 @@ export class ExecuteBlockActionHandler {
         private readonly persistence: IPersistence
     ) {}
     public async run(
-        context: UIKitBlockInteractionContext
+        context: UIKitActionButtonInteractionContext
     ): Promise<IUIKitResponse> {
         const data = context.getInteractionData();
 
         try {
-            const { blockId, user, actionId } = data;
+            const { actionId, user } = data;
             switch (actionId) {
-                case ModalsEnum.PREVIEW_BUTTON_ACTION_ID:
-                    console.log("Preview block clicked");
+                case ModalsEnum.RENAME_BUTTON_ACTION_ID:
+                    console.log("RENAME BUTTON CLICKED");
                     return context.getInteractionResponder().successResponse();
                 default:
                     return context.getInteractionResponder().successResponse();

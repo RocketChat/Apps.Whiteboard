@@ -7,6 +7,7 @@ import {
     IModify,
     IPersistence,
     IRead,
+    IPersistenceRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
@@ -16,8 +17,9 @@ import {
     UIKitViewSubmitInteractionContext,
     UIKitViewCloseInteractionContext,
     UIKitBlockInteractionContext,
+    IUIKitResponse,
+    UIKitActionButtonInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import { ExecuteViewClosedHandler } from "./handlers/ExecuteViewClosedHandler";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 import {
     ApiSecurity,
@@ -32,27 +34,34 @@ import {
 import { Buffer } from "buffer";
 import { compressedString } from "./excalidraw";
 import { excalidrawContent } from "./excalidrawContent";
-
+import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
+import {
+    getBoardRecord,
+    storeBoardRecord,
+} from "./persistence/boardInteraction";
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
+import { sendMessageWithAttachment } from "./lib/messages";
+import { previewBlock } from "./blocks/UtilityBlock";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
     }
 
-    public async executeViewClosedHandler(
-        context: UIKitViewCloseInteractionContext,
+    public async executeActionButtonHandler(
+        context: UIKitActionButtonInteractionContext,
         read: IRead,
         http: IHttp,
         modify: IModify,
         persistence: IPersistence
-    ) {
-        const handler = new ExecuteViewClosedHandler(
+    ): Promise<IUIKitResponse> {
+        const handler = new ExecuteActionButtonHandler(
             this,
             read,
             http,
             modify,
             persistence
         );
-        await handler.run(context);
+        return await handler.run(context);
     }
 
     public async executeBlockActionHandler(
@@ -61,7 +70,7 @@ export class WhiteboardApp extends App {
         http: IHttp,
         modify: IModify,
         persistence: IPersistence
-    ) {
+    ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
             this,
             read,
@@ -69,7 +78,7 @@ export class WhiteboardApp extends App {
             modify,
             persistence
         );
-        await handler.run(context);
+        return await handler.run(context);
     }
 
     public async executeViewSubmitHandler(
@@ -104,13 +113,15 @@ export class WhiteboardApp extends App {
             security: ApiSecurity.UNSECURE,
             endpoints: [
                 new ExcalidrawEndpoint(this),
+                new UpdateBoardEndpoint(this),
                 new BundleJsEndpoint(this),
+                new GetBoardEndpoint(this),
             ],
         });
     }
 }
 export class ExcalidrawEndpoint extends ApiEndpoint {
-    public path = "excalidraw";
+    public path = `board`;
 
     public async get(
         request: IApiRequest,
@@ -125,7 +136,8 @@ export class ExcalidrawEndpoint extends ApiEndpoint {
             status: 200,
             headers: {
                 "Content-Type": "text/html",
-                "Content-Security-Policy": "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
             },
             content,
         };
@@ -151,7 +163,106 @@ export class BundleJsEndpoint extends ApiEndpoint {
                 "Content-Encoding": "br",
             },
             content,
-
         };
+    }
+}
+
+export class GetBoardEndpoint extends ApiEndpoint {
+    public path = `board/get`;
+
+    public async get(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        const boardId = request.query.id;
+
+        const boardData = await getBoardRecord(
+            read.getPersistenceReader(),
+            boardId
+        );
+        const { id, ...rest } = boardData;
+        return {
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content: {
+                data: {
+                    ...rest,
+                    boardId: id,
+                },
+                success: true,
+            },
+        };
+    }
+}
+
+export class UpdateBoardEndpoint extends ApiEndpoint {
+    public path = `board/update/*`;
+
+    public async post(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        const boardId = request.content.boardId;
+        const boardData = request.content.boardData;
+        const cover = request.content.cover;
+        const title = request.content.title;
+        const userId = request.content.userId;
+        const roomId = request.content.roomId;
+
+        console.log("cover", cover);
+        const boardata = await getBoardRecord(
+            read.getPersistenceReader(),
+            boardId
+        );
+        const msgId = boardata.messageId;
+
+        await storeBoardRecord(
+            persis,
+            userId,
+            roomId,
+            boardId,
+            boardData,
+            msgId,
+            cover,
+            title
+        );
+        const user = await read.getUserReader().getById(userId);
+
+        const previewMsg = (await modify.getUpdater().message(msgId, user))
+            .setEditor(user)
+            .setAttachments([
+                {
+                    collapsed: true,
+                    color: "#00000000",
+                    imageUrl: cover,
+                },
+            ]);
+
+        const attachments = previewMsg.getMessage().attachments;
+        console.log("previewMsg", attachments);
+
+        return this.json({
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content: {
+                success: true,
+            },
+        });
     }
 }
