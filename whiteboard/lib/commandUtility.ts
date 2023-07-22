@@ -18,7 +18,7 @@ import {
 } from "./messages";
 import { getAuthData, clearAuthData } from "../persistence/authorization";
 import { DeleteBoardModal } from "../modals/DeleteBoardModal";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 import { previewBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
@@ -177,8 +177,6 @@ export class CommandUtility implements ExecutorProps {
             );
             storeBoardRecord(
                 persistence,
-                appUser.id,
-                room.id,
                 randomBoardId,
                 {
                     elements: [],

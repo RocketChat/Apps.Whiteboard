@@ -10,7 +10,7 @@ import {
     IUIKitSurfaceViewParam,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 import { Block,TextObject } from "@rocket.chat/ui-kit";
 import {
     getButton,
@@ -38,33 +38,33 @@ export async function CreateBoardModal({
     const block: Block[] = [];
 
     let boardInputBlock = await getInputBox(
-        ModalsEnum.BOARD_INPUT_LABEL,
-        ModalsEnum.BOARD_INPUT_PLACEHOLDER,
-        ModalsEnum.BOARD_INPUT_BLOCK_ID,
-        ModalsEnum.BOARD_NAME_ACTION_ID,
+        UtilityEnum.BOARD_INPUT_LABEL,
+        UtilityEnum.BOARD_INPUT_PLACEHOLDER,
+        UtilityEnum.BOARD_INPUT_BLOCK_ID,
+        UtilityEnum.BOARD_NAME_ACTION_ID,
         ""
     );
     block.push(boardInputBlock);
 
     let closeButton = await getButton(
-        ModalsEnum.CLOSE,
-        ModalsEnum.CLOSE_BLOCK_ID,
-        ModalsEnum.CLOSE_ACTION_ID,
+        UtilityEnum.CLOSE,
+        UtilityEnum.CLOSE_BLOCK_ID,
+        UtilityEnum.CLOSE_ACTION_ID,
         "danger"
     );
     let submitButton = await getButton(
-        ModalsEnum.SUBMIT,
-        ModalsEnum.SUBMIT_BLOCK_ID,
-        ModalsEnum.SUBMIT_ACTION_ID,
+        UtilityEnum.SUBMIT,
+        UtilityEnum.SUBMIT_BLOCK_ID,
+        UtilityEnum.SUBMIT_ACTION_ID,
         "primary"
     );
 
     const value = {
-        id: ModalsEnum.NEW_BOARD_MODAL,
+        id: UtilityEnum.NEW_BOARD_MODAL,
         type: UIKitSurfaceType.MODAL,
         title:{
             type:'plain_text' as const,
-            text:ModalsEnum.NEW_BOARD_TITLE
+            text:UtilityEnum.NEW_BOARD_TITLE
         },
         close:closeButton,
         submit:submitButton,

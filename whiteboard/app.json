@@ -12,5 +12,55 @@
     "nameSlug": "whiteboard",
     "classFile": "WhiteboardApp.ts",
     "description": "Whiteboard Integration App for Rocket.Chat",
-    "implements": []
+    "implements": [],
+    "permissions": [
+        {
+            "name": "networking"
+        },
+        {
+            "name": "persistence"
+        },
+        {
+            "name": "slashcommand"
+        },
+        {
+            "name": "api"
+        },
+        {
+            "name": "message.write"
+        },
+        {
+            "name": "message.read"
+        },
+        {
+            "name": "room.write"
+        },
+        {
+            "name": "ui.interact"
+        },
+        {
+            "name": "ui.registerButtons"
+        },
+        {
+            "name": "room.read"
+        },
+        {
+            "name": "server-setting.read"
+        },
+        {
+            "name": "user.read"
+        },
+        {
+            "name": "user.write"
+        },
+        {
+            "name": "scheduler"
+        },
+        {
+            "name": "upload.write"
+        },
+        {
+            "name": "upload.read"
+        }
+    ]
 }

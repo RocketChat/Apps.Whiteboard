@@ -42,6 +42,8 @@ import {
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { sendMessageWithAttachment } from "./lib/messages";
 import { previewBlock } from "./blocks/UtilityBlock";
+import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
+import { UtilityEnum } from "./enum/uitlityEnum";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -108,6 +110,13 @@ export class WhiteboardApp extends App {
         await configuration.slashCommands.provideSlashCommand(
             whiteboardBoardCommand
         );
+
+        configuration.ui.registerButton({
+            actionId: UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID,
+            labelI18n: "Board",
+            context: UIActionButtonContext.MESSAGE_BOX_ACTION,
+        });
+
         await configuration.api.provideApi({
             visibility: ApiVisibility.PUBLIC,
             security: ApiSecurity.UNSECURE,
@@ -229,37 +238,49 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const msgId = boardata.messageId;
         await storeBoardRecord(
             persis,
-            userId,
-            roomId,
             boardId,
             boardData,
             msgId,
             cover,
             title
         );
-        const user = await read.getUserReader().getById(userId);
-        const room = await read.getRoomReader().getById(roomId);
+
+        const user= (await read.getMessageReader().getSenderUser(msgId))!;
+        const room= await read.getMessageReader().getRoom(msgId);
 
         if (room) {
+            // const preview = await previewBlock(
+            //     user.username,
+            //     cover,
+            //     title,
+            //     `https://whiteboard.rocket.chat/board/${boardId}`,
+            //     boardId,
+            //     {
+            //         width: 400,
+            //         height: 200,
+            //     }
+            // );
+
+
             const previewMsg = (await modify.getUpdater().message(msgId, user))
                 .setSender(user)
                 .setRoom(room)
                 .setEditor(user)
-                .setBlocks(
-                    await previewBlock(
-                        user.username,
-                        cover,
-                        title,
-                        `https://whiteboard.rocket.chat/board/${boardId}`,
-                        boardId,
-                        {
-                            width: 400,
-                            height: 200,
-                        }
-                    )
-                );
-            const attachments = previewMsg.getMessage().attachments;
-            console.log("previewMsg", attachments);
+                .setAttachments([
+                    {
+                        collapsed: true,
+                        color: "#2FA44F",
+                        text: "Whiteboard",
+                        timestamp: new Date(),
+                        author: {
+                            name: user.username,
+                        },
+                        imageUrl: cover,
+                        type: "image",
+                    },
+                ]);
+
+                console.log("preview Message", previewMsg);
         }
 
         return this.json({

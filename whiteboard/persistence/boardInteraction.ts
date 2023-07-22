@@ -11,8 +11,6 @@ import {
 
 export const storeBoardRecord = async (
     persistence: IPersistence,
-    userId: string,
-    roomId: string,
     boardId: string,
     boardData: any,
     messageId:string,
@@ -26,8 +24,6 @@ export const storeBoardRecord = async (
     await persistence.updateByAssociation(
         association,
         {
-            userId: userId,
-            roomId: roomId,
             id: boardId,
             boardData:{
                 elements: boardData.elements,

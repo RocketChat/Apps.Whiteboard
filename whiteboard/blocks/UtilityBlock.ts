@@ -18,7 +18,7 @@ import {
     TextObject,
     PlainText,
 } from "@rocket.chat/ui-kit";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 
 export async function previewBlock(
     username: string,
@@ -33,18 +33,18 @@ export async function previewBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
-    const previewBlock = await getPreviewBlock(
-        imageURL,
-        title,
-        boardURL,
-        dimnesions
-    );
-    block.push(previewBlock);
+    // const previewBlock = await getPreviewBlock(
+    //     imageURL,
+    //     title,
+    //     boardURL,
+    //     dimnesions
+    // );
+    // block.push(previewBlock);
 
     const openbutton = await getButton(
         "Edit Board",
         "edit",
-        ModalsEnum.OPEN_BUTTON_ACTION_ID,
+        UtilityEnum.OPEN_BUTTON_ACTION_ID,
         "Open",
         ButtonStyle.PRIMARY,
         boardURL
@@ -53,13 +53,13 @@ export async function previewBlock(
     const renameButton = await getButton(
         "Rename Board",
         "edit",
-        ModalsEnum.OPEN_BUTTON_ACTION_ID,
+        UtilityEnum.OPEN_BUTTON_ACTION_ID,
         "Open",
         undefined,
         boardURL
     );
 
-    const actionBlock = await getActionsBlock(ModalsEnum.PREVIEW_BLOCK_ID, [
+    const actionBlock = await getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         renameButton,
         openbutton,
     ]);

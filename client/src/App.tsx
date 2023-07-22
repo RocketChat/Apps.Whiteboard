@@ -21,15 +21,16 @@ export interface BoardData {
   title: string;
 }
 
-function getBoardData(baseURL: string, boardId: string) {
-  return fetch(`${baseURL}/board/get?id=${boardId}`, {
+async function getBoardData(baseURL: string, boardId: string) {
+  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       "Content-Security-Policy":
         "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
     },
-  }).then((res) => res.json());
+  });
+  return await res.json();
 }
 
 async function postBoardData(baseURL: string, board: BoardData) {
@@ -63,9 +64,12 @@ async function postBoardData(baseURL: string, board: BoardData) {
   })
     .then((res) => res.json())
     .then((data) => console.log("Update Data Success", data));
-} 
+}
 
-const createOnChange = (baseURL: string, boardId: string) =>
+const createOnChange = (
+  baseURL: string,
+  boardId: string,
+) =>
   debounce(
     async (
       elements: readonly ExcalidrawElement[],
@@ -105,6 +109,8 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const boardId = urlParams.get("id") ?? "";
   const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
+  const [userId, setUserId] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>("");
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawAPIRefValue | null>(null);
 
@@ -112,7 +118,9 @@ function App() {
     console.log("excalidrawAPI updated", excalidrawAPI);
     if (excalidrawAPI != null) {
       getBoardData(baseURL, boardId).then((resp) => {
-        const { boardData } = resp.data;
+        const { boardData, userId, roomId } = resp.data;
+        setUserId(userId);
+        setRoomId(roomId);
         console.log({
           excalidrawAPI,
           boardData,
