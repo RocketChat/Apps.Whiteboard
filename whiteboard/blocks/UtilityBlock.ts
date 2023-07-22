@@ -1,9 +1,8 @@
 import { ButtonStyle } from "@rocket.chat/apps-engine/definition/uikit";
 import {
-    getPreviewBlock,
     getButton,
     getActionsBlock,
-    getContextBlock,
+    getMarkdownBlock,
 } from "../helpers/blockBuilder";
 import {
     ActionsBlock,
@@ -20,9 +19,8 @@ import {
 } from "@rocket.chat/ui-kit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 
-export async function previewBlock(
+export async function buildHeaderBlock(
     username: string,
-    imageURL: string,
     title: string,
     boardURL: string,
     randomBoardId: string,
@@ -33,15 +31,7 @@ export async function previewBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
-    // const previewBlock = await getPreviewBlock(
-    //     imageURL,
-    //     title,
-    //     boardURL,
-    //     dimnesions
-    // );
-    // block.push(previewBlock);
-
-    const openbutton = await getButton(
+    const openbutton = getButton(
         "Edit Board",
         "edit",
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
@@ -50,19 +40,22 @@ export async function previewBlock(
         boardURL
     );
 
-    const renameButton = await getButton(
-        "Rename Board",
-        "edit",
+    const renameButton = getButton(
+        "⚙️",
+        "edit info",
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
-        "Open",
+        "Information",
         undefined,
         boardURL
     );
 
-    const actionBlock = await getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
+    const markdownBlock = getMarkdownBlock(`*Untitled Whiteboard* by \`@${username}\``);
+
+    const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         renameButton,
         openbutton,
     ]);
+    block.push(markdownBlock);
     block.push(actionBlock);
     return block;
 }

@@ -19,5 +19,5 @@ let base64Compressed = `export const compressedString=\`${Buffer.from(
 
 let excalidrawHtml=`export const excalidrawContent=\`${readFileSync("./public/index.html","utf8")}\``
 
-writeFileSync("../whiteboard/excalidrawContent.ts", excalidrawHtml);
-writeFileSync("../whiteboard/excalidraw.ts", base64Compressed);
+writeFileSync("../whiteboard/assets/excalidrawContent.ts", excalidrawHtml);
+writeFileSync("../whiteboard/assets/excalidraw.ts", base64Compressed);

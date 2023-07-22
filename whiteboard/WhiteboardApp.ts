@@ -32,16 +32,13 @@ import {
     IApiResponse,
 } from "@rocket.chat/apps-engine/definition/api";
 import { Buffer } from "buffer";
-import { compressedString } from "./excalidraw";
-import { excalidrawContent } from "./excalidrawContent";
+import { compressedString } from "./assets/excalidraw";
+import { excalidrawContent } from "./assets/excalidrawContent";
 import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
 import {
     getBoardRecord,
     storeBoardRecord,
 } from "./persistence/boardInteraction";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
-import { sendMessageWithAttachment } from "./lib/messages";
-import { previewBlock } from "./blocks/UtilityBlock";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
 export class WhiteboardApp extends App {
@@ -113,7 +110,7 @@ export class WhiteboardApp extends App {
 
         configuration.ui.registerButton({
             actionId: UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID,
-            labelI18n: "Board",
+            labelI18n: "Create_Whiteboard",
             context: UIActionButtonContext.MESSAGE_BOX_ACTION,
         });
 
@@ -213,7 +210,7 @@ export class GetBoardEndpoint extends ApiEndpoint {
 }
 
 export class UpdateBoardEndpoint extends ApiEndpoint {
-    public path = `board/update/*`;
+    public path = `board/update`;
 
     public async post(
         request: IApiRequest,
@@ -227,60 +224,34 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const boardData = request.content.boardData;
         const cover = request.content.cover;
         const title = request.content.title;
-        const userId = request.content.userId;
-        const roomId = request.content.roomId;
 
-        console.log("cover", cover);
         const boardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
         );
         const msgId = boardata.messageId;
-        await storeBoardRecord(
-            persis,
-            boardId,
-            boardData,
-            msgId,
-            cover,
-            title
-        );
+        await storeBoardRecord(persis, boardId, boardData, msgId, cover, title);
 
-        const user= (await read.getMessageReader().getSenderUser(msgId))!;
-        const room= await read.getMessageReader().getRoom(msgId);
+        const user = (await read.getMessageReader().getSenderUser(msgId))!;
+        const room = await read.getMessageReader().getRoom(msgId);
 
         if (room) {
-            // const preview = await previewBlock(
-            //     user.username,
-            //     cover,
-            //     title,
-            //     `https://whiteboard.rocket.chat/board/${boardId}`,
-            //     boardId,
-            //     {
-            //         width: 400,
-            //         height: 200,
-            //     }
-            // );
-
 
             const previewMsg = (await modify.getUpdater().message(msgId, user))
+                .setEditor(user)
                 .setSender(user)
                 .setRoom(room)
-                .setEditor(user)
+                .setParseUrls(true)
                 .setAttachments([
                     {
                         collapsed: true,
-                        color: "#2FA44F",
-                        text: "Whiteboard",
-                        timestamp: new Date(),
-                        author: {
-                            name: user.username,
-                        },
+                        color: "#00000000",
                         imageUrl: cover,
                         type: "image",
                     },
                 ]);
 
-                console.log("preview Message", previewMsg);
+                await modify.getUpdater().finish(previewMsg);
         }
 
         return this.json({
