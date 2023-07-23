@@ -6,7 +6,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
 import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 import { getInteractionRoomData } from "../persistence/roomInteraction";
 import { storeAuthData } from "../persistence/authorization";
 import { sendNotification, sendMessage } from "../lib/messages";
@@ -32,7 +32,7 @@ export class ExecuteViewSubmitHandler {
 
         try {
             switch (view.id) {
-                case ModalsEnum.DELETE_BOARD_MODAL:
+                case UtilityEnum.DELETE_BOARD_MODAL:
                     if (user.id && view.state) {
                         const { roomId } = await getInteractionRoomData(
                             this.read.getPersistenceReader(),
@@ -43,8 +43,8 @@ export class ExecuteViewSubmitHandler {
                                 .getRoomReader()
                                 .getById(roomId);
                             const boardname =
-                                view.state?.[ModalsEnum.BOARD_INPUT_BLOCK_ID]?.[
-                                    ModalsEnum.BOARD_NAME_ACTION_ID
+                                view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
+                                    UtilityEnum.BOARD_NAME_ACTION_ID
                                 ];
 
                             if (room) {
@@ -78,7 +78,7 @@ export class ExecuteViewSubmitHandler {
                     }
                     break;
 
-                case ModalsEnum.AUTH_MODAL:
+                case UtilityEnum.AUTH_MODAL:
                     if (user.id && view.state) {
                         //Use the persistence functions to store the room data
                         const { roomId } = await getInteractionRoomData(

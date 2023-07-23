@@ -9,7 +9,7 @@ import {
     IUIKitResponse,
     UIKitBlockInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 
 export class ExecuteBlockActionHandler {
     constructor(
@@ -27,7 +27,7 @@ export class ExecuteBlockActionHandler {
         try {
             const { blockId, user, actionId } = data;
             switch (actionId) {
-                case ModalsEnum.PREVIEW_BUTTON_ACTION_ID:
+                case UtilityEnum.PREVIEW_BUTTON_ACTION_ID:
                     console.log("Preview block clicked");
                     return context.getInteractionResponder().successResponse();
                 default:

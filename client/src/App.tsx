@@ -1,4 +1,8 @@
-import { Excalidraw, WelcomeScreen } from "@excalidraw/excalidraw";
+import {
+  Excalidraw,
+  WelcomeScreen,
+  exportToCanvas,
+} from "@excalidraw/excalidraw";
 import { ExcalidrawElement } from "@excalidraw/excalidraw/types/element/types";
 import {
   AppState,
@@ -8,7 +12,6 @@ import {
 } from "@excalidraw/excalidraw/types/types";
 import { useEffect, useState, useRef, useMemo, Ref } from "react";
 import debounce from "lodash.debounce";
-import { exportToSvg } from "@excalidraw/excalidraw";
 
 export interface BoardData {
   boardId: string;
@@ -21,15 +24,16 @@ export interface BoardData {
   title: string;
 }
 
-function getBoardData(baseURL: string, boardId: string) {
-  return fetch(`${baseURL}/board/get?id=${boardId}`, {
+async function getBoardData(baseURL: string, boardId: string) {
+  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
       "Content-Security-Policy":
         "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
     },
-  }).then((res) => res.json());
+  });
+  return res.json();
 }
 
 async function postBoardData(baseURL: string, board: BoardData) {
@@ -52,7 +56,7 @@ async function postBoardData(baseURL: string, board: BoardData) {
   //     files,
   //   });
 
-  fetch(`${baseURL}/board/update/`, {
+  fetch(`${baseURL}/board/update`, {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -63,7 +67,7 @@ async function postBoardData(baseURL: string, board: BoardData) {
   })
     .then((res) => res.json())
     .then((data) => console.log("Update Data Success", data));
-} 
+}
 
 const createOnChange = (baseURL: string, boardId: string) =>
   debounce(
@@ -78,22 +82,27 @@ const createOnChange = (baseURL: string, boardId: string) =>
         cover: "",
         title: "",
       });
-      const exportToSvgResult = await exportToSvg({
+
+      const canvas = await exportToCanvas({
         elements,
         appState: state,
         files,
+        maxWidthOrHeight: 360*3,
+        getDimensions: (width, height) => ({
+          width: 360*2,
+          height: 360*2,
+          scale: 3,
+        }),
+        exportPadding: 20,
       });
 
-      const svg = exportToSvgResult.outerHTML;
-
-      const svgBase64 = btoa(svg);
-      const svgBase64String = `data:image/svg+xml;base64,${svgBase64}`;
-      console.log("svgBase64String", svgBase64String);
+      const canvasBase64 = canvas.toDataURL();
+      console.log("canvasBase64", canvasBase64);
 
       postBoardData(baseURL, {
         boardId,
         boardData: { elements, appState: state, files },
-        cover: svgBase64String,
+        cover: canvasBase64,
         title: "",
       });
     },
@@ -105,6 +114,8 @@ function App() {
   const urlParams = new URLSearchParams(window.location.search);
   const boardId = urlParams.get("id") ?? "";
   const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
+  const [userId, setUserId] = useState<string>("");
+  const [roomId, setRoomId] = useState<string>("");
   const [excalidrawAPI, setExcalidrawAPI] =
     useState<ExcalidrawAPIRefValue | null>(null);
 
@@ -112,7 +123,9 @@ function App() {
     console.log("excalidrawAPI updated", excalidrawAPI);
     if (excalidrawAPI != null) {
       getBoardData(baseURL, boardId).then((resp) => {
-        const { boardData } = resp.data;
+        const { boardData, userId, roomId } = resp.data;
+        setUserId(userId);
+        setRoomId(roomId);
         console.log({
           excalidrawAPI,
           boardData,

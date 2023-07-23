@@ -1,4 +1,4 @@
-export enum ModalsEnum {
+export enum UtilityEnum {
     NEW_BOARD_MODAL = "new-board-modal",
     BOARD_INPUT_BLOCK_ID = "board-input-block-id",
     BOARD_INPUT_LABEL = "Board Name",
@@ -24,4 +24,5 @@ export enum ModalsEnum {
     OPEN_BUTTON_ACTION_ID = "open-button-action-id",
     SAVE_BUTTON_ACTION_ID = "save-button-action-id",
     RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
+    CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID = "create-whiteboard-message-box-action-id",
 }

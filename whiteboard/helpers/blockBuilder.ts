@@ -10,17 +10,17 @@ import {
     StaticSelectElement,
 } from "@rocket.chat/ui-kit";
 import { AppEnum } from "../enum/App";
-import { PreviewBlock, PreviewBlockWithPreview } from "@rocket.chat/ui-kit";
+import { PreviewBlockWithPreview } from "@rocket.chat/ui-kit";
 import { LayoutBlockType } from "@rocket.chat/ui-kit/dist/esm/blocks/LayoutBlockType";
 
-export async function getInputBox(
+export function getInputBox(
     labelText: string,
     placeholderText: string,
     blockId: string,
     actionId: string,
     initialValue?: string,
     multiline?: boolean
-): Promise<InputBlock> {
+) {
     const block: InputBlock = {
         type: "input",
         label: {
@@ -43,13 +43,13 @@ export async function getInputBox(
     return block;
 }
 
-export async function getInputBoxDate(
+export function getInputBoxDate(
     labelText: string,
     placeholderText: string,
     blockId: string,
     actionId: string,
     initialDate?: string
-): Promise<InputBlock> {
+) {
     const block: InputBlock = {
         type: "input",
         label: {
@@ -71,19 +71,20 @@ export async function getInputBoxDate(
     return block;
 }
 
-export async function getButton(
+export function getButton(
     labelText: string,
     blockId: string,
     actionId: string,
     value?: string,
     style?: ButtonStyle.PRIMARY | ButtonStyle.DANGER,
     url?: string
-): Promise<ButtonElement> {
+) {
     const button: ButtonElement = {
         type: "button",
         text: {
             type: "plain_text",
             text: labelText,
+            emoji: true,
         },
         appId: AppEnum.APP_ID,
         blockId: blockId,
@@ -95,10 +96,7 @@ export async function getButton(
     return button;
 }
 
-export async function getSectionBlock(
-    labelText: string,
-    accessory?: any
-): Promise<SectionBlock> {
+export function getSectionBlock(labelText: string, accessory?: any) {
     const block: SectionBlock = {
         type: "section",
         text: {
@@ -110,16 +108,25 @@ export async function getSectionBlock(
     return block;
 }
 
-export async function getDividerBlock(): Promise<DividerBlock> {
+export function getMarkdownBlock(labelText: string) {
+    const block: SectionBlock = {
+        type: "section",
+        text: {
+            type: "mrkdwn",
+            text: labelText,
+        },
+    };
+    return block;
+}
+
+export function getDividerBlock() {
     const block: DividerBlock = {
         type: "divider",
     };
     return block;
 }
 
-export async function getContextBlock(
-    elementText: string
-): Promise<ContextBlock> {
+export function getContextBlock(elementText: string) {
     const block: ContextBlock = {
         type: "context",
         elements: [
@@ -132,13 +139,13 @@ export async function getContextBlock(
     return block;
 }
 
-export async function getStaticSelectElement(
+export function getStaticSelectElement(
     placeholderText: string,
     options: Array<Option>,
     blockId: string,
     actionId: string,
     initialValue?: Option["value"]
-): Promise<StaticSelectElement> {
+) {
     const block: StaticSelectElement = {
         type: "static_select",
         placeholder: {
@@ -154,7 +161,7 @@ export async function getStaticSelectElement(
     return block;
 }
 
-export async function getOptions(text: string, value: string): Promise<Option> {
+export function getOptions(text: string, value: string) {
     const block: Option = {
         text: { type: "plain_text", text: text },
         value: value,
@@ -162,10 +169,10 @@ export async function getOptions(text: string, value: string): Promise<Option> {
     return block;
 }
 
-export async function getActionsBlock(
+export function getActionsBlock(
     blockId: string,
     elements: Array<ButtonElement> | Array<StaticSelectElement>
-): Promise<ActionsBlock> {
+) {
     const block: ActionsBlock = {
         type: "actions",
         blockId: blockId,
@@ -174,7 +181,7 @@ export async function getActionsBlock(
     return block;
 }
 
-export async function getPreviewBlock(
+export function getPreviewBlock(
     url: string,
     title: string,
     boardURL: string,
@@ -182,7 +189,7 @@ export async function getPreviewBlock(
         width: number;
         height: number;
     }
-): Promise<PreviewBlockWithPreview> {
+) {
     const block: PreviewBlockWithPreview = {
         preview: {
             url: url,

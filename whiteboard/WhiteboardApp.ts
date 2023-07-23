@@ -32,16 +32,15 @@ import {
     IApiResponse,
 } from "@rocket.chat/apps-engine/definition/api";
 import { Buffer } from "buffer";
-import { compressedString } from "./excalidraw";
-import { excalidrawContent } from "./excalidrawContent";
+import { compressedString } from "./assets/excalidraw";
+import { excalidrawContent } from "./assets/excalidrawContent";
 import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
 import {
     getBoardRecord,
     storeBoardRecord,
 } from "./persistence/boardInteraction";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
-import { sendMessageWithAttachment } from "./lib/messages";
-import { previewBlock } from "./blocks/UtilityBlock";
+import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
+import { UtilityEnum } from "./enum/uitlityEnum";
 export class WhiteboardApp extends App {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -108,6 +107,13 @@ export class WhiteboardApp extends App {
         await configuration.slashCommands.provideSlashCommand(
             whiteboardBoardCommand
         );
+
+        configuration.ui.registerButton({
+            actionId: UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID,
+            labelI18n: "Create_Whiteboard",
+            context: UIActionButtonContext.MESSAGE_BOX_ACTION,
+        });
+
         await configuration.api.provideApi({
             visibility: ApiVisibility.PUBLIC,
             security: ApiSecurity.UNSECURE,
@@ -204,7 +210,7 @@ export class GetBoardEndpoint extends ApiEndpoint {
 }
 
 export class UpdateBoardEndpoint extends ApiEndpoint {
-    public path = `board/update/*`;
+    public path = `board/update`;
 
     public async post(
         request: IApiRequest,
@@ -218,40 +224,35 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const boardData = request.content.boardData;
         const cover = request.content.cover;
         const title = request.content.title;
-        const userId = request.content.userId;
-        const roomId = request.content.roomId;
 
-        console.log("cover", cover);
         const boardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
         );
         const msgId = boardata.messageId;
+        await storeBoardRecord(persis, boardId, boardData, msgId, cover, title);
 
-        await storeBoardRecord(
-            persis,
-            userId,
-            roomId,
-            boardId,
-            boardData,
-            msgId,
-            cover,
-            title
-        );
-        const user = await read.getUserReader().getById(userId);
+        const user = (await read.getMessageReader().getSenderUser(msgId))!;
+        const room = await read.getMessageReader().getRoom(msgId);
 
-        const previewMsg = (await modify.getUpdater().message(msgId, user))
-            .setEditor(user)
-            .setAttachments([
-                {
-                    collapsed: true,
-                    color: "#00000000",
-                    imageUrl: cover,
-                },
-            ]);
+        if (room) {
 
-        const attachments = previewMsg.getMessage().attachments;
-        console.log("previewMsg", attachments);
+            const previewMsg = (await modify.getUpdater().message(msgId, user))
+                .setEditor(user)
+                .setSender(user)
+                .setRoom(room)
+                .setParseUrls(true)
+                .setAttachments([
+                    {
+                        collapsed: true,
+                        color: "#00000000",
+                        imageUrl: cover,
+                        type: "image",
+                    },
+                ]);
+
+                await modify.getUpdater().finish(previewMsg);
+        }
 
         return this.json({
             status: 200,

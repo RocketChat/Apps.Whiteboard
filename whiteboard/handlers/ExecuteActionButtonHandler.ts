@@ -9,7 +9,7 @@ import {
     IUIKitResponse,
     UIKitActionButtonInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum} from "../enum/uitlityEnum";
 
 export class ExecuteActionButtonHandler {
     constructor(
@@ -27,8 +27,11 @@ export class ExecuteActionButtonHandler {
         try {
             const { actionId, user } = data;
             switch (actionId) {
-                case ModalsEnum.RENAME_BUTTON_ACTION_ID:
+                case UtilityEnum.RENAME_BUTTON_ACTION_ID:
                     console.log("RENAME BUTTON CLICKED");
+                    return context.getInteractionResponder().successResponse();
+                case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
+                    console.log("CREATE NEW WHITEBOARD BUTTON CLICKED");
                     return context.getInteractionResponder().successResponse();
                 default:
                     return context.getInteractionResponder().successResponse();

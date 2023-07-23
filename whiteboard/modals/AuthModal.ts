@@ -10,7 +10,7 @@ import {
     IUIKitSurfaceViewParam,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
-import { ModalsEnum } from "../enum/Modals";
+import { UtilityEnum } from "../enum/uitlityEnum";
 import { Block,TextObject } from "@rocket.chat/ui-kit";
 import {
     getButton,
@@ -38,29 +38,29 @@ export async function AuthModal({
     const block: Block[] = [];
 
     let authTextBlock = await getSectionBlock(
-        ModalsEnum.AUTH_LABEL,
+        UtilityEnum.AUTH_LABEL,
     );
     block.push(authTextBlock);
 
     let closeButton = await getButton(
-        ModalsEnum.CANCEL,
-        ModalsEnum.CLOSE_BLOCK_ID,
-        ModalsEnum.CLOSE_ACTION_ID,
+        UtilityEnum.CANCEL,
+        UtilityEnum.CLOSE_BLOCK_ID,
+        UtilityEnum.CLOSE_ACTION_ID,
         "danger"
     );
     let submitButton = await getButton(
-        ModalsEnum.AUTHORIZE,
-        ModalsEnum.SUBMIT_BLOCK_ID,
-        ModalsEnum.SUBMIT_ACTION_ID,
+        UtilityEnum.AUTHORIZE,
+        UtilityEnum.SUBMIT_BLOCK_ID,
+        UtilityEnum.SUBMIT_ACTION_ID,
         "primary"
     );
 
     const value = {
-        id: ModalsEnum.AUTH_MODAL,
+        id: UtilityEnum.AUTH_MODAL,
         type: UIKitSurfaceType.MODAL,
         title:{
             type:'plain_text' as const,
-            text:ModalsEnum.AUTH_TITLE
+            text:UtilityEnum.AUTH_TITLE
         },
         close:closeButton,
         submit:submitButton,
