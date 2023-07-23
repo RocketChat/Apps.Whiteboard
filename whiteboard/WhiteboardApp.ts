@@ -110,7 +110,7 @@ export class WhiteboardApp extends App {
 
         configuration.ui.registerButton({
             actionId: UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID,
-            labelI18n: "create-whiteboard",
+            labelI18n: "create_whiteboard",
             context: UIActionButtonContext.MESSAGE_BOX_ACTION,
         });
 
