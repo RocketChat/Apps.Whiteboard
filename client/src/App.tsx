@@ -12,7 +12,6 @@ import {
 } from "@excalidraw/excalidraw/types/types";
 import { useEffect, useState, useRef, useMemo, Ref } from "react";
 import debounce from "lodash.debounce";
-import { exportToSvg } from "@excalidraw/excalidraw";
 
 export interface BoardData {
   boardId: string;
@@ -34,7 +33,7 @@ async function getBoardData(baseURL: string, boardId: string) {
         "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
     },
   });
-  return await res.json();
+  return res.json();
 }
 
 async function postBoardData(baseURL: string, board: BoardData) {

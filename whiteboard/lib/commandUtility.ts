@@ -30,7 +30,7 @@ import {
     MessageActionType,
     MessageProcessingType,
 } from "@rocket.chat/apps-engine/definition/messages";
-import { defaultPreview } from "../assets/deafultPreview";
+import { defaultPreview } from "../assets/defaultPreview";
 
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
