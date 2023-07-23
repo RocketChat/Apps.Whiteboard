@@ -16,8 +16,8 @@ export class ExecuteBlockActionHandler {
         private readonly app: WhiteboardApp,
         private readonly read: IRead,
         private readonly http: IHttp,
+        private readonly persistence: IPersistence,
         private readonly modify: IModify,
-        private readonly persistence: IPersistence
     ) {}
     public async run(
         context: UIKitBlockInteractionContext

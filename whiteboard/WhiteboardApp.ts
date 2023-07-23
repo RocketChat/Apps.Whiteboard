@@ -47,18 +47,18 @@ export class WhiteboardApp extends App {
     }
 
     public async executeActionButtonHandler(
-        context: UIKitActionButtonInteractionContext,
+        context: UIKitActionButtonInteractionContext,//Keep this sequence of parameters
         read: IRead,
         http: IHttp,
+        persistence: IPersistence,
         modify: IModify,
-        persistence: IPersistence
     ): Promise<IUIKitResponse> {
         const handler = new ExecuteActionButtonHandler(
             this,
             read,
             http,
+            persistence,
             modify,
-            persistence
         );
         return await handler.run(context);
     }
@@ -67,15 +67,15 @@ export class WhiteboardApp extends App {
         context: UIKitBlockInteractionContext,
         read: IRead,
         http: IHttp,
+        persistence: IPersistence,
         modify: IModify,
-        persistence: IPersistence
     ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
             this,
             read,
             http,
+            persistence,
             modify,
-            persistence
         );
         return await handler.run(context);
     }
@@ -110,7 +110,7 @@ export class WhiteboardApp extends App {
 
         configuration.ui.registerButton({
             actionId: UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID,
-            labelI18n: "Create_Whiteboard",
+            labelI18n: "create-whiteboard",
             context: UIActionButtonContext.MESSAGE_BOX_ACTION,
         });
 
