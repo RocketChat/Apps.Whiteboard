@@ -1,6 +1,9 @@
 # Whiteboard
 Boost your collaborative experience with diagrams, drawings and more via Rocket.Chat `Apps.Whiteboard`.
 
+![image](https://github.com/RocketChat/Apps.Whiteboard/assets/32427260/e4ce670e-9b6a-4a77-8ac2-58730b63b79f)
+
+
 ## Local Setup Guide
 - First `cd client` folder and run `npm install` to install all packages
 - Run `npm build` to build webpack bundle for excalidraw react app
