@@ -40,19 +40,18 @@ export async function buildHeaderBlock(
         boardURL
     );
 
-    const renameButton = getButton(
+    const settingButton = getButton(
         "⚙️",
-        "edit info",
-        UtilityEnum.OPEN_BUTTON_ACTION_ID,
-        "Information",
+        "setting",
+        UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
+        "Settings",
         undefined,
-        boardURL
     );
 
     const markdownBlock = getMarkdownBlock(`*Untitled Whiteboard* by \`@${username}\``);
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
-        renameButton,
+        settingButton,
         openbutton,
     ]);
     block.push(markdownBlock);

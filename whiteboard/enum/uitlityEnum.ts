@@ -25,4 +25,5 @@ export enum UtilityEnum {
     SAVE_BUTTON_ACTION_ID = "save-button-action-id",
     RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
     CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID = "create-whiteboard-message-box-action-id",
+    SETTINGS_BUTTON_ACTION_ID = "settings-button-action-id",
 }
