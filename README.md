@@ -1,5 +1,5 @@
 # Whiteboard
-Whiteboard Integration App for Rocket.Chat
+Boost your collaborative experience with diagrams, drawings and more via Rocket.Chat `Apps.Whiteboard`.
 
 ## Local Setup Guide
 - First `cd client` folder and run `npm install` to install all packages
