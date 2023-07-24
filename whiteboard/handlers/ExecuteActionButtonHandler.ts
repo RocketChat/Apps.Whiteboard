@@ -33,7 +33,6 @@ export class ExecuteActionButtonHandler {
             const { actionId, user } = data;
             switch (actionId) {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
-                    console.log("BUTTON CLICKED");
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;
                     if (room) {
