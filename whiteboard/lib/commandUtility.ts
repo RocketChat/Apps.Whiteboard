@@ -8,28 +8,18 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { ExecutorProps } from "../definitions/ExecutorProps";
-import { ExcalidrawEndpoint, WhiteboardApp } from "../WhiteboardApp";
-import { CreateBoardModal } from "../modals/CreateBoardModal";
-import { AuthModal } from "../modals/AuthModal";
+import {  WhiteboardApp } from "../WhiteboardApp";
 import {
     helperMessage,
     sendMessage,
     sendMessageWithAttachment,
 } from "./messages";
-import { getAuthData, clearAuthData } from "../persistence/authorization";
-import { DeleteBoardModal } from "../modals/DeleteBoardModal";
-import { UtilityEnum } from "../enum/uitlityEnum";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
-    getBoardRecord,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
-import {
-    MessageActionType,
-    MessageProcessingType,
-} from "@rocket.chat/apps-engine/definition/messages";
 import { defaultPreview } from "../assets/defaultPreview";
 
 export class CommandUtility implements ExecutorProps {
@@ -53,78 +43,6 @@ export class CommandUtility implements ExecutorProps {
         this.http = props.http;
         this.persistence = props.persistence;
         this.app = props.app;
-    }
-
-    private async handleAuthCommand() {
-        const triggerId = this.context.getTriggerId();
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        if (triggerId) {
-            const modal = await AuthModal({
-                slashCommandContext: this.context,
-                read: this.read,
-                modify: this.modify,
-                http: this.http,
-                persistence: this.persistence,
-            });
-
-            const Auth_Status = await getAuthData(
-                this.read.getPersistenceReader(),
-                this.sender.id
-            );
-            if (Auth_Status.auth_status === true) {
-                sendMessage(
-                    this.modify,
-                    this.room,
-                    appSender,
-                    "**whiteboard-app** already authenticated"
-                );
-            } else {
-                await Promise.all([
-                    this.modify.getUiController().openSurfaceView(
-                        modal,
-                        {
-                            triggerId,
-                        },
-                        this.context.getSender()
-                    ),
-                ]);
-            }
-        }
-    }
-
-    private async handleRemoveAuthCommand() {
-        const authStatus = await this.handleAuthStatus();
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        if (authStatus === true) {
-            await clearAuthData(this.persistence, this.sender.id, this.room.id);
-            sendMessage(
-                this.modify,
-                this.room,
-                appSender,
-                "**whiteboard-app** authentication removed by @" +
-                    this.sender.username
-            );
-        } else {
-            sendMessage(
-                this.modify,
-                this.room,
-                appSender,
-                "You are not authenticated"
-            );
-        }
-    }
-
-    private async handleAuthStatus() {
-        const authData = await getAuthData(
-            this.read.getPersistenceReader(),
-            this.sender.id
-        );
-        const authStatus = authData.auth_status;
-        return authStatus;
     }
 
     private async handleNewBoardCommand({
@@ -184,42 +102,6 @@ export class CommandUtility implements ExecutorProps {
         }
     }
 
-    private async handleDeleteBoardCommand() {
-        const triggerId = this.context.getTriggerId();
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        const authStatus = await this.handleAuthStatus();
-        if (authStatus === true) {
-            if (triggerId) {
-                const modal = await DeleteBoardModal({
-                    slashCommandContext: this.context,
-                    read: this.read,
-                    modify: this.modify,
-                    http: this.http,
-                    persistence: this.persistence,
-                });
-
-                await Promise.all([
-                    this.modify.getUiController().openSurfaceView(
-                        modal,
-                        {
-                            triggerId,
-                        },
-                        this.context.getSender()
-                    ),
-                ]);
-            }
-        } else {
-            sendMessage(
-                this.modify,
-                this.room,
-                appSender,
-                "Please authenticate yourself first !!!"
-            );
-        }
-    }
-
     private async helperMessage() {
         const appSender: IUser = (await this.read
             .getUserReader()
@@ -229,17 +111,8 @@ export class CommandUtility implements ExecutorProps {
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
-            case "auth":
-                this.handleAuthCommand();
-                break;
-            case "remove-auth":
-                await this.handleRemoveAuthCommand();
-                break;
             case "new":
                 await this.handleNewBoardCommand(context);
-                break;
-            case "delete":
-                await this.handleDeleteBoardCommand();
                 break;
             case "help":
                 await this.helperMessage();

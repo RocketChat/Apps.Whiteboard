@@ -12,10 +12,7 @@ import {
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
 import { WhiteboardCommand } from "./commands/WhiteboardCommand";
-import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import {
-    UIKitViewSubmitInteractionContext,
-    UIKitViewCloseInteractionContext,
     UIKitBlockInteractionContext,
     IUIKitResponse,
     UIKitActionButtonInteractionContext,

@@ -43,7 +43,7 @@ export async function sendMessage(
     room: IRoom,
     sender: IUser,
     message: string,
-    blocks?: Array<Block>,
+    blocks?: Array<Block>
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -51,7 +51,7 @@ export async function sendMessage(
         .setSender(sender)
         .setRoom(room)
         .setParseUrls(true)
-        .setText(message)
+        .setText(message);
 
     if (blocks !== undefined) {
         msg.setBlocks(blocks);
@@ -66,7 +66,7 @@ export async function sendMessageWithAttachment(
     sender: IUser,
     message: string,
     attachments?: Array<IMessageAttachment>,
-    blocks?: Array<Block>,
+    blocks?: Array<Block>
 ): Promise<string> {
     const msg = modify
         .getCreator()
@@ -74,7 +74,7 @@ export async function sendMessageWithAttachment(
         .setSender(sender)
         .setRoom(room)
         .setParseUrls(true)
-        .setText(message)
+        .setText(message);
 
     if (attachments !== undefined) {
         msg.setAttachments(attachments);
