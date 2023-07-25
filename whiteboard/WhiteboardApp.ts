@@ -19,6 +19,7 @@ import {
     UIKitBlockInteractionContext,
     IUIKitResponse,
     UIKitActionButtonInteractionContext,
+    IUIKitInteractionHandler,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 import {
@@ -41,26 +42,9 @@ import {
 } from "./persistence/boardInteraction";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
-export class WhiteboardApp extends App {
+export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
-    }
-
-    public async executeActionButtonHandler(
-        context: UIKitActionButtonInteractionContext,//Keep this sequence of parameters
-        read: IRead,
-        http: IHttp,
-        persistence: IPersistence,
-        modify: IModify,
-    ): Promise<IUIKitResponse> {
-        const handler = new ExecuteActionButtonHandler(
-            this,
-            read,
-            http,
-            persistence,
-            modify,
-        );
-        return await handler.run(context);
     }
 
     public async executeBlockActionHandler(
@@ -68,36 +52,30 @@ export class WhiteboardApp extends App {
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
-        modify: IModify,
+        modify: IModify
     ): Promise<IUIKitResponse> {
-        const handler = new ExecuteBlockActionHandler(
-            this,
-            read,
-            http,
-            persistence,
-            modify,
-        );
-        return await handler.run(context);
+        const handler = new ExecuteBlockActionHandler( context);
+        return await handler.run();
     }
 
-    public async executeViewSubmitHandler(
-        context: UIKitViewSubmitInteractionContext,
+    public async executeActionButtonHandler(
+        context: UIKitActionButtonInteractionContext, //Keep this sequence of parameters
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
         modify: IModify
-    ) {
-        const handler = new ExecuteViewSubmitHandler(
+    ): Promise<IUIKitResponse> {
+        const handler = new ExecuteActionButtonHandler(
             this,
             read,
             http,
             persistence,
             modify
         );
-        await handler.run(context);
+        return await handler.run(context);
     }
 
-    public async extendConfiguration(
+    public async initialize(
         configuration: IConfigurationExtend,
         environmentRead: IEnvironmentRead
     ): Promise<void> {
@@ -236,7 +214,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const room = await read.getMessageReader().getRoom(msgId);
 
         if (room) {
-
             const previewMsg = (await modify.getUpdater().message(msgId, user))
                 .setEditor(user)
                 .setSender(user)
@@ -251,7 +228,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                     },
                 ]);
 
-                await modify.getUpdater().finish(previewMsg);
+            await modify.getUpdater().finish(previewMsg);
         }
 
         return this.json({

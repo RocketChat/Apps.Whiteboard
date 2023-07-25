@@ -33,7 +33,7 @@ export async function buildHeaderBlock(
 
     const openbutton = getButton(
         "Edit Board",
-        "edit",
+        UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
         "Open",
         ButtonStyle.PRIMARY,
@@ -41,8 +41,8 @@ export async function buildHeaderBlock(
     );
 
     const settingButton = getButton(
-        "⚙️",
-        "setting",
+        "⚙️ Settings",
+        UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
         "Settings",
         undefined,

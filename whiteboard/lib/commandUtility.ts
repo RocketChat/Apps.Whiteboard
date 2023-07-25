@@ -25,7 +25,7 @@ import {
     getBoardRecord,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
-import { randomId } from "../utilts";
+import { randomId } from "./utilts";
 import {
     MessageActionType,
     MessageProcessingType,

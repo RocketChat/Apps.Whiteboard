@@ -12,30 +12,29 @@ import {
 import { UtilityEnum } from "../enum/uitlityEnum";
 
 export class ExecuteBlockActionHandler {
-    constructor(
-        private readonly app: WhiteboardApp,
-        private readonly read: IRead,
-        private readonly http: IHttp,
-        private readonly persistence: IPersistence,
-        private readonly modify: IModify,
-    ) {}
-    public async run(
-        context: UIKitBlockInteractionContext
-    ): Promise<IUIKitResponse> {
-        const data = context.getInteractionData();
+    private context: UIKitBlockInteractionContext;
+    constructor(context: UIKitBlockInteractionContext) {
+        this.context = context;
+    }
+    public async run(): Promise<IUIKitResponse> {
+        const data = this.context.getInteractionData();
 
         try {
-            const { blockId, user, actionId } = data;
+            const { actionId } = data;
             switch (actionId) {
-                case UtilityEnum.PREVIEW_BUTTON_ACTION_ID:
-                    console.log("Preview block clicked");
-                    return context.getInteractionResponder().successResponse();
+                case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
+                    console.log("Settings button clicked");
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 default:
-                    return context.getInteractionResponder().successResponse();
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
             }
         } catch (err) {
             console.log(err);
-            return context.getInteractionResponder().errorResponse();
+            return this.context.getInteractionResponder().errorResponse();
         }
     }
 }

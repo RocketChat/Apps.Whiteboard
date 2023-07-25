@@ -80,9 +80,9 @@ export function getButton(
     url?: string
 ) {
     const button: ButtonElement = {
-        type: "button",
+        type: 'button',
         text: {
-            type: "plain_text",
+            type: 'plain_text',
             text: labelText,
             emoji: true,
         },
@@ -174,7 +174,7 @@ export function getActionsBlock(
     elements: Array<ButtonElement> | Array<StaticSelectElement>
 ) {
     const block: ActionsBlock = {
-        type: "actions",
+        type: 'actions',
         blockId: blockId,
         elements: elements,
     };
