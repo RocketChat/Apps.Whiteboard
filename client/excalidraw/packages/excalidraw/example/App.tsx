@@ -30,6 +30,7 @@ import { NonDeletedExcalidrawElement } from "../../../element/types";
 import { ImportedLibraryData } from "../../../data/types";
 import CustomFooter from "./CustomFooter";
 import MobileFooter from "./MobileFooter";
+import React from "react";
 
 declare global {
   interface Window {
