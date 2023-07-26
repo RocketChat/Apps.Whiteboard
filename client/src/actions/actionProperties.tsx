@@ -1,4 +1,4 @@
-import { AppState } from "../../src/types";
+import { AppState } from "../types";
 import { trackEvent } from "../analytics";
 import { ButtonIconSelect } from "../components/ButtonIconSelect";
 import { ColorPicker } from "../components/ColorPicker";

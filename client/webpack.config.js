@@ -28,6 +28,17 @@ export default {
   module: {
     rules: [
       {
+        test: /\.scss$/,
+        use: [
+          // Adds the styles to the DOM by injecting a <style> tag
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
+      {
         test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,

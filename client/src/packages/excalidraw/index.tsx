@@ -217,7 +217,7 @@ export {
   getFreeDrawSvgPath,
   exportToClipboard,
   mergeLibraryItems,
-} from "../../packages/utils";
+} from "../utils";
 export { isLinearElement } from "../../element/typeChecks";
 
 export { FONT_FAMILY, THEME, MIME_TYPES } from "../../constants";

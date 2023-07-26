@@ -104,7 +104,7 @@ export const exportToSvg = async (
   if (exportEmbedScene) {
     try {
       metadata = await (
-        await import(/* webpackChunkName: "image" */ "../../src/data/image")
+        await import(/* webpackChunkName: "image" */ "../data/image")
       ).encodeSvgMetadata({
         text: opts?.serializeAsJSON
           ? opts?.serializeAsJSON?.()
