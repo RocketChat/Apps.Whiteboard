@@ -28,6 +28,17 @@ export default {
   module: {
     rules: [
       {
+        test: /\.scss$/,
+        use: [
+          // Adds the styles to the DOM by injecting a <style> tag
+          "style-loader",
+          // Translates CSS into CommonJS
+          "css-loader",
+          // Compiles Sass to CSS
+          "sass-loader",
+        ],
+      },
+      {
         test: /\.tsx?$/,
         use: "ts-loader",
         exclude: /node_modules/,
@@ -35,6 +46,11 @@ export default {
       {
         test: "/.css$/i",
         use: ["style-loader", "css-loader"],
+      },
+      {
+        test: /\.(js)x?$/,
+        exclude: /node_modules/,
+        use: "babel-loader",
       },
     ],
   },
@@ -44,6 +60,15 @@ export default {
     }),
     new DefinePlugin({
       __DEV__: JSON.stringify(process.env.NODE_ENV === "development"),
+      "process.env.REACT_APP_FIREBASE_CONFIG": JSON.stringify(
+        process.env.REACT_APP_FIREBASE_CONFIG || "{}"
+      ),
+      "process.env.REACT_APP_BACKEND_V2_GET_URL": JSON.stringify(
+        process.env.REACT_APP_BACKEND_V2_GET_URL || ""
+      ),
+      "process.env.REACT_APP_BACKEND_V2_POST_URL": JSON.stringify(
+        process.env.REACT_APP_BACKEND_V2_POST_URL || ""
+      ),
     }),
   ].filter(Boolean),
   devServer: {

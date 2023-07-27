@@ -2,41 +2,32 @@
   "compilerOptions": {
     "baseUrl": ".",
     "paths": {
-      "~/*": [
-        "src/*"
-      ]
+      "~/*": ["src/*"],
+      "excalidraw/*": ["src/*"]
     },
-    "target": "esnext",
+    "target": "ES6",
+    "lib": ["dom", "dom.iterable", "esnext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "allowSyntheticDefaultImports": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
+    "noEmit": false, //hopefully this will fix the error
     "jsx": "react-jsx",
     "jsxImportSource": "react",
-    "esModuleInterop": true,
     "sourceMap": true,
-    "strict": true,
-    "allowSyntheticDefaultImports": true,
-    "lib": [
-      "dom",
-      "dom.iterable",
-      "esnext"
-    ],
-    "allowJs": false,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true
   },
-  "include": [
-    "src",
-    "src/types"
-  ],
+  "include": ["src"],
   "exclude": [
     "node_modules/**/*",
-    "src/**/*.js"
+    "src/**/*.js",
+    "src/packages/excalidraw/types"
   ],
-  "types": [
-    "src/types"
-  ]
+  "types": ["src/types"]
 }
-
