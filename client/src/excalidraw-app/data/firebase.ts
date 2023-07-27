@@ -19,15 +19,20 @@ import { ResolutionType } from "../../utility-types";
 // private
 // -----------------------------------------------------------------------------
 
-let FIREBASE_CONFIG: Record<string, any>;
-try {
-  FIREBASE_CONFIG = JSON.parse(process.env.REACT_APP_FIREBASE_CONFIG);
-} catch (error: any) {
-  console.warn(
-    `Error JSON parsing firebase config. Supplied value: ${process.env.REACT_APP_FIREBASE_CONFIG}`,
-  );
-  FIREBASE_CONFIG = {};
+declare const REACT_APP_FIREBASE_CONFIG: string; // Declare the variable here
+declare const REACT_APP_BACKEND_V2_GET_URL: string;
+declare const REACT_APP_BACKEND_V2_POST_URL: string;
+let FIREBASE_CONFIG: Record<string, any> = {};
+if (typeof REACT_APP_FIREBASE_CONFIG !== "undefined") {
+  try {
+    FIREBASE_CONFIG = JSON.parse(REACT_APP_FIREBASE_CONFIG);
+  } catch (error: any) {
+    console.warn(
+      `Error JSON parsing firebase config. Supplied value: ${REACT_APP_FIREBASE_CONFIG}`
+    );
+  }
 }
+
 
 let firebasePromise: Promise<typeof import("firebase/app").default> | null =
   null;

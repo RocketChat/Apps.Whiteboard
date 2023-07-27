@@ -51,7 +51,7 @@ export default {
         test: /\.(js)x?$/,
         exclude: /node_modules/,
         use: "babel-loader",
-      }
+      },
     ],
   },
   plugins: [
@@ -60,6 +60,15 @@ export default {
     }),
     new DefinePlugin({
       __DEV__: JSON.stringify(process.env.NODE_ENV === "development"),
+      "process.env.REACT_APP_FIREBASE_CONFIG": JSON.stringify(
+        process.env.REACT_APP_FIREBASE_CONFIG || "{}"
+      ),
+      "process.env.REACT_APP_BACKEND_V2_GET_URL": JSON.stringify(
+        process.env.REACT_APP_BACKEND_V2_GET_URL || ""
+      ),
+      "process.env.REACT_APP_BACKEND_V2_POST_URL": JSON.stringify(
+        process.env.REACT_APP_BACKEND_V2_POST_URL || ""
+      ),
     }),
   ].filter(Boolean),
   devServer: {

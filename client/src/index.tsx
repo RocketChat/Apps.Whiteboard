@@ -10,5 +10,6 @@ const root = createRoot(rootElement);
 root.render(
   <StrictMode>
     <ExcalidrawApp />
+    "Hello World"
   </StrictMode>,
 );
