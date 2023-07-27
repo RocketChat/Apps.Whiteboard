@@ -5,7 +5,7 @@
       "~/*": ["src/*"],
       "excalidraw/*": ["src/*"]
     },
-    "target": "es6",
+    "target": "ES6",
     "lib": ["dom", "dom.iterable", "esnext"],
     "allowJs": true,
     "skipLibCheck": true,
@@ -16,7 +16,7 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "noEmit": true, //hopefully this will fix the error
+    "noEmit": false, //hopefully this will fix the error
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "sourceMap": true,
