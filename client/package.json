@@ -20,7 +20,7 @@
     "clsx": "^2.0.0",
     "cross-env": "^7.0.3",
     "fake-indexeddb": "^4.0.2",
-    "firebase": "^10.1.0",
+    "firebase": "8.3.3",
     "i18next-browser-languagedetector": "^7.1.0",
     "idb-keyval": "^6.2.1",
     "image-blob-reduce": "^4.1.0",
