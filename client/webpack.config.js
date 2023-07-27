@@ -47,6 +47,23 @@ export default {
         test: "/.css$/i",
         use: ["style-loader", "css-loader"],
       },
+      {
+        test: /\.(js)x?$/,
+        exclude: /node_modules/,
+        use: "babel-loader",
+      },
+      {
+        test: /\.(ts)x?$/,
+        exclude: /node_modules|\.d\.ts$/, // this line as well
+        use: {
+          loader: "ts-loader",
+          options: {
+            compilerOptions: {
+              noEmit: true, // this option will solve the issue
+            },
+          },
+        },
+      },
     ],
   },
   plugins: [

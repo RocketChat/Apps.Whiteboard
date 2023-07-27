@@ -16,14 +16,14 @@
     "module": "esnext",
     "moduleResolution": "node",
     "resolveJsonModule": true,
-    "noEmit": true,
+    "noEmit": true, //hopefully this will fix the error
     "jsx": "react-jsx",
     "jsxImportSource": "react",
     "sourceMap": true,
     "noFallthroughCasesInSwitch": true,
     "isolatedModules": true
   },
-  "include": ["src", "src/types", "src/main.tsx"],
+  "include": ["src"],
   "exclude": [
     "node_modules/**/*",
     "src/**/*.js",
