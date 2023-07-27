@@ -5,5 +5,6 @@ import {Excalidraw} from './App'
 ReactDOM.createRoot(document.getElementById('root')!).render(
   <React.StrictMode>
     <Excalidraw/>
+    "HEy"
   </React.StrictMode>,
 )

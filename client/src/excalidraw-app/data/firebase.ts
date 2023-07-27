@@ -229,7 +229,7 @@ export const saveToFirebase = async (
 
   const docRef = firestore.collection("scenes").doc(roomId);
 
-  const savedData = await firestore.runTransaction(async (transaction: { get: (arg0: any) => any; set: (arg0: any, arg1: FirebaseStoredScene) => void; update: (arg0: any, arg1: FirebaseStoredScene) => void; }) => {
+  const savedData = await firestore.runTransaction(async (transaction) => {
     const snapshot = await transaction.get(docRef);
 
     if (!snapshot.exists) {
