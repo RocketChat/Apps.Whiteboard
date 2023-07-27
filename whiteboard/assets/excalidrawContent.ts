@@ -9,10 +9,6 @@ export const excalidrawContent=`<!DOCTYPE html>
       margin: 0;
       padding: 0;
     }
-    .main-Excalidraw {
-      height: 100vh;
-      width: 100vw;
-    }
   </style>
 </head>
 <body>
