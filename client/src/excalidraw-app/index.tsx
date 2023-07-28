@@ -25,6 +25,7 @@ import {
   Excalidraw,
   defaultLang,
   LiveCollaborationTrigger,
+  exportToCanvas,
 } from "../packages/excalidraw/index";
 import {
   AppState,
@@ -87,6 +88,17 @@ import { appJotaiStore } from "./app-jotai";
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
 
+export interface BoardData {
+  boardId: string;
+  boardData: {
+    elements: readonly ExcalidrawElement[];
+    appState: AppState;
+    files: BinaryFiles;
+  };
+  cover: string;
+  title: string;
+}
+
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -108,7 +120,7 @@ const initializeScene = async (opts: {
   const searchParams = new URLSearchParams(window.location.search);
   const id = searchParams.get("id");
   const jsonBackendMatch = window.location.hash.match(
-    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/,
+    /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
 
@@ -133,7 +145,7 @@ const initializeScene = async (opts: {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
-          localDataState,
+          localDataState
         );
       }
       scene.scrollToContent = true;
@@ -149,7 +161,7 @@ const initializeScene = async (opts: {
             () => initializeScene(opts).then(resolve).catch(reject),
             {
               once: true,
-            },
+            }
           );
         });
       }
@@ -199,7 +211,7 @@ const initializeScene = async (opts: {
               ...scene?.appState,
               theme: localDataState?.appState?.theme || scene?.appState?.theme,
             },
-            excalidrawAPI.getAppState(),
+            excalidrawAPI.getAppState()
           ),
           // necessary if we're invoking from a hashchange handler which doesn't
           // go through App.initializeScene() that resets this flag
@@ -208,7 +220,7 @@ const initializeScene = async (opts: {
         elements: reconcileElements(
           scene?.elements || [],
           excalidrawAPI.getSceneElementsIncludingDeleted(),
-          excalidrawAPI.getAppState(),
+          excalidrawAPI.getAppState()
         ),
       },
       isExternalScene: true,
@@ -230,12 +242,60 @@ const initializeScene = async (opts: {
 
 const detectedLangCode = languageDetector.detect() || defaultLang.code;
 export const appLangCodeAtom = atom(
-  Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode,
+  Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode
 );
+
+async function getBoardData(baseURL: string, boardId: string) {
+  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+  });
+  return res.json();
+}
+async function postBoardData(baseURL: string, board: BoardData) {
+  const { boardData, boardId } = board;
+  const resp = await getBoardData(baseURL, boardId);
+  const { boardData: remoteBoard } = resp.data;
+
+  // const remoteElements = Array.isArray(remoteBoard?.elements)
+  //   ? remoteBoard!.elements
+  //   : [];
+  // const elements = reconcileElements(
+  //   board.elements,
+  //   remoteElements,
+  //   localAppState
+  // );
+  // const files = Object.assign({}, board.files, remoteBoard?.files);
+  // const result = await Services.get("board").saveBoard({
+  //   ...board,
+  //   elements,
+  //   files,
+  // });
+
+  fetch(`${baseURL}/board/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+    body: JSON.stringify(board),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log("Update Data Success", data));
+}
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
+  const fullURL = window.location.href;
+  const urlParams = new URLSearchParams(window.location.search);
+  const boardId = urlParams.get("id") ?? "";
+  const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
 
   // initial state
   // ---------------------------------------------------------------------------
@@ -277,7 +337,7 @@ const ExcalidrawWrapper = () => {
 
     const loadImages = (
       data: ResolutionType<typeof initializeScene>,
-      isInitialLoad = false,
+      isInitialLoad = false
     ) => {
       if (!data.scene) {
         return;
@@ -311,7 +371,7 @@ const ExcalidrawWrapper = () => {
           loadFilesFromFirebase(
             `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
             data.key,
-            fileIds,
+            fileIds
           ).then(({ loadedFiles, erroredFiles }) => {
             excalidrawAPI.addFiles(loadedFiles);
             updateStaleImageStatuses({
@@ -374,7 +434,7 @@ const ExcalidrawWrapper = () => {
 
     const titleTimeout = setTimeout(
       () => (document.title = APP_NAME),
-      TITLE_TIMEOUT,
+      TITLE_TIMEOUT
     );
 
     const syncData = debounce(() => {
@@ -461,7 +521,7 @@ const ExcalidrawWrapper = () => {
       document.removeEventListener(
         EVENT.VISIBILITY_CHANGE,
         visibilityChange,
-        false,
+        false
       );
       clearTimeout(titleTimeout);
     };
@@ -474,7 +534,7 @@ const ExcalidrawWrapper = () => {
       if (
         excalidrawAPI &&
         LocalData.fileStorage.shouldPreventUnload(
-          excalidrawAPI.getSceneElements(),
+          excalidrawAPI.getSceneElements()
         )
       ) {
         preventUnload(event);
@@ -495,7 +555,7 @@ const ExcalidrawWrapper = () => {
       localStorage.getItem(STORAGE_KEYS.LOCAL_STORAGE_THEME) ||
       // FIXME migration from old LS scheme. Can be removed later. #5660
       importFromLocalStorage().appState?.theme ||
-      THEME.LIGHT,
+      THEME.LIGHT
   );
 
   useEffect(() => {
@@ -505,54 +565,85 @@ const ExcalidrawWrapper = () => {
     document.documentElement.classList.toggle("dark", theme === THEME.DARK);
   }, [theme]);
 
-  const onChange = (
-    elements: readonly ExcalidrawElement[],
-    appState: AppState,
-    files: BinaryFiles,
-  ) => {
-    if (collabAPI?.isCollaborating()) {
-      collabAPI.syncElements(elements);
-    }
-
-    setTheme(appState.theme);
-
-    // this check is redundant, but since this is a hot path, it's best
-    // not to evaludate the nested expression every time
-    if (!LocalData.isSavePaused()) {
-      LocalData.save(elements, appState, files, () => {
-        if (excalidrawAPI) {
-          let didChange = false;
-
-          const elements = excalidrawAPI
-            .getSceneElementsIncludingDeleted()
-            .map((element) => {
-              if (
-                LocalData.fileStorage.shouldUpdateImageElementStatus(element)
-              ) {
-                const newElement = newElementWith(element, { status: "saved" });
-                if (newElement !== element) {
-                  didChange = true;
-                }
-                return newElement;
-              }
-              return element;
-            });
-
-          if (didChange) {
-            excalidrawAPI.updateScene({
-              elements,
-            });
-          }
+  const createOnChange = (baseURL: string, boardId: string) =>
+    debounce(
+      async (
+        elements: readonly ExcalidrawElement[],
+        appState: AppState,
+        files: BinaryFiles
+      ) => {
+        if (collabAPI?.isCollaborating()) {
+          collabAPI.syncElements(elements);
         }
-      });
-    }
-  };
+
+        setTheme(appState.theme);
+
+        // this check is redundant, but since this is a hot path, it's best
+        // not to evaludate the nested expression every time
+        if (!LocalData.isSavePaused()) {
+          LocalData.save(elements, appState, files, () => {
+            if (excalidrawAPI) {
+              let didChange = false;
+
+              const elements = excalidrawAPI
+                .getSceneElementsIncludingDeleted()
+                .map((element) => {
+                  if (
+                    LocalData.fileStorage.shouldUpdateImageElementStatus(
+                      element
+                    )
+                  ) {
+                    const newElement = newElementWith(element, {
+                      status: "saved",
+                    });
+                    if (newElement !== element) {
+                      didChange = true;
+                    }
+                    return newElement;
+                  }
+                  return element;
+                });
+
+              if (didChange) {
+                excalidrawAPI.updateScene({
+                  elements,
+                });
+              }
+            }
+          });
+        }
+
+        const canvas = await exportToCanvas({
+          elements,
+          appState: appState,
+          files,
+          maxWidthOrHeight: 360 * 3,
+          getDimensions: (width, height) => ({
+            width: 360 * 2,
+            height: 360 * 2,
+            scale: 3,
+          }),
+          exportPadding: 20,
+        });
+
+        const canvasBase64 = canvas.toDataURL();
+        console.log("canvasBase64", canvasBase64);
+
+        postBoardData(baseURL, {
+          boardId,
+          boardData: { elements, appState: appState, files },
+          cover: canvasBase64,
+          title: "",
+        });
+      },
+      1000
+    );
 
   const onExportToBackend = async (
     exportedElements: readonly NonDeletedExcalidrawElement[],
     appState: AppState,
     files: BinaryFiles,
-    canvas: HTMLCanvasElement | null,
+    canvas: HTMLCanvasElement | null
   ) => {
     if (exportedElements.length === 0) {
       return window.alert(t("alerts.cannotExportEmptyCanvas"));
@@ -567,7 +658,7 @@ const ExcalidrawWrapper = () => {
               ? appState.viewBackgroundColor
               : getDefaultAppState().viewBackgroundColor,
           },
-          files,
+          files
         );
       } catch (error: any) {
         if (error.name !== "AbortError") {
@@ -581,7 +672,7 @@ const ExcalidrawWrapper = () => {
 
   const renderCustomStats = (
     elements: readonly NonDeletedExcalidrawElement[],
-    appState: AppState,
+    appState: AppState
   ) => {
     return (
       <CustomStats
@@ -605,14 +696,14 @@ const ExcalidrawWrapper = () => {
 
   return (
     <div
-      style={{ height: "100%" }}
+      style={{ height: "100vh", width: "100vw" }}
       className={clsx("excalidraw-app", {
         "is-collaborating": isCollaborating,
       })}
     >
       <Excalidraw
         ref={excalidrawRefCallback}
-        onChange={onChange}
+        onChange={createOnChange(baseURL, boardId)}
         initialData={initialStatePromiseRef.current.promise}
         isCollaborating={isCollaborating}
         onPointerUpdate={collabAPI?.onPointerUpdate}

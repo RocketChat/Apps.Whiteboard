@@ -1,11 +1,9 @@
 import React from "react";
 import ReactDOM from "react-dom/client";
-import { Excalidraw } from "./App";
+import ExcalidrawApp from "./excalidraw-app/index";
 
 ReactDOM.createRoot(document.getElementById("root")!).render(
   <React.StrictMode>
-    <div style={{ height: "100vh", width: "100vw" }}>
-      <Excalidraw />
-    </div>
+    <ExcalidrawApp />
   </React.StrictMode>
 );
