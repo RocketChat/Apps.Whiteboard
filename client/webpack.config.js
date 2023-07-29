@@ -20,7 +20,7 @@ export default {
     fallback: {
       crypto: false,
     },
-    extensions: [".js", ".jsx", ".ts", ".tsx"],
+    extensions: [".js", ".jsx", ".ts", ".tsx",".mjs",".cjs"],
   },
   stats: {
     errorDetails: true,
@@ -69,6 +69,9 @@ export default {
       "process.env.REACT_APP_BACKEND_V2_POST_URL": JSON.stringify(
         process.env.REACT_APP_BACKEND_V2_POST_URL || ""
       ),
+    }),
+    new webpack.ProvidePlugin({
+      process: "process/browser",
     }),
   ].filter(Boolean),
   devServer: {

@@ -1947,7 +1947,7 @@ class App extends React.Component<AppProps, AppState> {
         const file = new File([blob], blob.name || "", { type: blob.type });
         this.loadFileToCanvas(file, null);
         await webShareTargetCache.delete("shared-file");
-        window.history.replaceState(null, APP_NAME, window.location.pathname);
+        // window.history.replaceState(null, APP_NAME, window.location.pathname);  //TODO URL cleanup
       }
     } catch (error: any) {
       this.setState({ errorMessage: error.message });
@@ -5740,6 +5740,7 @@ class App extends React.Component<AppProps, AppState> {
         this.state,
       );
 
+      debugger
       const imageFile = await fileOpen({
         description: "Image",
         extensions: ["jpg", "png", "svg", "gif"],

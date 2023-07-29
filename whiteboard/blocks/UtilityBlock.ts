@@ -30,7 +30,6 @@ export async function buildHeaderBlock(
     }
 ): Promise<Array<Block>> {
     const block: Block[] = [];
-
     const openbutton = getButton(
         "Edit Board",
         "edit",
