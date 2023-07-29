@@ -10,20 +10,36 @@ import {
     UIKitBlockInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
+import { SettingsModal } from "../modals/SettingsModal";
 
 export class ExecuteBlockActionHandler {
-    private context: UIKitBlockInteractionContext;
-    constructor(context: UIKitBlockInteractionContext) {
-        this.context = context;
-    }
+    constructor(
+        private readonly app: WhiteboardApp,
+        private readonly read: IRead,
+        private readonly http: IHttp,
+        private readonly persistence: IPersistence,
+        private readonly modify: IModify,
+        private readonly context: UIKitBlockInteractionContext
+    ) {}
     public async run(): Promise<IUIKitResponse> {
         const data = this.context.getInteractionData();
-
         try {
-            const { actionId } = data;
+            const { actionId, triggerId, user } = data;
+            const appSender = this.app;
+            const appId = data.appId;
             switch (actionId) {
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
                     console.log("Settings button clicked");
+                    const modal = await SettingsModal(appId);
+                    await Promise.all([
+                        this.modify.getUiController().openSurfaceView(
+                            modal,
+                            {
+                                triggerId,
+                            },
+                            user
+                        ),
+                    ]);
                     return this.context
                         .getInteractionResponder()
                         .successResponse();

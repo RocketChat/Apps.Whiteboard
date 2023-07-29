@@ -1,8 +1,8 @@
 export enum UtilityEnum {
     NEW_BOARD_MODAL = "new-board-modal",
     BOARD_INPUT_BLOCK_ID = "board-input-block-id",
-    BOARD_INPUT_LABEL = "Board Name",
-    BOARD_NAME_ACTION_ID = "board-name-action-id",
+    BOARD_INPUT_LABEL = "Update Board Name",
+    BOARD_INPUT_ACTION_ID = "board-name-action-id",
     BOARD_INPUT_PLACEHOLDER = "Enter Board Name",
     SUBMIT = "Submit",
     AUTHORIZE = "Authorize",
@@ -26,4 +26,11 @@ export enum UtilityEnum {
     RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
     CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID = "create-whiteboard-message-box-action-id",
     SETTINGS_BUTTON_ACTION_ID = "settings-button-action-id",
+    SETTINGS_LABEL = "Modify settings as your preference",
+    SETTINGS_MODAL_ID = "settings-modal-id",
+    SETTINGS_TITLE = "Settings",
+    ATTACHMENTS_ACTION_ID = "ATTACHMENTS_ACTION_ID",
+    ATTACHMENTS_BLOCK_ID = "ATTACHMENTS_BLOCK_ID",
+    ATTACHMENTS = "Download Assets ⬇",
+    ATTACHMENTS_LABEL = "ATTACHMENTS_LABEL"
 }

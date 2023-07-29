@@ -17,6 +17,7 @@ import {
     IUIKitResponse,
     UIKitActionButtonInteractionContext,
     IUIKitInteractionHandler,
+    UIKitViewSubmitInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 import {
@@ -39,6 +40,8 @@ import {
 } from "./persistence/boardInteraction";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
+import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
+import { AppEnum } from "./enum/App";
 export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -51,7 +54,14 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         persistence: IPersistence,
         modify: IModify
     ): Promise<IUIKitResponse> {
-        const handler = new ExecuteBlockActionHandler( context);
+        const handler = new ExecuteBlockActionHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context
+        );
         return await handler.run();
     }
 
@@ -70,6 +80,24 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             modify
         );
         return await handler.run(context);
+    }
+
+    public async executeViewSubmitHandler(
+        context: UIKitViewSubmitInteractionContext,
+        read: IRead,
+        http: IHttp,
+        persistence: IPersistence,
+        modify: IModify
+    ): Promise<IUIKitResponse> {
+        const handler = new ExecuteViewSubmitHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify,
+            context
+        );
+        return await handler.run();
     }
 
     public async initialize(
@@ -216,6 +244,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 .setSender(user)
                 .setRoom(room)
                 .setParseUrls(true)
+                .setUsernameAlias(AppEnum.APP_NAME)
                 .setAttachments([
                     {
                         collapsed: true,

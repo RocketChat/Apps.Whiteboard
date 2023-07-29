@@ -8,6 +8,7 @@ import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
 import { Block, TextObject } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
+import { AppEnum } from "../enum/App";
 
 export async function getDirect(
     read: IRead,
@@ -72,6 +73,7 @@ export async function sendMessageWithAttachment(
         .getCreator()
         .startMessage()
         .setSender(sender)
+        .setUsernameAlias(AppEnum.APP_NAME)
         .setRoom(room)
         .setParseUrls(true)
         .setText(message);
