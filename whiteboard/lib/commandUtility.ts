@@ -58,6 +58,7 @@ export class CommandUtility implements ExecutorProps {
         const room = context.getRoom();
         const endpoints = app.getAccessors().providedApiEndpoints;
         const boardEndpoint = endpoints[0];
+        const appId = app.getID();
         if (room) {
             const randomBoardId = randomId();
             const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
@@ -67,6 +68,7 @@ export class CommandUtility implements ExecutorProps {
                 "Untitled Board",
                 boardURL,
                 randomBoardId,
+                appId,
                 {
                     width: 500,
                     height: 500,

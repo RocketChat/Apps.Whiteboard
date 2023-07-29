@@ -24,17 +24,18 @@ export async function buildHeaderBlock(
     title: string,
     boardURL: string,
     randomBoardId: string,
+    appId: string,
     dimnesions: {
         width: number;
         height: number;
     }
 ): Promise<Array<Block>> {
     const block: Block[] = [];
-
     const openbutton = getButton(
         "Edit Board",
         UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
+        appId,
         "Open",
         ButtonStyle.PRIMARY,
         boardURL
@@ -44,11 +45,14 @@ export async function buildHeaderBlock(
         "⚙️ Settings",
         UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
+        appId,
         "Settings",
-        undefined,
+        undefined
     );
 
-    const markdownBlock = getMarkdownBlock(`*Untitled Whiteboard* by \`@${username}\``);
+    const markdownBlock = getMarkdownBlock(
+        `*Untitled Whiteboard* by \`@${username}\``
+    );
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         settingButton,

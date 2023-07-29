@@ -35,6 +35,7 @@ export class ExecuteActionButtonHandler {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;
+                    const appId= this.app.getID();
                     if (room) {
                         const endpoints =
                             this.app.getAccessors().providedApiEndpoints;
@@ -50,6 +51,7 @@ export class ExecuteActionButtonHandler {
                             "Untitled Board",
                             boardURL,
                             randomBoardId,
+                            appId,
                             {
                                 width: 500,
                                 height: 500,
