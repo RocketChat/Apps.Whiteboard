@@ -52,3 +52,16 @@ export const getBoardRecord = async (
     return result && result.length ? result[0] : null;
 };
 
+export const getBoardRecordByMessageId = async (
+    persistenceRead: IPersistenceRead,
+    messageId: string
+): Promise<any> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.USER,
+        `${messageId}#MessageId`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+    return result && result.length ? result[0] : null;
+};

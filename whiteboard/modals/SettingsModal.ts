@@ -1,4 +1,5 @@
 import {
+    ButtonStyle,
     UIKitInteractionContext,
     UIKitSurfaceType,
 } from "@rocket.chat/apps-engine/definition/uikit";
@@ -21,7 +22,8 @@ import {
 } from "../helpers/blockBuilder";
 
 export async function SettingsModal(
-    appId: string
+    appId: string,
+    messageId: string
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -56,14 +58,16 @@ export async function SettingsModal(
         UtilityEnum.CLOSE_BLOCK_ID,
         UtilityEnum.CLOSE_ACTION_ID,
         appId,
-        "danger"
+        "",
+        ButtonStyle.DANGER
     );
     let submitButton = getButton(
         UtilityEnum.SUBMIT,
         UtilityEnum.SUBMIT_BLOCK_ID,
         UtilityEnum.SUBMIT_ACTION_ID,
         appId,
-        "primary"
+        messageId,
+        ButtonStyle.PRIMARY
     );
 
     const value = {

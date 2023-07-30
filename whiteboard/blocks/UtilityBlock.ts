@@ -21,14 +21,9 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 
 export async function buildHeaderBlock(
     username: string,
-    title: string,
     boardURL: string,
-    randomBoardId: string,
     appId: string,
-    dimnesions: {
-        width: number;
-        height: number;
-    }
+    boardname?: string
 ): Promise<Array<Block>> {
     const block: Block[] = [];
     const openbutton = getButton(
@@ -49,10 +44,16 @@ export async function buildHeaderBlock(
         "Settings",
         undefined
     );
-
-    const markdownBlock = getMarkdownBlock(
-        `*Untitled Whiteboard* by \`@${username}\``
-    );
+    let markdownBlock: SectionBlock;
+    if (boardname == undefined) {
+        markdownBlock = getMarkdownBlock(
+            `*Untitled Whiteboard* by \`@${username}\``
+        );
+    } else {
+        markdownBlock = getMarkdownBlock(
+            `*${boardname} Whiteboard* by \`@${username}\``
+        );
+    }
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         settingButton,

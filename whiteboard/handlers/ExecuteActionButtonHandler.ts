@@ -48,14 +48,9 @@ export class ExecuteActionButtonHandler {
 
                         const headerBlock = await buildHeaderBlock(
                             sender.username,
-                            "Untitled Board",
                             boardURL,
-                            randomBoardId,
                             appId,
-                            {
-                                width: 500,
-                                height: 500,
-                            }
+                            undefined
                         );
                         const attachments = [
                             {

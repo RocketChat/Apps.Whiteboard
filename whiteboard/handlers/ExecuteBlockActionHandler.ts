@@ -30,16 +30,19 @@ export class ExecuteBlockActionHandler {
             switch (actionId) {
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
                     console.log("Settings button clicked");
-                    const modal = await SettingsModal(appId);
-                    await Promise.all([
-                        this.modify.getUiController().openSurfaceView(
-                            modal,
-                            {
-                                triggerId,
-                            },
-                            user
-                        ),
-                    ]);
+                    const messageId =  data.message?.id;
+                    if (messageId) {
+                        const modal = await SettingsModal(appId, messageId);
+                        await Promise.all([
+                            this.modify.getUiController().openSurfaceView(
+                                modal,
+                                {
+                                    triggerId,
+                                },
+                                user
+                            ),
+                        ]);
+                    }
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
