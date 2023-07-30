@@ -110,6 +110,32 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+async function getBoardData(baseURL: string, boardId: string) {
+  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+  });
+  const response = await res.json();
+  //   console.log("getBoardData", response);
+  return response;
+}
+async function postBoardData(baseURL: string, board: BoardData) {
+  fetch(`${baseURL}/board/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+    body: JSON.stringify(board),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log("Update Data Success", data));
+}
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
@@ -126,25 +152,17 @@ const initializeScene = async (opts: {
     /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
-  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Security-Policy":
-        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    },
-  });
-  const response = await res.json();
-  let dataState = response.data.boardData;
+  const response = await getBoardData(baseURL, boardId);
+  const dataState = response.data.boardData;
   const elements = dataState.elements;
   const appState = dataState.appState;
   const files = dataState.files;
-  console.log("dataState", dataState);
+  console.log("dataState", dataState.appState);
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
   } = {
     elements,
-    appState:getDefaultAppState(),
+    appState:getDefaultAppState(), // Default appState is only working not /get appState
     files,
     scrollToContent: true,
   };
@@ -156,21 +174,15 @@ const initializeScene = async (opts: {
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
-      roomLinkData 
+      roomLinkData
       // otherwise, prompt whether user wants to override current scene
-    //   window.confirm(t("alerts.loadSceneOverridePrompt"))
+      //   window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
           dataState
-          //   Object.assign(getDefaultAppState(), {
-          //     offsetTop: 0,
-          //     offsetLeft: 0,
-          //     width: window.innerWidth,
-          //     height: window.innerHeight,
-          //   }) as ImportedDataState
         );
       }
       scene.scrollToContent = true;
@@ -269,36 +281,6 @@ const detectedLangCode = languageDetector.detect() || defaultLang.code;
 export const appLangCodeAtom = atom(
   Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode
 );
-
-async function getBoardData(baseURL: string, boardId: string) {
-  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Security-Policy":
-        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    },
-  });
-  const response = await res.json();
-  //   console.log("getBoardData", response);
-  return response;
-}
-async function postBoardData(baseURL: string, board: BoardData) {
-  const { boardData, boardId } = board;
-  const resp = await getBoardData(baseURL, boardId);
-  const { boardData: remoteBoard } = resp.data;
-  fetch(`${baseURL}/board/update`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Security-Policy":
-        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    },
-    body: JSON.stringify(board),
-  })
-    .then((res) => res.json())
-    .then((data) => console.log("Update Data Success", data));
-}
 
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
