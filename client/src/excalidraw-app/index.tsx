@@ -162,7 +162,7 @@ const initializeScene = async (opts: {
     scrollToContent?: boolean;
   } = {
     elements,
-    appState:getDefaultAppState(), // Default appState is only working not /get appState
+    appState: getDefaultAppState(), // Default appState is only working not /get appState
     files,
     scrollToContent: true,
   };
@@ -600,9 +600,15 @@ const ExcalidrawWrapper = () => {
             }
           });
         }
+        const reconciledElements = reconcileElements(
+          elements,
+          excalidrawAPI?.getSceneElementsIncludingDeleted() || [],
+          appState
+        );
+        elements=reconciledElements;
 
         const canvas = await exportToCanvas({
-          elements,
+          elements: elements,
           appState: appState,
           files,
           maxWidthOrHeight: 360 * 3,
