@@ -6,26 +6,12 @@ import {
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
-    ButtonStyle,
-    IBlock,
     IUIKitResponse,
     UIKitViewSubmitInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
-import { sendNotification, sendMessage } from "../lib/messages";
-import { AppEnum } from "../enum/App";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import {
-    getActionsBlock,
-    getButton,
-    getMarkdownBlock,
-} from "../helpers/blockBuilder";
-import { Block } from "@rocket.chat/ui-kit";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
-import {
-    getBoardRecord,
-    getBoardRecordByMessageId,
-} from "../persistence/boardInteraction";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -39,8 +25,7 @@ export class ExecuteViewSubmitHandler {
     ) {}
 
     public async run(): Promise<IUIKitResponse> {
-        const { user, view } =
-            this.context.getInteractionData();
+        const { user, view } = this.context.getInteractionData();
 
         const AppSender: IUser = (await this.read
             .getUserReader()
@@ -66,33 +51,24 @@ export class ExecuteViewSubmitHandler {
                                 .getRoom(messageId);
 
                             if (room) {
-                                const { id } = await getBoardRecordByMessageId(
-                                    this.read.getPersistenceReader(),
-                                    messageId
-                                );
-                                console.log(id);
-                                const endpoints =
-                                    this.app.getAccessors()
-                                        .providedApiEndpoints;
-                                const boardEndpoint = endpoints[0];
-                                const boardURL = `${boardEndpoint.computedPath}?id=${id}`;
+                                const message = await this.modify
+                                    .getUpdater()
+                                    .message(messageId, AppSender);
 
-                                console.log("boardId", id);
+                                const url =
+                                    message.getBlocks()[1]["elements"][1][
+                                        "url"
+                                    ];
+                                console.log(url);
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
                                         user.username,
-                                        boardURL,
+                                        url,
                                         appId,
                                         boardname
                                     );
 
-                                const message = (
-                                    await this.modify
-                                        .getUpdater()
-                                        .message(messageId, AppSender)
-                                )
-                                    .setEditor(user)
-                                    .setRoom(room);
+                                message.setEditor(user).setRoom(room);
                                 message.setBlocks(updateHeaderBlock);
 
                                 await this.modify.getUpdater().finish(message);
