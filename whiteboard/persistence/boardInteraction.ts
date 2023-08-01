@@ -13,24 +13,44 @@ export const storeBoardRecord = async (
     persistence: IPersistence,
     boardId: string,
     boardData: any,
-    messageId:string,
+    messageId: string,
     cover: string,
     title: string
 ): Promise<void> => {
-    const association = new RocketChatAssociationRecord(
+    const boardassociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
     );
+
+    const messageAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
     await persistence.updateByAssociation(
-        association,
+        boardassociation,
         {
             id: boardId,
-            boardData:{
+            boardData: {
                 elements: boardData.elements,
                 appState: boardData.appState,
                 files: boardData.files,
             },
             messageId,
+            cover,
+            title,
+        },
+        true
+    );
+    await persistence.updateByAssociation(
+        messageAssociation,
+        {
+            id: messageId,
+            boardData: {
+                elements: boardData.elements,
+                appState: boardData.appState,
+                files: boardData.files,
+            },
+            boardId: boardId,
             cover,
             title,
         },
@@ -45,6 +65,20 @@ export const getBoardRecord = async (
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+    return result && result.length ? result[0] : null;
+};
+
+export const getBoardRecordByMessageId = async (
+    persistenceRead: IPersistenceRead,
+    messageId: string
+): Promise<any> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
     );
     const result = (await persistenceRead.readByAssociation(
         association

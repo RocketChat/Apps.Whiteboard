@@ -39,20 +39,6 @@ export async function SettingsModal(
     );
     block.push(boardInputBlock);
 
-    const attachmentsButton = getButton(
-        UtilityEnum.ATTACHMENTS,
-        UtilityEnum.ATTACHMENTS_BLOCK_ID,
-        UtilityEnum.ATTACHMENTS_ACTION_ID,
-        appId,
-        undefined
-    );
-
-    const attachmentsActionBlock = getActionsBlock(
-        UtilityEnum.ATTACHMENTS_BLOCK_ID,
-        [attachmentsButton]
-    );
-    block.push(attachmentsActionBlock);
-
     let closeButton = getButton(
         UtilityEnum.CANCEL,
         UtilityEnum.CLOSE_BLOCK_ID,
