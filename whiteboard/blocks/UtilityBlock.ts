@@ -55,18 +55,18 @@ export async function buildHeaderBlock(
         );
     }
 
-    const attachmentsButton = getButton(
-        UtilityEnum.ATTACHMENTS,
-        UtilityEnum.ATTACHMENTS_BLOCK_ID,
-        UtilityEnum.ATTACHMENTS_ACTION_ID,
-        appId,
-        undefined
-    );
+    // const attachmentsButton = getButton(
+    //     UtilityEnum.ATTACHMENTS,
+    //     UtilityEnum.ATTACHMENTS_BLOCK_ID,
+    //     UtilityEnum.ATTACHMENTS_ACTION_ID,
+    //     appId,
+    //     undefined
+    // );
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         settingButton,
         openbutton,
-        attachmentsButton
+        // attachmentsButton
     ]);
     block.push(markdownBlock);
     block.push(actionBlock);

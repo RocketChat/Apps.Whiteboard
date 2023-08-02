@@ -52,52 +52,6 @@ export class ExecuteBlockActionHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
-
-                case UtilityEnum.ATTACHMENTS_ACTION_ID:
-                    if (messageId && room) {
-                        const boardRecord = await getBoardRecordByMessageId(
-                            this.read.getPersistenceReader(),
-                            messageId
-                        );
-                        const filesObject = Object.values(
-                            boardRecord.boardData.files
-                        );
-                        const urlArray: string[] = [];
-
-                        const message = await this.modify
-                            .getUpdater()
-                            .message(messageId, AppSender);
-                        message.setEditor(user).setRoom(room);
-
-                        filesObject.forEach((element: Object) => {
-                            urlArray.push(element["dataURL"]);
-                        });
-                        if (
-                            message.getAttachments().length ==
-                            urlArray.length + 1
-                        ) {
-                            return this.context
-                                .getInteractionResponder()
-                                .successResponse();
-                        }
-                        urlArray.forEach((element: string) => {
-                            message.addAttachment({
-                                color: "#00000000",
-                                title: {
-                                    link: element,
-                                    displayDownloadLink: true,
-                                    value: "Click to download asset",
-                                },
-                                thumbnailUrl: element,
-                            });
-                        });
-
-                        await this.modify.getUpdater().finish(message);
-                    }
-
-                    return this.context
-                        .getInteractionResponder()
-                        .successResponse();
                 default:
                     return this.context
                         .getInteractionResponder()

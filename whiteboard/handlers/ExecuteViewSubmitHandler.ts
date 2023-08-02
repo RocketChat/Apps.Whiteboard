@@ -12,6 +12,7 @@ import {
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
+import { updateBoardnameByMessageId } from "../persistence/boardInteraction";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -46,6 +47,11 @@ export class ExecuteViewSubmitHandler {
                         console.log(messageId);
 
                         if (messageId) {
+                            await updateBoardnameByMessageId(
+                                this.persistence,
+                                messageId,
+                                boardname
+                            );
                             const room = await this.read
                                 .getMessageReader()
                                 .getRoom(messageId);

@@ -26,8 +26,8 @@ export const storeBoardRecord = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
-    await persistence.updateByAssociation(
-        boardassociation,
+    await persistence.updateByAssociations(
+        [boardassociation, messageAssociation],
         {
             id: boardId,
             boardData: {
@@ -37,25 +37,10 @@ export const storeBoardRecord = async (
             },
             messageId,
             cover,
-            title,
+            title:"",
         },
         true
-    );
-    await persistence.updateByAssociation(
-        messageAssociation,
-        {
-            id: messageId,
-            boardData: {
-                elements: boardData.elements,
-                appState: boardData.appState,
-                files: boardData.files,
-            },
-            boardId: boardId,
-            cover,
-            title,
-        },
-        true
-    );
+    )
 };
 
 export const getBoardRecord = async (
@@ -84,4 +69,22 @@ export const getBoardRecordByMessageId = async (
         association
     )) as Array<any>;
     return result && result.length ? result[0] : null;
+};
+
+export const updateBoardnameByMessageId = async (
+    persistence: IPersistence,
+    messageId: string,
+    boardName: string
+): Promise<void> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
+    const res=await persistence.updateByAssociation(
+        association,
+        {
+            title:boardName,
+        },
+        true
+    );
 };
