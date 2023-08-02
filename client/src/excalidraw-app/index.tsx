@@ -600,9 +600,10 @@ const ExcalidrawWrapper = () => {
             }
           });
         }
+        const remoteElements = await getBoardData(baseURL, boardId);
         const reconciledElements = reconcileElements(
           elements,
-          excalidrawAPI?.getSceneElementsIncludingDeleted() || [],
+          remoteElements,
           appState
         );
         elements=reconciledElements;
