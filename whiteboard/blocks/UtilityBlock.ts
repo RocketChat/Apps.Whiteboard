@@ -21,37 +21,52 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 
 export async function buildHeaderBlock(
     username: string,
-    title: string,
     boardURL: string,
-    randomBoardId: string,
-    dimnesions: {
-        width: number;
-        height: number;
-    }
+    appId: string,
+    boardname?: string
 ): Promise<Array<Block>> {
     const block: Block[] = [];
     const openbutton = getButton(
         "Edit Board",
-        "edit",
+        UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
+        appId,
         "Open",
         ButtonStyle.PRIMARY,
         boardURL
     );
 
     const settingButton = getButton(
-        "⚙️",
-        "setting",
+        "⚙️ Settings",
+        UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
+        appId,
         "Settings",
-        undefined,
+        undefined
     );
+    let markdownBlock: SectionBlock;
+    if (boardname == undefined) {
+        markdownBlock = getMarkdownBlock(
+            `*Untitled Whiteboard* by \`@${username}\``
+        );
+    } else {
+        markdownBlock = getMarkdownBlock(
+            `*${boardname} Whiteboard* by \`@${username}\``
+        );
+    }
 
-    const markdownBlock = getMarkdownBlock(`*Untitled Whiteboard* by \`@${username}\``);
+    // const attachmentsButton = getButton(
+    //     UtilityEnum.ATTACHMENTS,
+    //     UtilityEnum.ATTACHMENTS_BLOCK_ID,
+    //     UtilityEnum.ATTACHMENTS_ACTION_ID,
+    //     appId,
+    //     undefined
+    // );
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         settingButton,
         openbutton,
+        // attachmentsButton
     ]);
     block.push(markdownBlock);
     block.push(actionBlock);

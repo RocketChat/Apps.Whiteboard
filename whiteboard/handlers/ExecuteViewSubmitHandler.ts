@@ -5,14 +5,14 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
-import { UIKitViewSubmitInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
+import {
+    IUIKitResponse,
+    UIKitViewSubmitInteractionContext,
+} from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
-import { getInteractionRoomData } from "../persistence/roomInteraction";
-import { storeAuthData } from "../persistence/authorization";
-import { sendNotification, sendMessage } from "../lib/messages";
-import { AppEnum } from "../enum/App";
-import { createBoard, deleteBoard, getAuth } from "../lib/post/postDetails";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
+import { buildHeaderBlock } from "../blocks/UtilityBlock";
+import { updateBoardnameByMessageId } from "../persistence/boardInteraction";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -21,118 +21,85 @@ export class ExecuteViewSubmitHandler {
         private readonly read: IRead,
         private readonly http: IHttp,
         private readonly persistence: IPersistence,
-        private readonly modify: IModify
+        private readonly modify: IModify,
+        private readonly context: UIKitViewSubmitInteractionContext
     ) {}
 
-    public async run(context: UIKitViewSubmitInteractionContext) {
-        const { user, view } = context.getInteractionData();
+    public async run(): Promise<IUIKitResponse> {
+        const { user, view } = this.context.getInteractionData();
+
         const AppSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
-
+        const appId = AppSender.appId;
         try {
             switch (view.id) {
-                case UtilityEnum.DELETE_BOARD_MODAL:
-                    if (user.id && view.state) {
-                        const { roomId } = await getInteractionRoomData(
-                            this.read.getPersistenceReader(),
-                            user.id
-                        );
-                        if (roomId) {
+                case UtilityEnum.SETTINGS_MODAL_ID:
+                    if (view.state && appId) {
+                        const boardname =
+                            view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
+                                UtilityEnum.BOARD_INPUT_ACTION_ID
+                            ];
+                        const messageId =
+                            this.context.getInteractionData().view.submit
+                                ?.value;
+
+                        console.log(messageId);
+
+                        if (messageId) {
+                            await updateBoardnameByMessageId(
+                                this.persistence,
+                                messageId,
+                                boardname
+                            );
                             const room = await this.read
-                                .getRoomReader()
-                                .getById(roomId);
-                            const boardname =
-                                view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
-                                    UtilityEnum.BOARD_NAME_ACTION_ID
-                                ];
+                                .getMessageReader()
+                                .getRoom(messageId);
 
                             if (room) {
-                                const deleteResult = await deleteBoard({
-                                    http: this.http,
-                                    modify: this.modify,
-                                    persistence: this.persistence,
-                                    read: this.read,
-                                    user: user,
-                                    room: roomId,
-                                    boardname: boardname,
-                                });
+                                const message = await this.modify
+                                    .getUpdater()
+                                    .message(messageId, AppSender);
 
-                                if (deleteResult == true) {
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${boardname}** whiteboard deleted! by @${user.username}`
+                                const url =
+                                    message.getBlocks()[1]["elements"][1][
+                                        "url"
+                                    ];
+                                console.log(url);
+                                const updateHeaderBlock =
+                                    await buildHeaderBlock(
+                                        user.username,
+                                        url,
+                                        appId,
+                                        boardname
                                     );
-                                } else {
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${boardname}** whiteboard deletion failed! by @${user.username}`
-                                    );
-                                }
+
+                                message.setEditor(user).setRoom(room);
+                                message.setBlocks(updateHeaderBlock);
+
+                                await this.modify.getUpdater().finish(message);
+                            } else {
+                                console.log("Room not found");
                             }
+                        } else {
+                            console.log("MessageId not found");
                         }
+                    } else {
+                        console.log("Submit Failed");
                     }
-                    break;
 
-                case UtilityEnum.AUTH_MODAL:
-                    if (user.id && view.state) {
-                        //Use the persistence functions to store the room data
-                        const { roomId } = await getInteractionRoomData(
-                            this.read.getPersistenceReader(),
-                            user.id
-                        );
-                        if (roomId) {
-                            const room = await this.read
-                                .getRoomReader()
-                                .getById(roomId);
-                            if (room) {
-                                const auth = await getAuth({
-                                    http: this.http,
-                                    modify: this.modify,
-                                    persistence: this.persistence,
-                                    read: this.read,
-                                    user: user,
-                                    room: roomId,
-                                });
-
-                                if (auth == true) {
-                                    const Auth_Status = true;
-                                    await storeAuthData(
-                                        this.persistence,
-                                        user.id,
-                                        roomId,
-                                        Auth_Status
-                                    );
-                                    await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `**${AppEnum.APP_ID}** authorized by @${user.username}`
-                                    );
-                                } else {
-                                    await sendNotification(
-                                        this.read,
-                                        this.modify,
-                                        AppSender,
-                                        room,
-                                        `**${AppEnum.APP_ID}** authorization failed`
-                                    );
-                                }
-                            }
-                        }
-                    }
-                    break;
-
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 default:
                     console.log("View Id not found");
-                    break;
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
             }
         } catch (err) {
             console.log(err);
+            return this.context.getInteractionResponder().errorResponse();
         }
     }
 }
