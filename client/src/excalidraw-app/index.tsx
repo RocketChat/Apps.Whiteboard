@@ -600,13 +600,14 @@ const ExcalidrawWrapper = () => {
             }
           });
         }
-        const remoteElements = await getBoardData(baseURL, boardId);
+        const remoteElements = (await getBoardData(baseURL, boardId)).data
+          .boardData.elements;
         const reconciledElements = reconcileElements(
           elements,
           remoteElements,
           appState
         );
-        elements=reconciledElements;
+        elements = reconciledElements;
 
         const canvas = await exportToCanvas({
           elements: elements,
@@ -622,7 +623,6 @@ const ExcalidrawWrapper = () => {
         });
 
         const canvasBase64 = canvas.toDataURL();
-        console.log("canvasBase64", canvasBase64);
 
         postBoardData(baseURL, {
           boardId,
