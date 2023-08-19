@@ -44,8 +44,6 @@ export class ExecuteViewSubmitHandler {
                             this.context.getInteractionData().view.submit
                                 ?.value;
 
-                        console.log(messageId);
-
                         if (messageId) {
                             await updateBoardnameByMessageId(
                                 this.persistence,
@@ -65,7 +63,6 @@ export class ExecuteViewSubmitHandler {
                                     message.getBlocks()[1]["elements"][1][
                                         "url"
                                     ];
-                                console.log(url);
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
                                         user.username,
@@ -77,7 +74,32 @@ export class ExecuteViewSubmitHandler {
                                 message.setEditor(user).setRoom(room);
                                 message.setBlocks(updateHeaderBlock);
 
-                                await this.modify.getUpdater().finish(message);
+                                const boardStatus =
+                                    view.state[
+                                        UtilityEnum.BOARD_SELECT_BLOCK_ID
+                                    ][UtilityEnum.BOARD_SELECT_ACTION_ID];
+
+                                if (
+                                    boardStatus != undefined &&
+                                    boardStatus == UtilityEnum.PRIVATE
+                                ) {
+                                    message.addCustomField(
+                                        "BoardStatus",
+                                        UtilityEnum.PRIVATE
+                                    );
+                                    console.log(
+                                        message["msg"]["customFields"][
+                                            "BoardStatus"
+                                        ]
+                                    );
+                                    await this.modify
+                                        .getNotifier()
+                                        .notifyUser(user, message.getMessage());
+                                } else {
+                                    await this.modify
+                                        .getUpdater()
+                                        .finish(message);
+                                }
                             } else {
                                 console.log("Room not found");
                             }

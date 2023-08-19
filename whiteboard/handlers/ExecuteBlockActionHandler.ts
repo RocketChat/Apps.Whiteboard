@@ -52,6 +52,12 @@ export class ExecuteBlockActionHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+
+                case UtilityEnum.BOARD_SELECT_ACTION_ID:
+                    console.log("Data",data.value);
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 default:
                     return this.context
                         .getInteractionResponder()

@@ -239,6 +239,8 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const room = await read.getMessageReader().getRoom(msgId);
 
         if (room) {
+            const originalMsg = await read.getMessageReader().getById(msgId);
+            console.log("Original Msg", originalMsg);
             const previewMsg = (await modify.getUpdater().message(msgId, user))
                 .setEditor(user)
                 .setSender(user)
@@ -253,7 +255,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                         type: "image",
                     },
                 ]);
-
             await modify.getUpdater().finish(previewMsg);
         }
 
