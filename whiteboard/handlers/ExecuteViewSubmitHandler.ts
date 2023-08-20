@@ -13,6 +13,7 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { updateBoardnameByMessageId } from "../persistence/boardInteraction";
+import { getDirect } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -27,7 +28,6 @@ export class ExecuteViewSubmitHandler {
 
     public async run(): Promise<IUIKitResponse> {
         const { user, view } = this.context.getInteractionData();
-
         const AppSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
@@ -74,27 +74,48 @@ export class ExecuteViewSubmitHandler {
                                 message.setEditor(user).setRoom(room);
                                 message.setBlocks(updateHeaderBlock);
 
-                                const boardStatus =
+                                if (
                                     view.state[
                                         UtilityEnum.BOARD_SELECT_BLOCK_ID
-                                    ][UtilityEnum.BOARD_SELECT_ACTION_ID];
-
-                                if (
-                                    boardStatus != undefined &&
-                                    boardStatus == UtilityEnum.PRIVATE
+                                    ] != undefined &&
+                                    view.state[
+                                        UtilityEnum.BOARD_SELECT_BLOCK_ID
+                                    ][UtilityEnum.BOARD_SELECT_ACTION_ID] !=
+                                        undefined
                                 ) {
-                                    message.addCustomField(
-                                        "BoardStatus",
-                                        UtilityEnum.PRIVATE
-                                    );
-                                    console.log(
-                                        message["msg"]["customFields"][
-                                            "BoardStatus"
-                                        ]
-                                    );
-                                    await this.modify
-                                        .getNotifier()
-                                        .notifyUser(user, message.getMessage());
+                                    const boardStatus =
+                                        view.state[
+                                            UtilityEnum.BOARD_SELECT_BLOCK_ID
+                                        ][UtilityEnum.BOARD_SELECT_ACTION_ID];
+
+                                    if (
+                                        boardStatus != undefined &&
+                                        boardStatus == UtilityEnum.PRIVATE
+                                    ) {
+                                        message.addCustomField(
+                                            "BoardStatus",
+                                            UtilityEnum.PRIVATE
+                                        );
+                                        console.log(
+                                            message["msg"]["customFields"][
+                                                "BoardStatus"
+                                            ]
+                                        );
+                                        const direct = await getDirect(
+                                            this.read,
+                                            this.modify,
+                                            AppSender,
+                                            user.username,
+                                        );
+
+                                        console.log("Direct found", direct);
+                                        if (direct) {
+                                            message.setRoom(direct);
+                                            await this.modify
+                                                .getUpdater()
+                                                .finish(message);
+                                        }
+                                    }
                                 } else {
                                     await this.modify
                                         .getUpdater()
@@ -113,6 +134,7 @@ export class ExecuteViewSubmitHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+
                 default:
                     console.log("View Id not found");
                     return this.context

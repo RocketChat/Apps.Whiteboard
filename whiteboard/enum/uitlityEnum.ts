@@ -34,8 +34,8 @@ export enum UtilityEnum {
     ATTACHMENTS = "Download Assets ⬇",
     ATTACHMENTS_LABEL = "ATTACHMENTS_LABEL",
     BOARD_SELECT_LABEL = "Select Public or Private Board",
-    BOARD_SELECT_BLOCK_ID = "BOARD_SELECT_BLOCK_ID",
-    BOARD_SELECT_ACTION_ID = "BOARD_SELECT_ACTION_ID",
+    BOARD_SELECT_BLOCK_ID = "board-select-block-id",
+    BOARD_SELECT_ACTION_ID = "board-select-action-id",
     PRIVATE = "PRIVATE",
-    PUBLIC = "PUBLIC"
+    PUBLIC = "PUBLIC",
 }

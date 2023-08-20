@@ -15,7 +15,7 @@ export const storeBoardRecord = async (
     boardData: any,
     messageId: string,
     cover: string,
-    title: string
+    title: string,
 ): Promise<void> => {
     const boardassociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
