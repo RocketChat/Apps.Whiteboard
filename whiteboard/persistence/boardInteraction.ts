@@ -6,6 +6,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
+import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
 
 //functions needed to persist board data while modal and other UI interactions
 
@@ -16,6 +17,7 @@ export const storeBoardRecord = async (
     messageId: string,
     cover: string,
     title: string,
+    room?:IRoom
 ): Promise<void> => {
     const boardassociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
@@ -38,6 +40,7 @@ export const storeBoardRecord = async (
             messageId,
             cover,
             title:"",
+            room
         },
         true
     )

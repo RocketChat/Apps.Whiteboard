@@ -12,8 +12,11 @@ import {
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
-import { updateBoardnameByMessageId } from "../persistence/boardInteraction";
-import { getDirect } from "../lib/messages";
+import {
+    getBoardRecordByMessageId,
+    updateBoardnameByMessageId,
+} from "../persistence/boardInteraction";
+import { getDirect, sendMessage, sendNotification } from "../lib/messages";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -92,25 +95,53 @@ export class ExecuteViewSubmitHandler {
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PRIVATE
                                     ) {
-                                        message.addCustomField(
-                                            "BoardStatus",
-                                            UtilityEnum.PRIVATE
-                                        );
-                                        console.log(
-                                            message["msg"]["customFields"][
-                                                "BoardStatus"
-                                            ]
-                                        );
-                                        const direct = await getDirect(
+                                        const directRoom = await getDirect(
                                             this.read,
                                             this.modify,
                                             AppSender,
-                                            user.username,
+                                            user.username
                                         );
 
-                                        console.log("Direct found", direct);
-                                        if (direct) {
-                                            message.setRoom(direct);
+                                        if (directRoom) {
+                                            await sendNotification(
+                                                this.read,
+                                                this.modify,
+                                                user,
+                                                room,
+                                                `This Board has been made private by \`@${user.username}\``
+                                            );
+                                            await sendNotification(
+                                                this.read,
+                                                this.modify,
+                                                user,
+                                                directRoom,
+                                                `This Board has been made private by you`
+                                            );
+                                            message.setRoom(directRoom);
+                                            await this.modify
+                                                .getUpdater()
+                                                .finish(message);
+                                        }
+                                    }
+                                    if (
+                                        boardStatus != undefined &&
+                                        boardStatus == UtilityEnum.PUBLIC
+                                    ) {
+                                        const originalRoom = (
+                                            await getBoardRecordByMessageId(
+                                                this.read.getPersistenceReader(),
+                                                messageId
+                                            )
+                                        ).room;
+                                        if (originalRoom) {
+                                            await sendNotification(
+                                                this.read,
+                                                this.modify,
+                                                user,
+                                                room,
+                                                `This Board has been made public by you`
+                                            );
+                                            message.setRoom(originalRoom);
                                             await this.modify
                                                 .getUpdater()
                                                 .finish(message);

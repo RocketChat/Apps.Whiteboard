@@ -94,7 +94,8 @@ export class CommandUtility implements ExecutorProps {
                 },
                 messageId,
                 "",
-                "Untitled Whiteboard"
+                "Untitled Whiteboard",
+                room
             );
         }
     }

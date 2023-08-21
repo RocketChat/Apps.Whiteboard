@@ -233,14 +233,21 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             boardId
         );
         const msgId = boardata.messageId;
-        await storeBoardRecord(persis, boardId, boardData, msgId, cover, title);
 
         const user = (await read.getMessageReader().getSenderUser(msgId))!;
         const room = await read.getMessageReader().getRoom(msgId);
+        if (room) {
+            await storeBoardRecord(
+                persis,
+                boardId,
+                boardData,
+                msgId,
+                cover,
+                title,
+            );
+        }
 
         if (room) {
-            const originalMsg = await read.getMessageReader().getById(msgId);
-            console.log("Original Msg", originalMsg);
             const previewMsg = (await modify.getUpdater().message(msgId, user))
                 .setEditor(user)
                 .setSender(user)

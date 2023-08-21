@@ -77,7 +77,8 @@ export class ExecuteActionButtonHandler {
                             },
                             messageId,
                             "",
-                            "Untitled Whiteboard"
+                            "Untitled Whiteboard",
+                            room
                         );
                     }
 
