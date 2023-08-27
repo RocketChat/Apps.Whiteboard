@@ -1,5 +1,6 @@
 import {
     IHttp,
+    IMessageBuilder,
     IModify,
     IPersistence,
     IRead,
@@ -15,8 +16,12 @@ import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
     updateBoardnameByMessageId,
+    updatePrivateMessageIdByMessageId,
 } from "../persistence/boardInteraction";
 import { getDirect, sendMessage, sendNotification } from "../lib/messages";
+import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
+import { IRoom } from "@rocket.chat/apps-engine/definition/rooms/IRoom";
+import { AppEnum } from "../enum/App";
 
 //This class will handle all the view submit interactions
 export class ExecuteViewSubmitHandler {
@@ -90,62 +95,21 @@ export class ExecuteViewSubmitHandler {
                                         view.state[
                                             UtilityEnum.BOARD_SELECT_BLOCK_ID
                                         ][UtilityEnum.BOARD_SELECT_ACTION_ID];
-
                                     if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PRIVATE
                                     ) {
-                                        const directRoom = await getDirect(
-                                            this.read,
-                                            this.modify,
+                                        await this.publicToPrivate(
+                                            message,
+                                            messageId,
                                             AppSender,
-                                            user.username
+                                            user
                                         );
-
-                                        if (directRoom) {
-                                            await sendNotification(
-                                                this.read,
-                                                this.modify,
-                                                user,
-                                                room,
-                                                `This Board has been made private by \`@${user.username}\``
-                                            );
-                                            await sendNotification(
-                                                this.read,
-                                                this.modify,
-                                                user,
-                                                directRoom,
-                                                `This Board has been made private by you`
-                                            );
-                                            message.setRoom(directRoom);
-                                            await this.modify
-                                                .getUpdater()
-                                                .finish(message);
-                                        }
                                     }
                                     if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PUBLIC
                                     ) {
-                                        const originalRoom = (
-                                            await getBoardRecordByMessageId(
-                                                this.read.getPersistenceReader(),
-                                                messageId
-                                            )
-                                        ).room;
-                                        if (originalRoom) {
-                                            await sendNotification(
-                                                this.read,
-                                                this.modify,
-                                                user,
-                                                room,
-                                                `This Board has been made public by you`
-                                            );
-                                            message.setRoom(originalRoom);
-                                            await this.modify
-                                                .getUpdater()
-                                                .finish(message);
-                                        }
                                     }
                                 } else {
                                     await this.modify
@@ -175,6 +139,52 @@ export class ExecuteViewSubmitHandler {
         } catch (err) {
             console.log(err);
             return this.context.getInteractionResponder().errorResponse();
+        }
+    }
+    private async publicToPrivate(
+        message: IMessageBuilder,
+        messageId: string,
+        AppSender: IUser,
+        user: IUser
+    ) {
+        const directRoom = await getDirect(
+            this.read,
+            this.modify,
+            AppSender,
+            user.username
+        );
+        if (directRoom) {
+            const privateMessage = this.modify.getCreator().startMessage();
+            privateMessage
+                .setSender(AppSender)
+                .setRoom(directRoom)
+                .setEditor(AppSender)
+                .setBlocks(message.getBlocks())
+                .setUsernameAlias(AppEnum.APP_NAME);
+            const privateMessageAttachments = message.getAttachments();
+            privateMessageAttachments.forEach(
+                (attachment: IMessageAttachment) => {
+                    privateMessage.addAttachment(attachment);
+                }
+            );
+            const privateMessageId = await this.modify
+                .getCreator()
+                .finish(privateMessage);
+
+            await updatePrivateMessageIdByMessageId(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                messageId,
+                privateMessageId
+            );
+            message
+                .setBlocks([])
+                .setAttachments([])
+                .setText(
+                    `(This whiteboard has been made private by \`@${user.username}\`)`
+                )
+                .setUsernameAlias(AppEnum.APP_NAME);
+            await this.modify.getUpdater().finish(message);
         }
     }
 }

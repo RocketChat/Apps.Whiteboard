@@ -17,7 +17,7 @@ export const storeBoardRecord = async (
     messageId: string,
     cover: string,
     title: string,
-    room?:IRoom
+    privateMessageId: string
 ): Promise<void> => {
     const boardassociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
@@ -39,11 +39,11 @@ export const storeBoardRecord = async (
             },
             messageId,
             cover,
-            title:"",
-            room
+            title,
+            privateMessageId,
         },
         true
-    )
+    );
 };
 
 export const getBoardRecord = async (
@@ -83,11 +83,42 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
-    const res=await persistence.updateByAssociation(
+    await persistence.updateByAssociation(
         association,
         {
-            title:boardName,
+            title: boardName,
         },
         true
+    );
+};
+
+export const updatePrivateMessageIdByMessageId = async (
+    persistence: IPersistence,
+    persistenceRead: IPersistenceRead,
+    messageId: string,
+    privateMessageId: string
+): Promise<void> => {
+    let records = await getBoardRecordByMessageId(persistenceRead, messageId);
+    if (!records) {
+        console.log("No records found");
+        return;
+    }
+    const boardId = records["id"];
+
+    const boardassociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.USER,
+        `${boardId}#BoardName`
+    );
+
+    const messageAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
+
+    records["privateMessageId"] = privateMessageId;
+        await persistence.updateByAssociations(
+            [boardassociation, messageAssociation],
+            records,
+            false
     );
 };

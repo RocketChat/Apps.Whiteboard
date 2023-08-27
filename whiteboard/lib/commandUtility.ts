@@ -8,7 +8,7 @@ import {
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { ExecutorProps } from "../definitions/ExecutorProps";
-import {  WhiteboardApp } from "../WhiteboardApp";
+import { WhiteboardApp } from "../WhiteboardApp";
 import {
     helperMessage,
     sendMessage,
@@ -16,9 +16,7 @@ import {
 } from "./messages";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
-import {
-    storeBoardRecord,
-} from "../persistence/boardInteraction";
+import { storeBoardRecord } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
 import { defaultPreview } from "../assets/defaultPreview";
 
@@ -73,7 +71,7 @@ export class CommandUtility implements ExecutorProps {
                 {
                     collapsed: true,
                     color: "#00000000",
-                    imageUrl:defaultPreview
+                    imageUrl: defaultPreview,
                 },
             ];
             const messageId = await sendMessageWithAttachment(
@@ -95,7 +93,7 @@ export class CommandUtility implements ExecutorProps {
                 messageId,
                 "",
                 "Untitled Whiteboard",
-                room
+                ""
             );
         }
     }
