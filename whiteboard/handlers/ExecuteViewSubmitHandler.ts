@@ -15,6 +15,9 @@ import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
+    getMessageIdByPrivateMessageId,
+    storeBoardRecordByPrivateMessageId,
+    updateBoardStatusByMessageId,
     updateBoardnameByMessageId,
     updatePrivateMessageIdByMessageId,
 } from "../persistence/boardInteraction";
@@ -110,6 +113,12 @@ export class ExecuteViewSubmitHandler {
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PUBLIC
                                     ) {
+                                        this.privateToPublic(
+                                            message,
+                                            messageId,
+                                            AppSender,
+                                            user
+                                        );
                                     }
                                 } else {
                                     await this.modify
@@ -160,7 +169,8 @@ export class ExecuteViewSubmitHandler {
                 .setRoom(directRoom)
                 .setEditor(AppSender)
                 .setBlocks(message.getBlocks())
-                .setUsernameAlias(AppEnum.APP_NAME);
+                .setUsernameAlias(AppEnum.APP_NAME)
+                .setText("");
             const privateMessageAttachments = message.getAttachments();
             privateMessageAttachments.forEach(
                 (attachment: IMessageAttachment) => {
@@ -171,11 +181,22 @@ export class ExecuteViewSubmitHandler {
                 .getCreator()
                 .finish(privateMessage);
 
+            await storeBoardRecordByPrivateMessageId(
+                messageId,
+                privateMessageId,
+                this.persistence
+            );
             await updatePrivateMessageIdByMessageId(
                 this.persistence,
                 this.read.getPersistenceReader(),
                 messageId,
                 privateMessageId
+            );
+            await updateBoardStatusByMessageId(
+                this.persistence,
+                this.read.getPersistenceReader(),
+                messageId,
+                UtilityEnum.PRIVATE
             );
             message
                 .setBlocks([])
@@ -186,5 +207,45 @@ export class ExecuteViewSubmitHandler {
                 .setUsernameAlias(AppEnum.APP_NAME);
             await this.modify.getUpdater().finish(message);
         }
+    }
+    private async privateToPublic(
+        privateMessage: IMessageBuilder,
+        privateMessageId: string,
+        AppSender: IUser,
+        user: IUser
+    ) {
+        const messageId = (
+            await getMessageIdByPrivateMessageId(
+                this.read.getPersistenceReader(),
+                privateMessageId
+            )
+        ).messageId;
+        await updateBoardStatusByMessageId(
+            this.persistence,
+            this.read.getPersistenceReader(),
+            messageId,
+            UtilityEnum.PUBLIC
+        );
+        const attachments = privateMessage.getAttachments();
+        const blocks = privateMessage.getBlocks();
+        const publicMessage = await this.modify
+            .getUpdater()
+            .message(messageId, AppSender);
+        publicMessage
+            .setEditor(AppSender)
+            .setBlocks(blocks)
+            .setAttachments(attachments)
+            .setText("");
+        await this.modify.getUpdater().finish(publicMessage);
+        privateMessage
+            .setBlocks([])
+            .setAttachments([])
+            .setSender(AppSender)
+            .setEditor(AppSender)
+            .setUsernameAlias(AppEnum.APP_NAME)
+            .setText(
+                `(This whiteboard has been made public by \`@${user.username}\`)`
+            );
+        await this.modify.getUpdater().finish(privateMessage);
     }
 }

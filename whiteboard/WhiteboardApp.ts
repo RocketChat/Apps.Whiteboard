@@ -231,15 +231,13 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const cover = request.content.cover;
         const title = request.content.title;
 
-        const boardata = await getBoardRecord(
+        const savedBoardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
         );
-        const msgId = boardata.messageId;
-
-        const user = (await read.getMessageReader().getSenderUser(msgId))!;
-        const room = await read.getMessageReader().getRoom(msgId);
-        const privateMessageId = boardata.privateMessageId;
+        const { messagegId, privateMessageId, status } = savedBoardata;
+        const user = (await read.getMessageReader().getSenderUser(messagegId))!;
+        const room = await read.getMessageReader().getRoom(messagegId);
         const AppSender = (await read.getUserReader().getAppUser()) as IUser;
         const directRoom = await getDirect(
             read,
@@ -252,21 +250,22 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 persis,
                 boardId,
                 boardData,
-                msgId,
+                messagegId,
                 cover,
                 title,
-                privateMessageId
+                privateMessageId,
+                status
             );
-            if (privateMessageId.length > 0) {
+            if (privateMessageId.length > 0 && status == UtilityEnum.PRIVATE) {
                 if (directRoom) {
                     const previewMsg = (
                         await modify
                             .getUpdater()
                             .message(privateMessageId, user)
                     )
-                        .setEditor(user)
+                        .setEditor(AppSender)
                         .setRoom(directRoom)
-                        .setSender(user)
+                        .setSender(AppSender)
                         .setParseUrls(true)
                         .setUsernameAlias(AppEnum.APP_NAME)
                         .setAttachments([
@@ -281,7 +280,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 }
             } else {
                 const previewMsg = (
-                    await modify.getUpdater().message(msgId, user)
+                    await modify.getUpdater().message(messagegId, user)
                 )
                     .setEditor(user)
                     .setSender(user)

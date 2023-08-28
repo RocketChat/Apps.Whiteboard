@@ -93,7 +93,8 @@ export class CommandUtility implements ExecutorProps {
                 messageId,
                 "",
                 "Untitled Whiteboard",
-                ""
+                "",
+                "Public"
             );
         }
     }
