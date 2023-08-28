@@ -113,7 +113,7 @@ export class ExecuteViewSubmitHandler {
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PUBLIC
                                     ) {
-                                        this.privateToPublic(
+                                        await this.privateToPublic(
                                             message,
                                             messageId,
                                             AppSender,
@@ -162,36 +162,69 @@ export class ExecuteViewSubmitHandler {
             AppSender,
             user.username
         );
-        if (directRoom) {
-            const privateMessage = this.modify.getCreator().startMessage();
-            privateMessage
-                .setSender(AppSender)
-                .setRoom(directRoom)
-                .setEditor(AppSender)
-                .setBlocks(message.getBlocks())
-                .setUsernameAlias(AppEnum.APP_NAME)
-                .setText("");
-            const privateMessageAttachments = message.getAttachments();
-            privateMessageAttachments.forEach(
-                (attachment: IMessageAttachment) => {
-                    privateMessage.addAttachment(attachment);
-                }
-            );
-            const privateMessageId = await this.modify
-                .getCreator()
-                .finish(privateMessage);
+        const publicRoom = await this.read
+            .getMessageReader()
+            .getRoom(messageId);
 
-            await storeBoardRecordByPrivateMessageId(
-                messageId,
-                privateMessageId,
-                this.persistence
-            );
-            await updatePrivateMessageIdByMessageId(
-                this.persistence,
-                this.read.getPersistenceReader(),
-                messageId,
-                privateMessageId
-            );
+        if (directRoom && publicRoom) {
+            const privateMessageId = (
+                await getBoardRecordByMessageId(
+                    this.read.getPersistenceReader(),
+                    messageId
+                )
+            ).privateMessageId;
+            console.log("Private msgID", privateMessageId);
+            const privateMessage = await this.modify
+                .getUpdater()
+                .message(privateMessageId, AppSender);
+            console.log("Private msg", privateMessage);
+            //If private message already exists update it
+            if (privateMessageId.length > 0) {
+                privateMessage
+                    .setSender(AppSender)
+                    .setRoom(directRoom)
+                    .setEditor(AppSender)
+                    .setBlocks(message.getBlocks())
+                    .setUsernameAlias(AppEnum.APP_NAME)
+                    .setText("");
+                const privateMessageAttachments = message.getAttachments();
+                privateMessageAttachments.forEach(
+                    (attachment: IMessageAttachment) => {
+                        privateMessage.addAttachment(attachment);
+                    }
+                );
+                await this.modify.getUpdater().finish(privateMessage);
+            } else {
+                const privateMessage = this.modify.getCreator().startMessage();
+                privateMessage
+                    .setSender(AppSender)
+                    .setRoom(directRoom)
+                    .setEditor(AppSender)
+                    .setBlocks(message.getBlocks())
+                    .setUsernameAlias(AppEnum.APP_NAME)
+                    .setText("");
+                const privateMessageAttachments = message.getAttachments();
+                privateMessageAttachments.forEach(
+                    (attachment: IMessageAttachment) => {
+                        privateMessage.addAttachment(attachment);
+                    }
+                );
+                const privateMessageId = await this.modify
+                    .getCreator()
+                    .finish(privateMessage);
+
+                await storeBoardRecordByPrivateMessageId(
+                    messageId,
+                    privateMessageId,
+                    this.persistence
+                );
+                await updatePrivateMessageIdByMessageId(
+                    this.persistence,
+                    this.read.getPersistenceReader(),
+                    messageId,
+                    privateMessageId
+                );
+            }
             await updateBoardStatusByMessageId(
                 this.persistence,
                 this.read.getPersistenceReader(),
@@ -200,12 +233,15 @@ export class ExecuteViewSubmitHandler {
             );
             message
                 .setBlocks([])
+                .setRoom(publicRoom)
                 .setAttachments([])
                 .setText(
                     `(This whiteboard has been made private by \`@${user.username}\`)`
                 )
                 .setUsernameAlias(AppEnum.APP_NAME);
             await this.modify.getUpdater().finish(message);
+        }else{
+            console.log("Direct or Public room not found");
         }
     }
     private async privateToPublic(
@@ -220,6 +256,23 @@ export class ExecuteViewSubmitHandler {
                 privateMessageId
             )
         ).messageId;
+        const directRoom = await getDirect(
+            this.read,
+            this.modify,
+            AppSender,
+            user.username
+        );
+        const publicRoom = await this.read
+            .getMessageReader()
+            .getRoom(messageId);
+        if (!publicRoom) {
+            console.log("Public room not found");
+            return;
+        }
+        if (!directRoom) {
+            console.log("Direct room not found");
+            return;
+        }
         await updateBoardStatusByMessageId(
             this.persistence,
             this.read.getPersistenceReader(),
@@ -234,6 +287,7 @@ export class ExecuteViewSubmitHandler {
         publicMessage
             .setEditor(AppSender)
             .setBlocks(blocks)
+            .setRoom(publicRoom)
             .setAttachments(attachments)
             .setText("");
         await this.modify.getUpdater().finish(publicMessage);
@@ -241,6 +295,7 @@ export class ExecuteViewSubmitHandler {
             .setBlocks([])
             .setAttachments([])
             .setSender(AppSender)
+            .setRoom(directRoom)
             .setEditor(AppSender)
             .setUsernameAlias(AppEnum.APP_NAME)
             .setText(

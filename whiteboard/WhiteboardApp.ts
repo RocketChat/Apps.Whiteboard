@@ -235,9 +235,9 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             read.getPersistenceReader(),
             boardId
         );
-        const { messagegId, privateMessageId, status } = savedBoardata;
-        const user = (await read.getMessageReader().getSenderUser(messagegId))!;
-        const room = await read.getMessageReader().getRoom(messagegId);
+        const { messageId, privateMessageId, status } = savedBoardata;
+        const user = (await read.getMessageReader().getSenderUser(messageId))!;
+        const room = await read.getMessageReader().getRoom(messageId);
         const AppSender = (await read.getUserReader().getAppUser()) as IUser;
         const directRoom = await getDirect(
             read,
@@ -250,7 +250,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 persis,
                 boardId,
                 boardData,
-                messagegId,
+                messageId,
                 cover,
                 title,
                 privateMessageId,
@@ -280,7 +280,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 }
             } else {
                 const previewMsg = (
-                    await modify.getUpdater().message(messagegId, user)
+                    await modify.getUpdater().message(messageId, user)
                 )
                     .setEditor(user)
                     .setSender(user)
