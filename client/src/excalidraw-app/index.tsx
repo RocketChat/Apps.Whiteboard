@@ -73,7 +73,6 @@ import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
 import { loadFilesFromFirebase } from "./data/firebase";
-import { LocalData } from "./data/LocalData";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { reconcileElements } from "./collab/reconciliation";
@@ -98,7 +97,10 @@ export interface BoardData {
   cover: string;
   title: string;
 }
-
+const fullURL = window.location.href;
+const urlParams = new URLSearchParams(window.location.search);
+const boardId = urlParams.get("id") ?? "";
+const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
 polyfill();
 
 window.EXCALIDRAW_THROTTLE_RENDER = true;
@@ -107,6 +109,32 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+async function getBoardData(baseURL: string, boardId: string) {
+  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+  });
+  const response = await res.json();
+  //   console.log("getBoardData", response);
+  return response;
+}
+async function postBoardData(baseURL: string, board: BoardData) {
+  fetch(`${baseURL}/board/update`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Content-Security-Policy":
+        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+    },
+    body: JSON.stringify(board),
+  })
+    .then((res) => res.json())
+    .then((data) => console.log("Update Data Success", data));
+}
 
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
@@ -123,12 +151,20 @@ const initializeScene = async (opts: {
     /^#json=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/
   );
   const externalUrlMatch = window.location.hash.match(/^#url=(.*)$/);
-
-  const localDataState = importFromLocalStorage();
-
+  const response = await getBoardData(baseURL, boardId);
+  const dataState = response.data.boardData;
+  const elements = dataState.elements;
+  const appState = dataState.appState;
+  const files = dataState.files;
+  console.log("dataState", dataState.appState);
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
-  } = await loadScene(null, null, localDataState);
+  } = {
+    elements,
+    appState: getDefaultAppState(), // Default appState is only working not /get appState
+    files,
+    scrollToContent: true,
+  };
 
   let roomLinkData = getCollaborationLinkData(window.location.href);
   const isExternalScene = !!(id || jsonBackendMatch || roomLinkData);
@@ -137,21 +173,21 @@ const initializeScene = async (opts: {
       // don't prompt if scene is empty
       !scene.elements.length ||
       // don't prompt for collab scenes because we don't override local storage
-      roomLinkData ||
+      roomLinkData
       // otherwise, prompt whether user wants to override current scene
-      window.confirm(t("alerts.loadSceneOverridePrompt"))
+      //   window.confirm(t("alerts.loadSceneOverridePrompt"))
     ) {
       if (jsonBackendMatch) {
         scene = await loadScene(
           jsonBackendMatch[1],
           jsonBackendMatch[2],
-          localDataState
+          dataState
         );
       }
       scene.scrollToContent = true;
-      if (!roomLinkData) {
-        window.history.replaceState({}, APP_NAME, window.location.origin);
-      }
+      //   if (!roomLinkData) {
+      //     window.history.replaceState({}, APP_NAME, window.location.origin);
+      //   }
     } else {
       // https://github.com/excalidraw/excalidraw/issues/1919
       if (document.hidden) {
@@ -167,10 +203,10 @@ const initializeScene = async (opts: {
       }
 
       roomLinkData = null;
-      window.history.replaceState({}, APP_NAME, window.location.origin);
+      // window.history.replaceState({}, APP_NAME, window.location.origin);
     }
   } else if (externalUrlMatch) {
-    window.history.replaceState({}, APP_NAME, window.location.origin);
+    // window.history.replaceState({}, APP_NAME, window.location.origin);
 
     const url = externalUrlMatch[1];
     try {
@@ -209,7 +245,7 @@ const initializeScene = async (opts: {
           ...restoreAppState(
             {
               ...scene?.appState,
-              theme: localDataState?.appState?.theme || scene?.appState?.theme,
+              theme: scene?.appState?.theme || scene?.appState?.theme,
             },
             excalidrawAPI.getAppState()
           ),
@@ -245,58 +281,9 @@ export const appLangCodeAtom = atom(
   Array.isArray(detectedLangCode) ? detectedLangCode[0] : detectedLangCode
 );
 
-async function getBoardData(baseURL: string, boardId: string) {
-  const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
-    method: "GET",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Security-Policy":
-        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    },
-  });
-  return res.json();
-}
-async function postBoardData(baseURL: string, board: BoardData) {
-  const { boardData, boardId } = board;
-  const resp = await getBoardData(baseURL, boardId);
-  const { boardData: remoteBoard } = resp.data;
-
-  // const remoteElements = Array.isArray(remoteBoard?.elements)
-  //   ? remoteBoard!.elements
-  //   : [];
-  // const elements = reconcileElements(
-  //   board.elements,
-  //   remoteElements,
-  //   localAppState
-  // );
-  // const files = Object.assign({}, board.files, remoteBoard?.files);
-  // const result = await Services.get("board").saveBoard({
-  //   ...board,
-  //   elements,
-  //   files,
-  // });
-
-  fetch(`${baseURL}/board/update`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Content-Security-Policy":
-        "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
-    },
-    body: JSON.stringify(board),
-  })
-    .then((res) => res.json())
-    .then((data) => console.log("Update Data Success", data));
-}
-
 const ExcalidrawWrapper = () => {
   const [errorMessage, setErrorMessage] = useState("");
   const [langCode, setLangCode] = useAtom(appLangCodeAtom);
-  const fullURL = window.location.href;
-  const urlParams = new URLSearchParams(window.location.search);
-  const boardId = urlParams.get("id") ?? "";
-  const baseURL = fullURL.replace(`/board?id=${boardId}`, "");
-
   // initial state
   // ---------------------------------------------------------------------------
 
@@ -366,39 +353,6 @@ const ExcalidrawWrapper = () => {
             }
             return acc;
           }, [] as FileId[]) || [];
-
-        if (data.isExternalScene) {
-          loadFilesFromFirebase(
-            `${FIREBASE_STORAGE_PREFIXES.shareLinkFiles}/${data.id}`,
-            data.key,
-            fileIds
-          ).then(({ loadedFiles, erroredFiles }) => {
-            excalidrawAPI.addFiles(loadedFiles);
-            updateStaleImageStatuses({
-              excalidrawAPI,
-              erroredFiles,
-              elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-            });
-          });
-        } else if (isInitialLoad) {
-          if (fileIds.length) {
-            LocalData.fileStorage
-              .getFiles(fileIds)
-              .then(({ loadedFiles, erroredFiles }) => {
-                if (loadedFiles.length) {
-                  excalidrawAPI.addFiles(loadedFiles);
-                }
-                updateStaleImageStatuses({
-                  excalidrawAPI,
-                  erroredFiles,
-                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-                });
-              });
-          }
-          // on fresh load, clear unused files from IDB (from previous
-          // session)
-          LocalData.fileStorage.clearObsoleteFiles({ currentFileIds: fileIds });
-        }
       }
     };
 
@@ -474,71 +428,14 @@ const ExcalidrawWrapper = () => {
               }
               return acc;
             }, [] as FileId[]) || [];
-          if (fileIds.length) {
-            LocalData.fileStorage
-              .getFiles(fileIds)
-              .then(({ loadedFiles, erroredFiles }) => {
-                if (loadedFiles.length) {
-                  excalidrawAPI.addFiles(loadedFiles);
-                }
-                updateStaleImageStatuses({
-                  excalidrawAPI,
-                  erroredFiles,
-                  elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-                });
-              });
-          }
         }
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
 
-    const onUnload = () => {
-      LocalData.flushSave();
-    };
-
-    const visibilityChange = (event: FocusEvent | Event) => {
-      if (event.type === EVENT.BLUR || document.hidden) {
-        LocalData.flushSave();
-      }
-      if (
-        event.type === EVENT.VISIBILITY_CHANGE ||
-        event.type === EVENT.FOCUS
-      ) {
-        syncData();
-      }
-    };
-
-    window.addEventListener(EVENT.HASHCHANGE, onHashChange, false);
-    window.addEventListener(EVENT.UNLOAD, onUnload, false);
-    window.addEventListener(EVENT.BLUR, visibilityChange, false);
-    document.addEventListener(EVENT.VISIBILITY_CHANGE, visibilityChange, false);
-    window.addEventListener(EVENT.FOCUS, visibilityChange, false);
-    return () => {
-      window.removeEventListener(EVENT.HASHCHANGE, onHashChange, false);
-      window.removeEventListener(EVENT.UNLOAD, onUnload, false);
-      window.removeEventListener(EVENT.BLUR, visibilityChange, false);
-      window.removeEventListener(EVENT.FOCUS, visibilityChange, false);
-      document.removeEventListener(
-        EVENT.VISIBILITY_CHANGE,
-        visibilityChange,
-        false
-      );
-      clearTimeout(titleTimeout);
-    };
   }, [collabAPI, excalidrawAPI, setLangCode]);
 
   useEffect(() => {
     const unloadHandler = (event: BeforeUnloadEvent) => {
-      LocalData.flushSave();
-
-      if (
-        excalidrawAPI &&
-        LocalData.fileStorage.shouldPreventUnload(
-          excalidrawAPI.getSceneElements()
-        )
-      ) {
-        preventUnload(event);
-      }
     };
     window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     return () => {
@@ -580,41 +477,17 @@ const ExcalidrawWrapper = () => {
 
         // this check is redundant, but since this is a hot path, it's best
         // not to evaludate the nested expression every time
-        if (!LocalData.isSavePaused()) {
-          LocalData.save(elements, appState, files, () => {
-            if (excalidrawAPI) {
-              let didChange = false;
-
-              const elements = excalidrawAPI
-                .getSceneElementsIncludingDeleted()
-                .map((element) => {
-                  if (
-                    LocalData.fileStorage.shouldUpdateImageElementStatus(
-                      element
-                    )
-                  ) {
-                    const newElement = newElementWith(element, {
-                      status: "saved",
-                    });
-                    if (newElement !== element) {
-                      didChange = true;
-                    }
-                    return newElement;
-                  }
-                  return element;
-                });
-
-              if (didChange) {
-                excalidrawAPI.updateScene({
-                  elements,
-                });
-              }
-            }
-          });
-        }
+        const remoteElements = (await getBoardData(baseURL, boardId)).data
+          .boardData.elements;
+        const reconciledElements = reconcileElements(
+          elements,
+          remoteElements,
+          appState
+        );
+        elements = reconciledElements;
 
         const canvas = await exportToCanvas({
-          elements,
+          elements: elements,
           appState: appState,
           files,
           maxWidthOrHeight: 360 * 3,
@@ -627,7 +500,6 @@ const ExcalidrawWrapper = () => {
         });
 
         const canvasBase64 = canvas.toDataURL();
-        console.log("canvasBase64", canvasBase64);
 
         postBoardData(baseURL, {
           boardId,
