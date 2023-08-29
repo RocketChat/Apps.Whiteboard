@@ -12,13 +12,12 @@ import {
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
 import { WhiteboardCommand } from "./commands/WhiteboardCommand";
-import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import {
-    UIKitViewSubmitInteractionContext,
-    UIKitViewCloseInteractionContext,
     UIKitBlockInteractionContext,
     IUIKitResponse,
     UIKitActionButtonInteractionContext,
+    IUIKitInteractionHandler,
+    UIKitViewSubmitInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { ExecuteBlockActionHandler } from "./handlers/ExecuteBlockActionHandler";
 import {
@@ -41,26 +40,11 @@ import {
 } from "./persistence/boardInteraction";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
-export class WhiteboardApp extends App {
+import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
+import { AppEnum } from "./enum/App";
+export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
-    }
-
-    public async executeActionButtonHandler(
-        context: UIKitActionButtonInteractionContext,//Keep this sequence of parameters
-        read: IRead,
-        http: IHttp,
-        persistence: IPersistence,
-        modify: IModify,
-    ): Promise<IUIKitResponse> {
-        const handler = new ExecuteActionButtonHandler(
-            this,
-            read,
-            http,
-            persistence,
-            modify,
-        );
-        return await handler.run(context);
     }
 
     public async executeBlockActionHandler(
@@ -68,7 +52,7 @@ export class WhiteboardApp extends App {
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
-        modify: IModify,
+        modify: IModify
     ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
             this,
@@ -76,6 +60,24 @@ export class WhiteboardApp extends App {
             http,
             persistence,
             modify,
+            context
+        );
+        return await handler.run();
+    }
+
+    public async executeActionButtonHandler(
+        context: UIKitActionButtonInteractionContext, //Keep this sequence of parameters
+        read: IRead,
+        http: IHttp,
+        persistence: IPersistence,
+        modify: IModify
+    ): Promise<IUIKitResponse> {
+        const handler = new ExecuteActionButtonHandler(
+            this,
+            read,
+            http,
+            persistence,
+            modify
         );
         return await handler.run(context);
     }
@@ -86,18 +88,19 @@ export class WhiteboardApp extends App {
         http: IHttp,
         persistence: IPersistence,
         modify: IModify
-    ) {
+    ): Promise<IUIKitResponse> {
         const handler = new ExecuteViewSubmitHandler(
             this,
             read,
             http,
             persistence,
-            modify
+            modify,
+            context
         );
-        await handler.run(context);
+        return await handler.run();
     }
 
-    public async extendConfiguration(
+    public async initialize(
         configuration: IConfigurationExtend,
         environmentRead: IEnvironmentRead
     ): Promise<void> {
@@ -236,12 +239,12 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const room = await read.getMessageReader().getRoom(msgId);
 
         if (room) {
-
             const previewMsg = (await modify.getUpdater().message(msgId, user))
                 .setEditor(user)
                 .setSender(user)
                 .setRoom(room)
                 .setParseUrls(true)
+                .setUsernameAlias(AppEnum.APP_NAME)
                 .setAttachments([
                     {
                         collapsed: true,
@@ -251,7 +254,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                     },
                 ]);
 
-                await modify.getUpdater().finish(previewMsg);
+            await modify.getUpdater().finish(previewMsg);
         }
 
         return this.json({

@@ -10,6 +10,10 @@ import {
     UIKitBlockInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
+import { SettingsModal } from "../modals/SettingsModal";
+import { getBoardRecordByMessageId } from "../persistence/boardInteraction";
+import { IUser } from "@rocket.chat/apps-engine/definition/users";
+import { MessageActionButtonsAlignment } from "@rocket.chat/apps-engine/definition/messages";
 
 export class ExecuteBlockActionHandler {
     constructor(
@@ -18,24 +22,44 @@ export class ExecuteBlockActionHandler {
         private readonly http: IHttp,
         private readonly persistence: IPersistence,
         private readonly modify: IModify,
+        private readonly context: UIKitBlockInteractionContext
     ) {}
-    public async run(
-        context: UIKitBlockInteractionContext
-    ): Promise<IUIKitResponse> {
-        const data = context.getInteractionData();
-
+    public async run(): Promise<IUIKitResponse> {
+        const data = this.context.getInteractionData();
         try {
-            const { blockId, user, actionId } = data;
+            const { actionId, triggerId, user, room } = data;
+            const appSender = this.app;
+            const appId = data.appId;
+            const messageId = data.message?.id;
+            const AppSender: IUser = (await this.read
+                .getUserReader()
+                .getAppUser()) as IUser;
             switch (actionId) {
-                case UtilityEnum.PREVIEW_BUTTON_ACTION_ID:
-                    console.log("Preview block clicked");
-                    return context.getInteractionResponder().successResponse();
+                case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
+                    console.log("Settings button clicked");
+                    if (messageId) {
+                        const modal = await SettingsModal(appId, messageId);
+                        await Promise.all([
+                            this.modify.getUiController().openSurfaceView(
+                                modal,
+                                {
+                                    triggerId,
+                                },
+                                user
+                            ),
+                        ]);
+                    }
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 default:
-                    return context.getInteractionResponder().successResponse();
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
             }
         } catch (err) {
             console.log(err);
-            return context.getInteractionResponder().errorResponse();
+            return this.context.getInteractionResponder().errorResponse();
         }
     }
 }
