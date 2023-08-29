@@ -51,16 +51,36 @@ export class ExecuteViewSubmitHandler {
                             view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
                             ];
+                        const boardStatus =
+                            view.state[UtilityEnum.BOARD_SELECT_BLOCK_ID][
+                                UtilityEnum.BOARD_SELECT_ACTION_ID
+                            ];
                         const messageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
 
                         if (messageId) {
-                            await updateBoardnameByMessageId(
-                                this.persistence,
-                                messageId,
-                                boardname
-                            );
+                            const messageIdFromPrivateMessageId = (
+                                await getMessageIdByPrivateMessageId(
+                                    this.read.getPersistenceReader(),
+                                    messageId
+                                )
+                            )?.messageId;
+                            if (messageIdFromPrivateMessageId != null) {
+                                await updateBoardnameByMessageId(
+                                    this.persistence,
+                                    this.read.getPersistenceReader(),
+                                    messageIdFromPrivateMessageId,
+                                    boardname
+                                );
+                            } else {
+                                await updateBoardnameByMessageId(
+                                    this.persistence,
+                                    this.read.getPersistenceReader(),
+                                    messageId,
+                                    boardname
+                                );
+                            }
                             const room = await this.read
                                 .getMessageReader()
                                 .getRoom(messageId);
@@ -83,44 +103,64 @@ export class ExecuteViewSubmitHandler {
                                     );
 
                                 message.setEditor(user).setRoom(room);
-                                message.setBlocks(updateHeaderBlock);
 
-                                if (
-                                    view.state[
-                                        UtilityEnum.BOARD_SELECT_BLOCK_ID
-                                    ] != undefined &&
-                                    view.state[
-                                        UtilityEnum.BOARD_SELECT_BLOCK_ID
-                                    ][UtilityEnum.BOARD_SELECT_ACTION_ID] !=
-                                        undefined
-                                ) {
-                                    const boardStatus =
-                                        view.state[
-                                            UtilityEnum.BOARD_SELECT_BLOCK_ID
-                                        ][UtilityEnum.BOARD_SELECT_ACTION_ID];
+                                if (boardStatus != undefined) {
                                     if (
                                         boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PRIVATE
+                                        boardStatus == UtilityEnum.PRIVATE &&
+                                        boardname == undefined
                                     ) {
                                         await this.publicToPrivate(
                                             message,
                                             messageId,
                                             AppSender,
-                                            user
+                                            user,
+                                            undefined
                                         );
-                                    }
-                                    if (
+                                    } else if (
                                         boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PUBLIC
+                                        boardStatus == UtilityEnum.PUBLIC &&
+                                        boardname == undefined
                                     ) {
                                         await this.privateToPublic(
                                             message,
                                             messageId,
                                             AppSender,
-                                            user
+                                            user,
+                                            undefined
+                                        );
+                                    } else if (
+                                        boardStatus != undefined &&
+                                        boardStatus == UtilityEnum.PRIVATE &&
+                                        boardname != undefined
+                                    ) {
+                                        await this.publicToPrivate(
+                                            message,
+                                            messageId,
+                                            AppSender,
+                                            user,
+                                            updateHeaderBlock
+                                        );
+                                    } else if (
+                                        boardStatus != undefined &&
+                                        boardStatus == UtilityEnum.PUBLIC &&
+                                        boardname != undefined
+                                    ) {
+                                        await this.privateToPublic(
+                                            message,
+                                            messageId,
+                                            AppSender,
+                                            user,
+                                            updateHeaderBlock
                                         );
                                     }
                                 } else {
+                                    if (
+                                        boardStatus == undefined &&
+                                        boardname != undefined
+                                    ) {
+                                        message.setBlocks(updateHeaderBlock);
+                                    }
                                     await this.modify
                                         .getUpdater()
                                         .finish(message);
@@ -154,7 +194,8 @@ export class ExecuteViewSubmitHandler {
         message: IMessageBuilder,
         messageId: string,
         AppSender: IUser,
-        user: IUser
+        user: IUser,
+        updateHeaderBlock?: any
     ) {
         const directRoom = await getDirect(
             this.read,
@@ -173,18 +214,15 @@ export class ExecuteViewSubmitHandler {
                     messageId
                 )
             ).privateMessageId;
-            console.log("Private msgID", privateMessageId);
             const privateMessage = await this.modify
                 .getUpdater()
                 .message(privateMessageId, AppSender);
-            console.log("Private msg", privateMessage);
             //If private message already exists update it
             if (privateMessageId.length > 0) {
                 privateMessage
                     .setSender(AppSender)
                     .setRoom(directRoom)
                     .setEditor(AppSender)
-                    .setBlocks(message.getBlocks())
                     .setUsernameAlias(AppEnum.APP_NAME)
                     .setText("");
                 const privateMessageAttachments = message.getAttachments();
@@ -193,6 +231,12 @@ export class ExecuteViewSubmitHandler {
                         privateMessage.addAttachment(attachment);
                     }
                 );
+
+                if (updateHeaderBlock != undefined) {
+                    privateMessage.setBlocks(updateHeaderBlock);
+                } else {
+                    privateMessage.setBlocks(message.getBlocks());
+                }
                 await this.modify.getUpdater().finish(privateMessage);
             } else {
                 const privateMessage = this.modify.getCreator().startMessage();
@@ -200,7 +244,6 @@ export class ExecuteViewSubmitHandler {
                     .setSender(AppSender)
                     .setRoom(directRoom)
                     .setEditor(AppSender)
-                    .setBlocks(message.getBlocks())
                     .setUsernameAlias(AppEnum.APP_NAME)
                     .setText("");
                 const privateMessageAttachments = message.getAttachments();
@@ -209,6 +252,11 @@ export class ExecuteViewSubmitHandler {
                         privateMessage.addAttachment(attachment);
                     }
                 );
+                if (updateHeaderBlock != undefined) {
+                    privateMessage.setBlocks(updateHeaderBlock);
+                } else {
+                    privateMessage.setBlocks(message.getBlocks());
+                }
                 const privateMessageId = await this.modify
                     .getCreator()
                     .finish(privateMessage);
@@ -240,7 +288,7 @@ export class ExecuteViewSubmitHandler {
                 )
                 .setUsernameAlias(AppEnum.APP_NAME);
             await this.modify.getUpdater().finish(message);
-        }else{
+        } else {
             console.log("Direct or Public room not found");
         }
     }
@@ -248,7 +296,8 @@ export class ExecuteViewSubmitHandler {
         privateMessage: IMessageBuilder,
         privateMessageId: string,
         AppSender: IUser,
-        user: IUser
+        user: IUser,
+        updateHeaderBlock?: any
     ) {
         const messageId = (
             await getMessageIdByPrivateMessageId(
@@ -280,16 +329,19 @@ export class ExecuteViewSubmitHandler {
             UtilityEnum.PUBLIC
         );
         const attachments = privateMessage.getAttachments();
-        const blocks = privateMessage.getBlocks();
         const publicMessage = await this.modify
             .getUpdater()
             .message(messageId, AppSender);
         publicMessage
             .setEditor(AppSender)
-            .setBlocks(blocks)
             .setRoom(publicRoom)
             .setAttachments(attachments)
             .setText("");
+        if (updateHeaderBlock != undefined) {
+            publicMessage.setBlocks(updateHeaderBlock);
+        } else {
+            publicMessage.setBlocks(privateMessage.getBlocks());
+        }
         await this.modify.getUpdater().finish(publicMessage);
         privateMessage
             .setBlocks([])

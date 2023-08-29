@@ -21,7 +21,7 @@ export const storeBoardRecord = async (
     privateMessageId: string,
     status: string
 ): Promise<void> => {
-    const boardassociation = new RocketChatAssociationRecord(
+    const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
     );
@@ -31,7 +31,7 @@ export const storeBoardRecord = async (
         `${messageId}#MessageId`
     );
     await persistence.updateByAssociations(
-        [boardassociation, messageAssociation],
+        [boardAssociation, messageAssociation],
         {
             id: boardId,
             boardData: {
@@ -79,18 +79,29 @@ export const getBoardRecordByMessageId = async (
 
 export const updateBoardnameByMessageId = async (
     persistence: IPersistence,
+    persistenceRead: IPersistenceRead,
     messageId: string,
     boardName: string
 ): Promise<void> => {
-    const association = new RocketChatAssociationRecord(
+    let records = await getBoardRecordByMessageId(persistenceRead, messageId);
+    if (!records) {
+        console.log("No records found for boardname");
+        return;
+    }
+    const boardId = records["id"];
+
+    const boardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.USER,
+        `${boardId}#BoardName`
+    );
+    const messageAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
-    await persistence.updateByAssociation(
-        association,
-        {
-            title: boardName,
-        },
+    records["title"] = boardName;
+    await persistence.updateByAssociations(
+        [boardAssociation, messageAssociation],
+        records,
         true
     );
 };
@@ -103,12 +114,12 @@ export const updatePrivateMessageIdByMessageId = async (
 ): Promise<void> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     if (!records) {
-        console.log("No records found");
+        console.log("No records found for private message id");
         return;
     }
     const boardId = records["id"];
 
-    const boardassociation = new RocketChatAssociationRecord(
+    const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
     );
@@ -121,7 +132,7 @@ export const updatePrivateMessageIdByMessageId = async (
     records["privateMessageId"] = privateMessageId;
 
     await persistence.updateByAssociations(
-        [boardassociation, messageAssociation],
+        [boardAssociation, messageAssociation],
         records,
         false
     );
@@ -140,7 +151,7 @@ export const updateBoardStatusByMessageId = async (
     }
     const boardId = records["id"];
 
-    const boardassociation = new RocketChatAssociationRecord(
+    const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
     );
@@ -152,7 +163,7 @@ export const updateBoardStatusByMessageId = async (
 
     records["status"] = status;
     await persistence.updateByAssociations(
-        [boardassociation, messageAssociation],
+        [boardAssociation, messageAssociation],
         records,
         false
     );
