@@ -11,7 +11,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { sendMessage, sendMessageWithAttachment } from "../lib/messages";
-import { randomId } from "../utilts";
+import { randomId } from "../lib/utilts";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { defaultPreview } from "../assets/defaultPreview";
 import { storeBoardRecord } from "../persistence/boardInteraction";
@@ -35,6 +35,7 @@ export class ExecuteActionButtonHandler {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;
+                    const appId= this.app.getID();
                     if (room) {
                         const endpoints =
                             this.app.getAccessors().providedApiEndpoints;
@@ -47,13 +48,9 @@ export class ExecuteActionButtonHandler {
 
                         const headerBlock = await buildHeaderBlock(
                             sender.username,
-                            "Untitled Board",
                             boardURL,
-                            randomBoardId,
-                            {
-                                width: 500,
-                                height: 500,
-                            }
+                            appId,
+                            undefined
                         );
                         const attachments = [
                             {

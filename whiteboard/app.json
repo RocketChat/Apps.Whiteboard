@@ -12,7 +12,9 @@
     "nameSlug": "whiteboard",
     "classFile": "WhiteboardApp.ts",
     "description": "Whiteboard Integration App for Rocket.Chat",
-    "implements": [],
+    "implements": [
+        "IUIKitInteractionHandler"
+    ],
     "permissions": [
         {
             "name": "networking"

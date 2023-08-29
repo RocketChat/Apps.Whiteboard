@@ -1,4 +1,5 @@
 import {
+    ButtonStyle,
     UIKitInteractionContext,
     UIKitSurfaceType,
 } from "@rocket.chat/apps-engine/definition/uikit";
@@ -11,64 +12,61 @@ import {
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
 import { UtilityEnum } from "../enum/uitlityEnum";
-import { Block,TextObject } from "@rocket.chat/ui-kit";
+import { Block, TextObject } from "@rocket.chat/ui-kit";
 import {
+    getActionsBlock,
     getButton,
     getDividerBlock,
     getInputBox,
     getSectionBlock,
 } from "../helpers/blockBuilder";
 
-export async function DeleteBoardModal({
-    slashCommandContext,
-    read,
-    modify,
-    http,
-    persistence,
-    uikitcontext,
-}: {
-    modify: IModify;
-    read: IRead;
-    persistence: IPersistence;
-    http: IHttp;
-    slashCommandContext?: SlashCommandContext;
-    uikitcontext?: UIKitInteractionContext;
-}): Promise<IUIKitSurfaceViewParam> {
-
+export async function SettingsModal(
+    appId: string,
+    messageId: string
+): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
-    let boardInputBlock = await getInputBox(
+    let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
+    block.push(settingsTextBlock);
+
+    let boardInputBlock = getInputBox(
         UtilityEnum.BOARD_INPUT_LABEL,
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
         UtilityEnum.BOARD_INPUT_BLOCK_ID,
-        UtilityEnum.BOARD_NAME_ACTION_ID,
-        ""
+        UtilityEnum.BOARD_INPUT_ACTION_ID,
+        appId
     );
     block.push(boardInputBlock);
 
-    let closeButton = await getButton(
-        UtilityEnum.CLOSE,
+    let closeButton = getButton(
+        UtilityEnum.CANCEL,
         UtilityEnum.CLOSE_BLOCK_ID,
         UtilityEnum.CLOSE_ACTION_ID,
-        "danger"
+        appId,
+        "",
+        ButtonStyle.DANGER
     );
-    let submitButton = await getButton(
+    let submitButton = getButton(
         UtilityEnum.SUBMIT,
         UtilityEnum.SUBMIT_BLOCK_ID,
         UtilityEnum.SUBMIT_ACTION_ID,
-        "primary"
+        appId,
+        messageId,
+        ButtonStyle.PRIMARY
     );
 
     const value = {
-        id: UtilityEnum.DELETE_BOARD_MODAL,
+        id: UtilityEnum.SETTINGS_MODAL_ID,
         type: UIKitSurfaceType.MODAL,
-        title:{
-            type:'plain_text' as const,
-            text:UtilityEnum.DELETE_BOARD_TITLE
+        appId: appId,
+        title: {
+            type: "plain_text" as const,
+            text: UtilityEnum.SETTINGS_TITLE,
         },
-        close:closeButton,
-        submit:submitButton,
+        close: closeButton,
+        submit: submitButton,
         blocks: block,
-    }
+    };
     return value;
 }

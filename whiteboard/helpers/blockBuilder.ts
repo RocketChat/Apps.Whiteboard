@@ -9,7 +9,6 @@ import {
     SectionBlock,
     StaticSelectElement,
 } from "@rocket.chat/ui-kit";
-import { AppEnum } from "../enum/App";
 import { PreviewBlockWithPreview } from "@rocket.chat/ui-kit";
 import { LayoutBlockType } from "@rocket.chat/ui-kit/dist/esm/blocks/LayoutBlockType";
 
@@ -18,6 +17,7 @@ export function getInputBox(
     placeholderText: string,
     blockId: string,
     actionId: string,
+    appId: string,
     initialValue?: string,
     multiline?: boolean
 ) {
@@ -33,11 +33,11 @@ export function getInputBox(
                 type: "plain_text",
                 text: placeholderText,
             },
-            appId: AppEnum.APP_ID,
-            blockId: blockId,
-            actionId: actionId,
-            initialValue: initialValue,
-            multiline: multiline,
+            appId,
+            blockId,
+            actionId,
+            initialValue,
+            multiline,
         },
     };
     return block;
@@ -48,6 +48,7 @@ export function getInputBoxDate(
     placeholderText: string,
     blockId: string,
     actionId: string,
+    appId: string,
     initialDate?: string
 ) {
     const block: InputBlock = {
@@ -62,10 +63,10 @@ export function getInputBoxDate(
                 type: "plain_text",
                 text: placeholderText,
             },
-            appId: AppEnum.APP_ID,
-            blockId: blockId,
-            actionId: actionId,
-            initialDate: initialDate,
+            appId,
+            blockId,
+            actionId,
+            initialDate,
         },
     };
     return block;
@@ -75,23 +76,24 @@ export function getButton(
     labelText: string,
     blockId: string,
     actionId: string,
+    appId: string,
     value?: string,
     style?: ButtonStyle.PRIMARY | ButtonStyle.DANGER,
     url?: string
 ) {
     const button: ButtonElement = {
-        type: "button",
+        type: 'button',
         text: {
-            type: "plain_text",
+            type: 'plain_text',
             text: labelText,
             emoji: true,
         },
-        appId: AppEnum.APP_ID,
-        blockId: blockId,
-        actionId: actionId,
-        url: url,
-        value: value,
-        style: style,
+        appId,
+        blockId,
+        actionId,
+        url,
+        value,
+        style,
     };
     return button;
 }
@@ -142,6 +144,7 @@ export function getContextBlock(elementText: string) {
 export function getStaticSelectElement(
     placeholderText: string,
     options: Array<Option>,
+    appId: string,
     blockId: string,
     actionId: string,
     initialValue?: Option["value"]
@@ -152,11 +155,11 @@ export function getStaticSelectElement(
             type: "plain_text",
             text: placeholderText,
         },
-        options: options,
-        appId: AppEnum.APP_ID,
-        blockId: blockId,
-        actionId: actionId,
-        initialValue: initialValue,
+        options,
+        appId,
+        blockId,
+        actionId,
+        initialValue,
     };
     return block;
 }
@@ -174,9 +177,9 @@ export function getActionsBlock(
     elements: Array<ButtonElement> | Array<StaticSelectElement>
 ) {
     const block: ActionsBlock = {
-        type: "actions",
-        blockId: blockId,
-        elements: elements,
+        type: 'actions',
+        blockId,
+        elements,
     };
     return block;
 }
@@ -192,7 +195,7 @@ export function getPreviewBlock(
 ) {
     const block: PreviewBlockWithPreview = {
         preview: {
-            url: url,
+            url,
             dimensions: {
                 width: dimensions?.width || 500,
                 height: dimensions?.height || 500,
