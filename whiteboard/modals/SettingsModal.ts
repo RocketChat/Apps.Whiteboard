@@ -19,6 +19,7 @@ import {
     getDividerBlock,
     getInputBox,
     getSectionBlock,
+    getStaticSelectElement,
 } from "../helpers/blockBuilder";
 
 export async function SettingsModal(
@@ -29,7 +30,6 @@ export async function SettingsModal(
 
     let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
     block.push(settingsTextBlock);
-
     let boardInputBlock = getInputBox(
         UtilityEnum.BOARD_INPUT_LABEL,
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
@@ -39,6 +39,35 @@ export async function SettingsModal(
     );
     block.push(boardInputBlock);
 
+    let options = [
+        {
+            text: {
+                type: "plain_text" as const,
+                text: "Public",
+            },
+            value: UtilityEnum.PUBLIC,
+        },
+        {
+            text: {
+                type: "plain_text" as const,
+                text: "Private",
+            },
+            value: UtilityEnum.PRIVATE,
+        },
+    ];
+    let StaticSelectElement = getStaticSelectElement(
+        UtilityEnum.BOARD_SELECT_LABEL,
+        options,
+        appId,
+        UtilityEnum.BOARD_SELECT_BLOCK_ID,
+        UtilityEnum.BOARD_SELECT_ACTION_ID,
+    );
+
+    let actionStaticSelectBlock = getActionsBlock(
+        UtilityEnum.BOARD_SELECT_BLOCK_ID,
+        [StaticSelectElement]
+    );
+    block.push(actionStaticSelectBlock);
     let closeButton = getButton(
         UtilityEnum.CANCEL,
         UtilityEnum.CLOSE_BLOCK_ID,
@@ -55,7 +84,6 @@ export async function SettingsModal(
         messageId,
         ButtonStyle.PRIMARY
     );
-
     const value = {
         id: UtilityEnum.SETTINGS_MODAL_ID,
         type: UIKitSurfaceType.MODAL,

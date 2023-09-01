@@ -35,7 +35,7 @@ export class ExecuteActionButtonHandler {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;
-                    const appId= this.app.getID();
+                    const appId = this.app.getID();
                     if (room) {
                         const endpoints =
                             this.app.getAccessors().providedApiEndpoints;
@@ -77,7 +77,9 @@ export class ExecuteActionButtonHandler {
                             },
                             messageId,
                             "",
-                            "Untitled Whiteboard"
+                            "Untitled Whiteboard",
+                            "",
+                            "Public"
                         );
                     }
 

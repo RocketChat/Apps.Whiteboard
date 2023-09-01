@@ -36,12 +36,15 @@ import { excalidrawContent } from "./assets/excalidrawContent";
 import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
 import {
     getBoardRecord,
+    getBoardRecordByMessageId,
     storeBoardRecord,
 } from "./persistence/boardInteraction";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
 import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import { AppEnum } from "./enum/App";
+import { getDirect } from "./lib/messages";
+import { IUser } from "@rocket.chat/apps-engine/definition/users";
 export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
@@ -228,33 +231,72 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const cover = request.content.cover;
         const title = request.content.title;
 
-        const boardata = await getBoardRecord(
+        const savedBoardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
         );
-        const msgId = boardata.messageId;
-        await storeBoardRecord(persis, boardId, boardData, msgId, cover, title);
-
-        const user = (await read.getMessageReader().getSenderUser(msgId))!;
-        const room = await read.getMessageReader().getRoom(msgId);
-
+        const { messageId, privateMessageId, status } = savedBoardata;
+        const user = (await read.getMessageReader().getSenderUser(messageId))!;
+        const room = await read.getMessageReader().getRoom(messageId);
+        const AppSender = (await read.getUserReader().getAppUser()) as IUser;
+        const directRoom = await getDirect(
+            read,
+            modify,
+            AppSender,
+            user.username
+        );
         if (room) {
-            const previewMsg = (await modify.getUpdater().message(msgId, user))
-                .setEditor(user)
-                .setSender(user)
-                .setRoom(room)
-                .setParseUrls(true)
-                .setUsernameAlias(AppEnum.APP_NAME)
-                .setAttachments([
-                    {
-                        collapsed: true,
-                        color: "#00000000",
-                        imageUrl: cover,
-                        type: "image",
-                    },
-                ]);
-
-            await modify.getUpdater().finish(previewMsg);
+            await storeBoardRecord(
+                persis,
+                boardId,
+                boardData,
+                messageId,
+                cover,
+                title,
+                privateMessageId,
+                status
+            );
+            if (privateMessageId.length > 0 && status == UtilityEnum.PRIVATE) {
+                if (directRoom) {
+                    const previewMsg = (
+                        await modify
+                            .getUpdater()
+                            .message(privateMessageId, user)
+                    )
+                        .setEditor(AppSender)
+                        .setRoom(directRoom)
+                        .setSender(AppSender)
+                        .setParseUrls(true)
+                        .setUsernameAlias(AppEnum.APP_NAME)
+                        .setAttachments([
+                            {
+                                collapsed: true,
+                                color: "#00000000",
+                                imageUrl: cover,
+                                type: "image",
+                            },
+                        ]);
+                    await modify.getUpdater().finish(previewMsg);
+                }
+            } else {
+                const previewMsg = (
+                    await modify.getUpdater().message(messageId, user)
+                )
+                    .setEditor(user)
+                    .setSender(user)
+                    .setRoom(room)
+                    .setParseUrls(true)
+                    .setUsernameAlias(AppEnum.APP_NAME)
+                    .setAttachments([
+                        {
+                            collapsed: true,
+                            color: "#00000000",
+                            imageUrl: cover,
+                            type: "image",
+                        },
+                    ]);
+                await modify.getUpdater().finish(previewMsg);
+            }
         }
 
         return this.json({
