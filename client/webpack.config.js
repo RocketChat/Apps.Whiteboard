@@ -2,7 +2,7 @@ import path from "path";
 import webpack from "webpack";
 import CopyPlugin from "copy-webpack-plugin";
 
-const isEnvDevelopment = process.env.NODE_ENV !== "production";
+const isEnvDevelopment = process.env.NODE_ENV === "development";
 const isEnvProduction = process.env.NODE_ENV === "production";
 
 const DefinePlugin = webpack.DefinePlugin;
@@ -68,6 +68,12 @@ export default {
       ),
       "process.env.REACT_APP_BACKEND_V2_POST_URL": JSON.stringify(
         process.env.REACT_APP_BACKEND_V2_POST_URL || ""
+      ),
+      "process.env.REACT_APP_WS_SERVER_URL": JSON.stringify(
+        process.env.REACT_APP_WS_SERVER_URL || "http://localhost:3000"
+      ),
+      "process.env.REACT_APP_PORTAL_URL": JSON.stringify(
+        process.env.REACT_APP_PORTAL_URL || "http://localhost:3000"
       ),
     }),
     new webpack.ProvidePlugin({

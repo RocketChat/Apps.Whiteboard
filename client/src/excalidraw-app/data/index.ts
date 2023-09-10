@@ -24,7 +24,7 @@ import {
   ROOM_ID_BYTES,
 } from "../app_constants";
 import { encodeFilesForUpload } from "./FileManager";
-import { saveFilesToFirebase } from "./firebase";
+// import { saveFilesToFirebase } from "./firebase";
 
 export type SyncableExcalidrawElement = ExcalidrawElement & {
   _brand: "SyncableExcalidrawElement";
@@ -47,8 +47,8 @@ export const getSyncableElements = (elements: readonly ExcalidrawElement[]) =>
     isSyncableElement(element),
   ) as SyncableExcalidrawElement[];
 
-const BACKEND_V2_GET = process.env.REACT_APP_BACKEND_V2_GET_URL;
-const BACKEND_V2_POST = process.env.REACT_APP_BACKEND_V2_POST_URL;
+const BACKEND_V2_GET = "/get";
+const BACKEND_V2_POST = "/update";
 
 const generateRoomId = async () => {
   const buffer = new Uint8Array(ROOM_ID_BYTES);
@@ -76,7 +76,7 @@ export const getCollabServer = async (): Promise<{
 
   try {
     const resp = await fetch(
-      `${process.env.REACT_APP_PORTAL_URL}/collab-server`,
+      `${process.env.REACT_APP_PORTAL_URL}/collab`,
     );
     return await resp.json();
   } catch (error) {
@@ -134,7 +134,7 @@ export type SocketUpdateData =
     _brand: "socketUpdateData";
   };
 
-const RE_COLLAB_LINK = /^#room=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
+const RE_COLLAB_LINK = /^collab-server=([a-zA-Z0-9_-]+),([a-zA-Z0-9_-]+)$/;
 
 export const isCollaborationLink = (link: string) => {
   const hash = new URL(link).hash;
@@ -166,7 +166,7 @@ export const getCollaborationLink = (data: {
   roomId: string;
   roomKey: string;
 }) => {
-  return `${window.location.origin}${window.location.pathname}#room=${data.roomId},${data.roomKey}`;
+  return `${window.location.origin}${window.location.pathname}/collab-server`;
 };
 
 /**
@@ -322,10 +322,10 @@ export const exportToBackend = async (
       url.hash = `json=${json.id},${encryptionKey}`;
       const urlString = url.toString();
 
-      await saveFilesToFirebase({
-        prefix: `/files/shareLinks/${json.id}`,
-        files: filesToUpload,
-      });
+      // await saveFilesToFirebase({
+      //   prefix: `/files/shareLinks/${json.id}`,
+      //   files: filesToUpload,
+      // });
 
       window.prompt(`🔒${t("alerts.uploadedSecurly")}`, urlString);
     } else if (json.error_class === "RequestTooLargeError") {

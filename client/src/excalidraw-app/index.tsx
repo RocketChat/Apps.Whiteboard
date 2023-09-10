@@ -72,7 +72,7 @@ import { ExportToExcalidrawPlus } from "./components/ExportToExcalidrawPlus";
 import { updateStaleImageStatuses } from "./data/FileManager";
 import { newElementWith } from "../element/mutateElement";
 import { isInitializedImageElement } from "../element/typeChecks";
-import { loadFilesFromFirebase } from "./data/firebase";
+// import { loadFilesFromFirebase } from "./data/firebase";
 import { isBrowserStorageStateNewer } from "./data/tabSync";
 import clsx from "clsx";
 import { reconcileElements } from "./collab/reconciliation";
@@ -336,14 +336,14 @@ const ExcalidrawWrapper = () => {
               elements: data.scene.elements,
               forceFetchFiles: true,
             })
-            .then(({ loadedFiles, erroredFiles }) => {
-              excalidrawAPI.addFiles(loadedFiles);
-              updateStaleImageStatuses({
-                excalidrawAPI,
-                erroredFiles,
-                elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
-              });
-            });
+            // .then(({ loadedFiles, erroredFiles }) => {
+            //   excalidrawAPI.addFiles(loadedFiles);
+            //   updateStaleImageStatuses({
+            //     excalidrawAPI,
+            //     erroredFiles,
+            //     elements: excalidrawAPI.getSceneElementsIncludingDeleted(),
+            //   });
+            // });
         }
       } else {
         const fileIds =
