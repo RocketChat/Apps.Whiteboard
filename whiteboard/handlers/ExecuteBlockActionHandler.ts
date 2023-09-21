@@ -36,7 +36,6 @@ export class ExecuteBlockActionHandler {
                 .getAppUser()) as IUser;
             switch (actionId) {
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
-                    console.log("Settings button clicked");
                     if (messageId) {
                         const modal = await SettingsModal(appId, messageId);
                         await Promise.all([
@@ -52,6 +51,7 @@ export class ExecuteBlockActionHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+
                 default:
                     return this.context
                         .getInteractionResponder()
