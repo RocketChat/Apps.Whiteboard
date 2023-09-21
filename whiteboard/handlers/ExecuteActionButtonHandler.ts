@@ -35,7 +35,10 @@ export class ExecuteActionButtonHandler {
             switch (actionId) {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
                     const io = new Server();
-                    
+                    io.on("client-broadcast", (socket: Socket) => {
+                        io.adapter();
+                        console.log("connected");
+                    });
                     io.listen(3000);
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;

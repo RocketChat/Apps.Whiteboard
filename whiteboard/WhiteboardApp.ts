@@ -226,7 +226,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
