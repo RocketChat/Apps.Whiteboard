@@ -1,12 +1,12 @@
 {
     "id": "c986f058-d8d5-496f-9c1c-06e39a95b229",
     "version": "0.0.1",
-    "requiredApiVersion": "^1.19.0",
+    "requiredApiVersion": "^1.40.0",
     "iconFile": "icon.png",
     "author": {
         "name": "Vinayak Sharma",
-        "homepage": "n/a",
-        "support": "n/a"
+        "homepage": "https://github.com/CulturalProfessor",
+        "support": "https://github.com/CulturalProfessor"
     },
     "name": "Whiteboard",
     "nameSlug": "whiteboard",
@@ -17,52 +17,40 @@
     ],
     "permissions": [
         {
-            "name": "networking"
-        },
-        {
-            "name": "persistence"
-        },
-        {
-            "name": "slashcommand"
+            "name": "ui.registerButtons"
         },
         {
             "name": "api"
         },
         {
-            "name": "message.write"
-        },
-        {
-            "name": "message.read"
-        },
-        {
-            "name": "room.write"
-        },
-        {
-            "name": "ui.interact"
-        },
-        {
-            "name": "ui.registerButtons"
-        },
-        {
-            "name": "room.read"
+            "name": "slashcommand"
         },
         {
             "name": "server-setting.read"
         },
         {
+            "name": "room.read"
+        },
+        {
+            "name": "persistence"
+        },
+        {
+            "name": "ui.interact"
+        },
+        {
+            "name": "networking"
+        },
+        {
+            "name": "message.write"
+        },
+        {
             "name": "user.read"
         },
         {
-            "name": "user.write"
+            "name": "room.write"
         },
         {
-            "name": "scheduler"
-        },
-        {
-            "name": "upload.write"
-        },
-        {
-            "name": "upload.read"
+            "name": "message.read"
         }
     ]
 }

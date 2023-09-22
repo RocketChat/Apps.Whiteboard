@@ -45,6 +45,7 @@ import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import { AppEnum } from "./enum/App";
 import { getDirect } from "./lib/messages";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
+import { AppPermissions } from "@rocket.chat/apps-engine/server/permissions/AppPermissions";
 export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
