@@ -70,7 +70,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
    ```
 7. Deploy your app locally
    ```bash
-   rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password} --update
+   rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
    ```
    Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
