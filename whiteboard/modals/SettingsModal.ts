@@ -74,7 +74,7 @@ export async function SettingsModal(
         UtilityEnum.CLOSE_ACTION_ID,
         appId,
         "",
-        ButtonStyle.DANGER
+        undefined
     );
     let submitButton = getButton(
         UtilityEnum.SUBMIT,

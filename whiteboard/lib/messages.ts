@@ -157,11 +157,8 @@ export async function helperMessage(
     appUser: IUser
 ) {
     const text = `*Whiteboard App Commands*
-    \`/whiteboard auth\` - Provide User Details to whiteboard app
-    \`/whiteboard remove-auth\` - Remove User Details from whiteboard app
     \`/whiteboard new\` - Create a new whiteboard
-    \`/whiteboard delete\` - Delete a whiteboard
-    \`/whiteboard help\` - Display this message
+    \`/whiteboard help\` - Display helper message
     `;
 
     const msg = modify

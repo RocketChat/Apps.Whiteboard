@@ -431,12 +431,10 @@ const ExcalidrawWrapper = () => {
         }
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
-
   }, [collabAPI, excalidrawAPI, setLangCode]);
 
   useEffect(() => {
-    const unloadHandler = (event: BeforeUnloadEvent) => {
-    };
+    const unloadHandler = (event: BeforeUnloadEvent) => {};
     window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
@@ -475,8 +473,6 @@ const ExcalidrawWrapper = () => {
 
         setTheme(appState.theme);
 
-        // this check is redundant, but since this is a hot path, it's best
-        // not to evaludate the nested expression every time
         const remoteElements = (await getBoardData(baseURL, boardId)).data
           .boardData.elements;
         const reconciledElements = reconcileElements(
@@ -485,19 +481,19 @@ const ExcalidrawWrapper = () => {
           appState
         );
         elements = reconciledElements;
-
         const canvas = await exportToCanvas({
           elements: elements,
           appState: appState,
           files,
-          maxWidthOrHeight: 360 * 3,
-          getDimensions: (width, height) => ({
-            width: 360 * 2,
-            height: 360 * 2,
-            scale: 3,
+          maxWidthOrHeight:  1600,
+          getDimensions: () => ({
+            width: 360 * 3,
+            height: 360 * 3,
+            scale: 1,
           }),
-          exportPadding: 20,
+          exportPadding: 60,
         });
+        
 
         const canvasBase64 = canvas.toDataURL();
 
