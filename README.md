@@ -1,32 +1,98 @@
-# Whiteboard
-Boost your collaborative experience with diagrams, drawings and more via Rocket.Chat `Apps.Whiteboard`.
+# Whiteboard App for Rocket.Chat
 
-![image](https://github.com/RocketChat/Apps.Whiteboard/assets/32427260/e4ce670e-9b6a-4a77-8ac2-58730b63b79f)
+Enhance your collaborative experience with diagrams, drawings, and more using Whiteboard Integration in Rocket.Chat. **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
 
+![Whiteboard](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f6b77aa6-cb76-49d2-a83b-445b116fd1f0)
+
+## How to Use App
+
+### Create Whiteboard
+
+#### Through Slash Commands:
+
+- Use `/whiteboard new` to create a new whiteboard.
+
+- Use `/whiteboard help` for a helper message.
+
+#### Through Action Buttons:
+
+- Click on the "Create Whiteboard" action button to create a new whiteboard.
+
+![Action button](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/58647f66-13ec-4808-814a-e2e1be783328)
+
+### Using Whiteboard
+
+- Click on `Edit board` button and you will be directed to a new whiteboard tab.
+  ![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/8c0107df-9a66-4435-9b17-e7cb73d3881c)
+
+- User's edits will be stored in realtime as a image preview in the message.
+
+<table>
+  <tr>
+    <td><img src="https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f550edbd-baf7-4122-acff-d4240def97ec" alt="Image 1"></td>
+    <td><img src="https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/3a385c99-6366-43d9-a1b2-6654a95dac1c" alt="Image 2"></td>
+  </tr>
+</table>
+
+- Click on `Settings` button to modify `boardname` and make board `public/private`.
+![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/285896e1-995e-457d-9911-8a77bdf4679c)
+
+#### 
 
 ## Local Setup Guide
-- First `cd client` folder and run `npm install` to install all packages
-- Run `npm build` to build webpack bundle for excalidraw react app
-- Run `npm build:excalidraw` to execute build.js script to write build scripts to excalidraw.ts and excalidraw html to excalidrawContent.ts
-- Run `cd ../whiteboard/` and ` $  rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}` ,add `--update` flag to if you want update your app changes
-To verify successful build you can view endpoint `/excalidraw` in whiteboard-app settings and access the react app through url provided
 
-## Getting Started
-Now that you have generated a blank default Rocket.Chat App, what are you supposed to do next?
-Start developing! Open up your favorite editor, our recommended one is Visual Studio code,
-and start working on your App. Once you have something ready to test, you can either
-package it up and manually deploy it to your test instance or you can use the CLI to do so.
-Here are some commands to get started:
-- `rc-apps package`: this command will generate a packaged app file (zip) which can be installed **if** it compiles with TypeScript
-- `rc-apps deploy`: this will do what `package` does but will then ask you for your server url, username, and password to deploy it for you
+1. Navigate to the `client` folder: 
+   ```bash
+   cd client
+   ```
 
-## Documentation
-Here are some links to examples and documentation:
-- [Rocket.Chat Apps TypeScript Definitions Documentation](https://rocketchat.github.io/Rocket.Chat.Apps-engine/)
-- [Rocket.Chat Apps TypeScript Definitions Repository](https://github.com/RocketChat/Rocket.Chat.Apps-engine)
-- [Example Rocket.Chat Apps](https://github.com/graywolf336/RocketChatApps)
-- Community Forums
-  - [App Requests](https://forums.rocket.chat/c/rocket-chat-apps/requests)
-  - [App Guides](https://forums.rocket.chat/c/rocket-chat-apps/guides)
-  - [Top View of Both Categories](https://forums.rocket.chat/c/rocket-chat-apps)
-- [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
+2. Install all required packages:
+   ```bash
+   npm install
+   ```
+
+3. Build the webpack bundle for the Excalidraw React app:
+   ```bash
+   npm build
+   ```
+
+4. Execute the build.js script to generate build scripts for `excalidraw.ts` and `excalidrawContent.ts`:
+   ```bash
+   npm build:excalidraw
+   ```
+
+5. Change directory to `whiteboard` and install all Rocket chat app packages :
+   ```bash
+   cd ../whiteboard/
+   ```
+   ```bash
+   npm install
+   ```
+7. Deploy your app locally
+   ```bash
+   rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password} --update
+   ```
+   Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
+
+## Resources
+
+Explore our documentation and engage with the Rocket.Chat Apps community:
+
+- **Rocket.Chat Apps TypeScript Definitions Documentation**: Learn about Rocket.Chat Apps TypeScript definitions and how to use them.
+   - [Documentation](https://rocketchat.github.io/Rocket.Chat.Apps-engine/)
+
+- **Rocket.Chat Apps TypeScript Definitions Repository**: Contribute and explore the open-source repository for Rocket.Chat Apps TypeScript definitions.
+   - [GitHub Repository](https://github.com/RocketChat/Rocket.Chat.Apps-engine)
+
+- **Example Rocket.Chat Apps**: Find inspiration in a collection of example Rocket.Chat Apps, providing practical implementations.
+   - [Example Apps](https://github.com/graywolf336/RocketChatApps)
+
+- **Community Forums**: Engage with the Rocket.Chat Apps community through our forums.
+   - [App Requests](https://forums.rocket.chat/c/rocket-chat-apps/requests)
+   - [App Guides](https://forums.rocket.chat/c/rocket-chat-apps/guides)
+   - [Community Forums](https://forums.rocket.chat/c/rocket-chat-apps)
+
+- **Community Chat Channel**: Join the conversation in our community chat channel.
+   - [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
+
+Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
