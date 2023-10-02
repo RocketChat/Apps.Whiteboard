@@ -52,7 +52,7 @@ export class ExecuteViewSubmitHandler {
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
                             ];
                         const boardStatus =
-                            view.state[UtilityEnum.BOARD_SELECT_BLOCK_ID]?.[
+                            view.state?.[UtilityEnum.BOARD_SELECT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_SELECT_ACTION_ID
                             ];
                         const messageId =

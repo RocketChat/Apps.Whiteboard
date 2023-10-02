@@ -11,7 +11,7 @@
     "name": "Whiteboard",
     "nameSlug": "whiteboard",
     "classFile": "WhiteboardApp.ts",
-    "description": "Whiteboard Integration App for Rocket.Chat",
+    "description": "Seamlessly incorporate Whiteboard Integration into your Rocket.Chat environment, enabling digital drawing, annotation, and visual communication. Enhance your Rocket.Chat experience with the power of real-time whiteboarding and graphical interaction, facilitating teamwork, brainstorming, and idea sharing within your workspace. For more info check out <a href='https://github.com/RocketChat/Apps.Whiteboard'>Documentation</a>.",
     "implements": [
         "IUIKitInteractionHandler"
     ],

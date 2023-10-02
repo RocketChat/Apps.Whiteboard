@@ -38,4 +38,5 @@ export enum UtilityEnum {
     BOARD_SELECT_ACTION_ID = "board-select-action-id",
     PRIVATE = "PRIVATE",
     PUBLIC = "PUBLIC",
+    BOARD_PRIVACY_LABEL = "Update Board Privacy",
 }

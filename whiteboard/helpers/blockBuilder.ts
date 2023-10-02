@@ -159,7 +159,7 @@ export function getStaticSelectElement(
         appId,
         blockId,
         actionId,
-        initialValue,
+        initialValue
     };
     return block;
 }

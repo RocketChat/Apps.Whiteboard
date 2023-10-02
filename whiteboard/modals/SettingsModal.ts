@@ -1,22 +1,14 @@
 import {
     ButtonStyle,
-    UIKitInteractionContext,
     UIKitSurfaceType,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import {
-    IHttp,
-    IModify,
-    IPersistence,
-    IRead,
     IUIKitSurfaceViewParam,
 } from "@rocket.chat/apps-engine/definition/accessors";
-import { SlashCommandContext } from "@rocket.chat/apps-engine/definition/slashcommands";
 import { UtilityEnum } from "../enum/uitlityEnum";
-import { Block, TextObject } from "@rocket.chat/ui-kit";
+import { Block, Option, InputBlock } from "@rocket.chat/ui-kit";
 import {
-    getActionsBlock,
     getButton,
-    getDividerBlock,
     getInputBox,
     getSectionBlock,
     getStaticSelectElement,
@@ -39,22 +31,23 @@ export async function SettingsModal(
     );
     block.push(boardInputBlock);
 
-    let options = [
+    let options: Array<Option> = [
         {
             text: {
-                type: "plain_text" as const,
+                type: "plain_text",
                 text: "Public",
             },
             value: UtilityEnum.PUBLIC,
         },
         {
             text: {
-                type: "plain_text" as const,
+                type: "plain_text",
                 text: "Private",
             },
             value: UtilityEnum.PRIVATE,
         },
     ];
+
     let StaticSelectElement = getStaticSelectElement(
         UtilityEnum.BOARD_SELECT_LABEL,
         options,
@@ -62,12 +55,16 @@ export async function SettingsModal(
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
         UtilityEnum.BOARD_SELECT_ACTION_ID,
     );
+    let inputChoiceBlock: InputBlock = {
+        type: "input",
+        label: {
+            type: "plain_text",
+            text: UtilityEnum.BOARD_PRIVACY_LABEL,
+        },
+        element: StaticSelectElement,
+    };
+    block.push(inputChoiceBlock);
 
-    let actionStaticSelectBlock = getActionsBlock(
-        UtilityEnum.BOARD_SELECT_BLOCK_ID,
-        [StaticSelectElement]
-    );
-    block.push(actionStaticSelectBlock);
     let closeButton = getButton(
         UtilityEnum.CANCEL,
         UtilityEnum.CLOSE_BLOCK_ID,
@@ -84,6 +81,7 @@ export async function SettingsModal(
         messageId,
         ButtonStyle.PRIMARY
     );
+
     const value = {
         id: UtilityEnum.SETTINGS_MODAL_ID,
         type: UIKitSurfaceType.MODAL,
