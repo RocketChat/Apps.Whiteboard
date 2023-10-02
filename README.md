@@ -37,7 +37,11 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 - Click on `Settings` button to modify `boardname` and make board `public/private`.
 ![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/285896e1-995e-457d-9911-8a77bdf4679c)
 
-#### 
+## Whiteboard App Policies
+
+- [Privacy Policy](https://docs.google.com/document/d/1TnEIvkCBgvsd0QcuHJAqloPL9O5g5rS62MVgLd4dou8/edit?usp=sharing)
+- [Terms of Use](https://docs.google.com/document/d/10rs2D-b3f7SzT6-liMQNdZ6XqSC6vSiLYsvEG3Ip2d4/edit?usp=sharing)
+
 
 ## Local Setup Guide
 
