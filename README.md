@@ -1,4 +1,4 @@
-# Whiteboard App for Rocket.Chat
+![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f2b1bbde-3d6f-45f4-b8fe-b7630ffb4e53)# Whiteboard App for Rocket.Chat
 
 Enhance your collaborative experience with diagrams, drawings, and more using Whiteboard Integration in Rocket.Chat. **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
 
@@ -42,7 +42,6 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 - [Privacy Policy](https://docs.google.com/document/d/1TnEIvkCBgvsd0QcuHJAqloPL9O5g5rS62MVgLd4dou8/edit?usp=sharing)
 - [Terms of Use](https://docs.google.com/document/d/10rs2D-b3f7SzT6-liMQNdZ6XqSC6vSiLYsvEG3Ip2d4/edit?usp=sharing)
 
-
 ## Local Setup Guide
 
 1. Navigate to the `client` folder: 
@@ -77,6 +76,8 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
    rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
    ```
    Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
+
+## GSoC'23 Work: [Whiteboard App Report]( https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
 ## Resources
 
