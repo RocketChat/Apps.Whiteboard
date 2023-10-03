@@ -1,4 +1,4 @@
-![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f2b1bbde-3d6f-45f4-b8fe-b7630ffb4e53)# Whiteboard App for Rocket.Chat
+# Whiteboard App for Rocket.Chat
 
 Enhance your collaborative experience with diagrams, drawings, and more using Whiteboard Integration in Rocket.Chat. **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
 
