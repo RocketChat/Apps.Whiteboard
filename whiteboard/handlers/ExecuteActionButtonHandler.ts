@@ -15,6 +15,7 @@ import { randomId } from "../lib/utilts";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { defaultPreview } from "../assets/defaultPreview";
 import { storeBoardRecord } from "../persistence/boardInteraction";
+import { Socket, Server } from "../collab-socket/lib/index";
 
 export class ExecuteActionButtonHandler {
     constructor(
@@ -33,6 +34,12 @@ export class ExecuteActionButtonHandler {
             const { actionId, user } = data;
             switch (actionId) {
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
+                    const io = new Server();
+                    io.on("client-broadcast", (socket: Socket) => {
+                        io.adapter();
+                        console.log("connected");
+                    });
+                    io.listen(3000);
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;
                     const appId = this.app.getID();

@@ -100,10 +100,10 @@ class Portal {
 
   queueFileUpload = throttle(async () => {
     try {
-      await this.collab.fileManager.saveFiles({
-        elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
-        files: this.collab.excalidrawAPI.getFiles(),
-      });
+      // await this.collab.fileManager.saveFiles({
+      //   elements: this.collab.excalidrawAPI.getSceneElementsIncludingDeleted(),
+      //   files: this.collab.excalidrawAPI.getFiles(),
+      // });
     } catch (error: any) {
       if (error.name !== "AbortError") {
         this.collab.excalidrawAPI.updateScene({
@@ -114,19 +114,19 @@ class Portal {
       }
     }
 
-    this.collab.excalidrawAPI.updateScene({
-      elements: this.collab.excalidrawAPI
-        .getSceneElementsIncludingDeleted()
-        .map((element) => {
-          if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
-            // this will signal collaborators to pull image data from server
-            // (using mutation instead of newElementWith otherwise it'd break
-            // in-progress dragging)
-            return newElementWith(element, { status: "saved" });
-          }
-          return element;
-        }),
-    });
+    // this.collab.excalidrawAPI.updateScene({
+    //   elements: this.collab.excalidrawAPI
+    //     .getSceneElementsIncludingDeleted()
+    //     .map((element) => {
+    //       if (this.collab.fileManager.shouldUpdateImageElementStatus(element)) {
+    //         // this will signal collaborators to pull image data from server
+    //         // (using mutation instead of newElementWith otherwise it'd break
+    //         // in-progress dragging)
+    //         return newElementWith(element, { status: "saved" });
+    //       }
+    //       return element;
+    //     }),
+    // });
   }, FILE_UPLOAD_TIMEOUT);
 
   broadcastScene = async (

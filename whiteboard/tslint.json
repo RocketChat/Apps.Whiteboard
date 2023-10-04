@@ -3,6 +3,7 @@
     "rules": {
       "array-type": [true, "generic"],
       "member-access": true,
+      "import/no-cycle": "error",
       "no-console": [false],
       "no-duplicate-variable": true,
       "object-literal-sort-keys": false,
