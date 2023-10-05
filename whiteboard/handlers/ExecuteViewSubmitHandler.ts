@@ -21,12 +21,11 @@ import {
     updateBoardnameByMessageId,
     updatePrivateMessageIdByMessageId,
 } from "../persistence/boardInteraction";
-import { getDirect, sendMessage, sendNotification } from "../lib/messages";
+import { getDirect } from "../lib/messages";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
-import { IRoom } from "@rocket.chat/apps-engine/definition/rooms/IRoom";
 import { AppEnum } from "../enum/App";
 
-//This class will handle all the view submit interactions
+//This class will handle all the view submit interactions from the modals
 export class ExecuteViewSubmitHandler {
     constructor(
         private readonly app: WhiteboardApp,
@@ -45,12 +44,14 @@ export class ExecuteViewSubmitHandler {
         const appId = AppSender.appId;
         try {
             switch (view.id) {
+                // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
                     if (view.state && appId) {
                         const boardname =
                             view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
                             ];
+                        // This is used to get the board status(public/private) from the settings modal
                         const boardStatus =
                             view.state?.[UtilityEnum.BOARD_SELECT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_SELECT_ACTION_ID
@@ -66,6 +67,8 @@ export class ExecuteViewSubmitHandler {
                                     messageId
                                 )
                             )?.messageId;
+
+                            // Check if the message is a private message or not
                             if (messageIdFromPrivateMessageId != null) {
                                 await updateBoardnameByMessageId(
                                     this.persistence,
@@ -94,6 +97,7 @@ export class ExecuteViewSubmitHandler {
                                     message.getBlocks()[1]["elements"][1][
                                         "url"
                                     ];
+                                // Updating header block for new boardname
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
                                         user.username,
@@ -105,6 +109,7 @@ export class ExecuteViewSubmitHandler {
                                 message.setEditor(user).setRoom(room);
 
                                 if (boardStatus != undefined) {
+                                    // If board status is changed from public to private
                                     if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PRIVATE &&
@@ -117,7 +122,9 @@ export class ExecuteViewSubmitHandler {
                                             user,
                                             undefined
                                         );
-                                    } else if (
+                                    }
+                                    // If board status is changed from private to public
+                                    else if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PUBLIC &&
                                         boardname == undefined
@@ -129,7 +136,9 @@ export class ExecuteViewSubmitHandler {
                                             user,
                                             undefined
                                         );
-                                    } else if (
+                                    }
+                                    // If board status is changed from public to private and boardname is changed
+                                    else if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PRIVATE &&
                                         boardname != undefined
@@ -141,7 +150,9 @@ export class ExecuteViewSubmitHandler {
                                             user,
                                             updateHeaderBlock
                                         );
-                                    } else if (
+                                    }
+                                    // If board status is changed from private to public and boardname is changed
+                                    else if (
                                         boardStatus != undefined &&
                                         boardStatus == UtilityEnum.PUBLIC &&
                                         boardname != undefined
@@ -154,7 +165,9 @@ export class ExecuteViewSubmitHandler {
                                             updateHeaderBlock
                                         );
                                     }
-                                } else {
+                                }
+                                // If board status is not changed and boardname is changed
+                                else {
                                     if (
                                         boardStatus == undefined &&
                                         boardname != undefined
@@ -190,6 +203,7 @@ export class ExecuteViewSubmitHandler {
             return this.context.getInteractionResponder().errorResponse();
         }
     }
+    // This function is used to convert a public board to private board
     private async publicToPrivate(
         message: IMessageBuilder,
         messageId: string,
@@ -292,6 +306,8 @@ export class ExecuteViewSubmitHandler {
             console.log("Direct or Public room not found");
         }
     }
+
+    // This function is used to convert a private board to public board
     private async privateToPublic(
         privateMessage: IMessageBuilder,
         privateMessageId: string,

@@ -6,10 +6,10 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
-import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
-import { UtilityEnum } from "../enum/uitlityEnum";
 
 //functions needed to persist board data while modal and other UI interactions
+// Messages can be retrieved by using the messageId, privateMessageId and boardId
+// PrivateMessageId is the message id of the private message sent to the user when user modifies the board permission
 
 export const storeBoardRecord = async (
     persistence: IPersistence,

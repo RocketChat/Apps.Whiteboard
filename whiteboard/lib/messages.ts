@@ -6,9 +6,11 @@ import {
 import { IRoom, RoomType } from "@rocket.chat/apps-engine/definition/rooms";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { NotificationsController } from "./notifications";
-import { Block, TextObject } from "@rocket.chat/ui-kit";
+import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
+
+// getDirect is used to get the direct room between the app user and the user
 
 export async function getDirect(
     read: IRead,
@@ -39,6 +41,8 @@ export async function getDirect(
     }
 }
 
+// sendMessage is used to send a message to a room
+
 export async function sendMessage(
     modify: IModify,
     room: IRoom,
@@ -60,6 +64,8 @@ export async function sendMessage(
 
     return await modify.getCreator().finish(msg);
 }
+
+// sendMessageWithAttachment is used to send a message with attachments to a room
 
 export async function sendMessageWithAttachment(
     modify: IModify,
@@ -103,6 +109,8 @@ export async function shouldSendMessage(
     return notificationsStatus ? notificationsStatus.status : true;
 }
 
+// sendNotification is used to send a notification to a user,notification is a message which is not visible to other users
+
 export async function sendNotification(
     read: IRead,
     modify: IModify,
@@ -121,6 +129,8 @@ export async function sendNotification(
 
     return read.getNotifier().notifyUser(user, msg.getMessage());
 }
+
+// sendDirectMessage is used to send a direct message to a user
 
 export async function sendDirectMessage(
     read: IRead,
@@ -152,6 +162,7 @@ export function isUserHighHierarchy(user: IUser): boolean {
 }
 
 export async function helperMessage(
+    read: IRead,
     modify: IModify,
     room: IRoom,
     appUser: IUser
@@ -159,6 +170,8 @@ export async function helperMessage(
     const text = `*Whiteboard App Commands*
     \`/whiteboard new\` - Create a new whiteboard
     \`/whiteboard help\` - Display helper message
+    You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
+    Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
 
     const msg = modify
@@ -166,7 +179,8 @@ export async function helperMessage(
         .startMessage()
         .setSender(appUser)
         .setRoom(room)
-        .setText(text);
+        .setText(text)
+        .setParseUrls(true);
 
-    return await modify.getCreator().finish(msg);
+    return await read.getNotifier().notifyRoom(room, msg.getMessage());
 }

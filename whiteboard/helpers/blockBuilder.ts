@@ -12,6 +12,8 @@ import {
 import { PreviewBlockWithPreview } from "@rocket.chat/ui-kit";
 import { LayoutBlockType } from "@rocket.chat/ui-kit/dist/esm/blocks/LayoutBlockType";
 
+// Important functions used to build the blocks for the modals and messages
+
 export function getInputBox(
     labelText: string,
     placeholderText: string,

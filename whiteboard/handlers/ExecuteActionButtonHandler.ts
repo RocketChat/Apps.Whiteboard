@@ -15,7 +15,7 @@ import { randomId } from "../lib/utilts";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { defaultPreview } from "../assets/defaultPreview";
 import { storeBoardRecord } from "../persistence/boardInteraction";
-
+// ExecuteActionButtonHandler is used to handle the action button actions
 export class ExecuteActionButtonHandler {
     constructor(
         private readonly app: WhiteboardApp,
@@ -30,8 +30,9 @@ export class ExecuteActionButtonHandler {
         const data = context.getInteractionData();
 
         try {
-            const { actionId, user } = data;
+            const { actionId } = data;
             switch (actionId) {
+                // handleCreateWhiteboardButtonAction is used to handle the create whiteboard button action
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
                     const room = context.getInteractionData().room;
                     const sender = context.getInteractionData().user;

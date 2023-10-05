@@ -20,6 +20,8 @@ import { storeBoardRecord } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
 import { defaultPreview } from "../assets/defaultPreview";
 
+//CommandUtility is used to handle the commands
+
 export class CommandUtility implements ExecutorProps {
     sender: IUser;
     room: IRoom;
@@ -42,6 +44,8 @@ export class CommandUtility implements ExecutorProps {
         this.persistence = props.persistence;
         this.app = props.app;
     }
+
+    // handleNewBoardCommand is used to handle the /whiteboard new command
 
     private async handleNewBoardCommand({
         app,
@@ -99,11 +103,13 @@ export class CommandUtility implements ExecutorProps {
         }
     }
 
+    // helperMessage is used to send the helper message to the user and /whiteboard help command
+
     private async helperMessage() {
         const appSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
-        await helperMessage(this.modify, this.room, appSender);
+        await helperMessage(this.read, this.modify, this.room, appSender);
     }
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {

@@ -1,3 +1,4 @@
+// Defined all the utility enum values
 export enum UtilityEnum {
     NEW_BOARD_MODAL = "new-board-modal",
     BOARD_INPUT_BLOCK_ID = "board-input-block-id",
@@ -5,7 +6,6 @@ export enum UtilityEnum {
     BOARD_INPUT_ACTION_ID = "board-name-action-id",
     BOARD_INPUT_PLACEHOLDER = "Enter Board Name",
     SUBMIT = "Submit",
-    AUTHORIZE = "Authorize",
     CANCEL = "Cancel",
     SUBMIT_ACTION_ID = "submit-action-id",
     SUBMIT_BLOCK_ID = "submit-block-id",
@@ -13,9 +13,6 @@ export enum UtilityEnum {
     CLOSE_ACTION_ID = "close-action-id",
     CLOSE_BLOCK_ID = "close-block-id",
     NEW_BOARD_TITLE = "Create New Whiteboard",
-    AUTH_LABEL = "Do you want to authorize this app to use your account details?",
-    AUTH_MODAL = "auth-modal",
-    AUTH_TITLE = "Authorization",
     DELETE_BOARD_TITLE = "Delete Whiteboard",
     DELETE_BOARD_MODAL = "delete-board-modal",
     PREVIEW_BLOCK_ID = "preview-block-id",
@@ -29,10 +26,6 @@ export enum UtilityEnum {
     SETTINGS_LABEL = "Modify settings as your preference",
     SETTINGS_MODAL_ID = "settings-modal-id",
     SETTINGS_TITLE = "Settings",
-    ATTACHMENTS_ACTION_ID = "ATTACHMENTS_ACTION_ID",
-    ATTACHMENTS_BLOCK_ID = "ATTACHMENTS_BLOCK_ID",
-    ATTACHMENTS = "Download Assets ⬇",
-    ATTACHMENTS_LABEL = "ATTACHMENTS_LABEL",
     BOARD_SELECT_LABEL = "Select Public or Private Board",
     BOARD_SELECT_BLOCK_ID = "board-select-block-id",
     BOARD_SELECT_ACTION_ID = "board-select-action-id",

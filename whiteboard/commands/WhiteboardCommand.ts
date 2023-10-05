@@ -19,7 +19,7 @@ export interface WhiteboardSlashCommandContext {
     http: IHttp;
     persistence: IPersistence;
 }
-
+// Parent class for all the slash commands
 export class WhiteboardCommand implements ISlashCommand {
     public constructor(private readonly app: WhiteboardApp) {}
     public command = "whiteboard";
