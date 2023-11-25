@@ -12,6 +12,8 @@ interface INotificationStatus {
     status: boolean;
 }
 
+// NotificationsController is used to store the notification status of the user
+
 export class NotificationsController {
     private read: IRead;
     private persistence: IPersistence;

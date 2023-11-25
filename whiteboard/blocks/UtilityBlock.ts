@@ -5,20 +5,12 @@ import {
     getMarkdownBlock,
 } from "../helpers/blockBuilder";
 import {
-    ActionsBlock,
-    ButtonElement,
-    ContextBlock,
-    DividerBlock,
-    InputBlock,
-    Option,
     SectionBlock,
-    StaticSelectElement,
     Block,
-    TextObject,
-    PlainText,
 } from "@rocket.chat/ui-kit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 
+//Header block for all new whiteboards
 export async function buildHeaderBlock(
     username: string,
     boardURL: string,
@@ -27,7 +19,7 @@ export async function buildHeaderBlock(
 ): Promise<Array<Block>> {
     const block: Block[] = [];
     const openbutton = getButton(
-        "Edit Board",
+        "Edit board",
         UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.OPEN_BUTTON_ACTION_ID,
         appId,
@@ -37,7 +29,7 @@ export async function buildHeaderBlock(
     );
 
     const settingButton = getButton(
-        "⚙️ Settings",
+        "Settings",
         UtilityEnum.PREVIEW_BLOCK_ID,
         UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
         appId,
@@ -55,18 +47,9 @@ export async function buildHeaderBlock(
         );
     }
 
-    // const attachmentsButton = getButton(
-    //     UtilityEnum.ATTACHMENTS,
-    //     UtilityEnum.ATTACHMENTS_BLOCK_ID,
-    //     UtilityEnum.ATTACHMENTS_ACTION_ID,
-    //     appId,
-    //     undefined
-    // );
-
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
         settingButton,
         openbutton,
-        // attachmentsButton
     ]);
     block.push(markdownBlock);
     block.push(actionBlock);

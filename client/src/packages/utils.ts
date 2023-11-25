@@ -85,8 +85,8 @@ export const exportToCanvas = ({
             ? maxWidthOrHeight / max
             : appState?.exportScale ?? 1;
 
-        canvas.width = width * scale;
-        canvas.height = height * scale;
+        canvas.width = max * scale;
+        canvas.height = max * scale;
 
         return {
           canvas,

@@ -7,7 +7,7 @@ import {
     IModify,
     IPersistence,
     IRead,
-    IPersistenceRead,
+    IAppInstallationContext,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
@@ -36,20 +36,19 @@ import { excalidrawContent } from "./assets/excalidrawContent";
 import { ExecuteActionButtonHandler } from "./handlers/ExecuteActionButtonHandler";
 import {
     getBoardRecord,
-    getBoardRecordByMessageId,
     storeBoardRecord,
 } from "./persistence/boardInteraction";
 import { UIActionButtonContext } from "@rocket.chat/apps-engine/definition/ui";
 import { UtilityEnum } from "./enum/uitlityEnum";
 import { ExecuteViewSubmitHandler } from "./handlers/ExecuteViewSubmitHandler";
 import { AppEnum } from "./enum/App";
-import { getDirect } from "./lib/messages";
+import { getDirect, sendDirectMessage } from "./lib/messages";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 export class WhiteboardApp extends App implements IUIKitInteractionHandler {
     constructor(info: IAppInfo, logger: ILogger, accessors: IAppAccessors) {
         super(info, logger, accessors);
     }
-
+    // Execute Handlers
     public async executeBlockActionHandler(
         context: UIKitBlockInteractionContext,
         read: IRead,
@@ -102,10 +101,28 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         );
         return await handler.run();
     }
+    public async onInstall(
+        context: IAppInstallationContext,
+        read: IRead,
+        http: IHttp,
+        persistence: IPersistence,
+        modify: IModify
+    ): Promise<void> {
+        sendDirectMessage(
+            read,
+            modify,
+            context.user,
+            `Whiteboard App Installed Successfully 🎉 \n *Whiteboard App Commands*
+            \`/whiteboard new\` - Create a new whiteboard
+            \`/whiteboard help\` - Display helper message
+            You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
+            Refer https://github.com/RocketChat/Apps.Whiteboard documentation for more details 🚀`,
+            persistence
+        );
+    }
 
     public async initialize(
-        configuration: IConfigurationExtend,
-        environmentRead: IEnvironmentRead
+        configuration: IConfigurationExtend
     ): Promise<void> {
         const whiteboardBoardCommand: WhiteboardCommand = new WhiteboardCommand(
             this
@@ -132,17 +149,12 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         });
     }
 }
+
+// Excalidraw endpoint serves whole html excalidraw content
 export class ExcalidrawEndpoint extends ApiEndpoint {
     public path = `board`;
 
-    public async get(
-        request: IApiRequest,
-        endpoint: IApiEndpointInfo,
-        read: IRead,
-        modify: IModify,
-        http: IHttp,
-        persis: IPersistence
-    ): Promise<IApiResponse> {
+    public async get(): Promise<IApiResponse> {
         const content = excalidrawContent;
         return {
             status: 200,
@@ -156,6 +168,9 @@ export class ExcalidrawEndpoint extends ApiEndpoint {
     }
 }
 
+// Bundle.js endpoint servers whole javascript excalidraw client content in compressed format
+// This is done to reduce the size of the content
+// Source code of uncompressed version is in client/src/excalidraw-app/index.tsx file
 export class BundleJsEndpoint extends ApiEndpoint {
     public path = "bundle.js";
 
@@ -179,6 +194,8 @@ export class BundleJsEndpoint extends ApiEndpoint {
     }
 }
 
+// GetBoardEndpoint serves the board data from the database
+// This endpoint is used to get the board data when user clicks on the edit button
 export class GetBoardEndpoint extends ApiEndpoint {
     public path = `board/get`;
 
@@ -214,6 +231,9 @@ export class GetBoardEndpoint extends ApiEndpoint {
         };
     }
 }
+
+// UpdateBoardEndpoint updates the board data in the database
+// This endpoint is used to update the preview Image.
 
 export class UpdateBoardEndpoint extends ApiEndpoint {
     public path = `board/update`;

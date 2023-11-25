@@ -87,6 +87,8 @@ import { appJotaiStore } from "./app-jotai";
 import "./index.scss";
 import { ResolutionType } from "../utility-types";
 
+// Main client-side entry point of Excalidraw
+// We generate following boardData
 export interface BoardData {
   boardId: string;
   boardData: {
@@ -97,6 +99,7 @@ export interface BoardData {
   cover: string;
   title: string;
 }
+// constant variables for board url
 const fullURL = window.location.href;
 const urlParams = new URLSearchParams(window.location.search);
 const boardId = urlParams.get("id") ?? "";
@@ -109,6 +112,7 @@ const languageDetector = new LanguageDetector();
 languageDetector.init({
   languageUtils: {},
 });
+// Get board data from backend
 async function getBoardData(baseURL: string, boardId: string) {
   const res = await fetch(`${baseURL}/board/get?id=${boardId}`, {
     method: "GET",
@@ -122,6 +126,7 @@ async function getBoardData(baseURL: string, boardId: string) {
   //   console.log("getBoardData", response);
   return response;
 }
+// Post board data to backend
 async function postBoardData(baseURL: string, board: BoardData) {
   fetch(`${baseURL}/board/update`, {
     method: "POST",
@@ -135,7 +140,6 @@ async function postBoardData(baseURL: string, board: BoardData) {
     .then((res) => res.json())
     .then((data) => console.log("Update Data Success", data));
 }
-
 const initializeScene = async (opts: {
   collabAPI: CollabAPI;
   excalidrawAPI: ExcalidrawImperativeAPI;
@@ -431,12 +435,10 @@ const ExcalidrawWrapper = () => {
         }
       }
     }, SYNC_BROWSER_TABS_TIMEOUT);
-
   }, [collabAPI, excalidrawAPI, setLangCode]);
 
   useEffect(() => {
-    const unloadHandler = (event: BeforeUnloadEvent) => {
-    };
+    const unloadHandler = (event: BeforeUnloadEvent) => {};
     window.addEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
     return () => {
       window.removeEventListener(EVENT.BEFORE_UNLOAD, unloadHandler);
@@ -475,32 +477,31 @@ const ExcalidrawWrapper = () => {
 
         setTheme(appState.theme);
 
-        // this check is redundant, but since this is a hot path, it's best
-        // not to evaludate the nested expression every time
         const remoteElements = (await getBoardData(baseURL, boardId)).data
           .boardData.elements;
+          // Reconciling updates for stable updates
         const reconciledElements = reconcileElements(
           elements,
           remoteElements,
           appState
         );
         elements = reconciledElements;
-
+        // Generating canvas preview for cover
         const canvas = await exportToCanvas({
           elements: elements,
           appState: appState,
           files,
-          maxWidthOrHeight: 360 * 3,
-          getDimensions: (width, height) => ({
-            width: 360 * 2,
-            height: 360 * 2,
-            scale: 3,
+          maxWidthOrHeight:  1600,
+          getDimensions: () => ({
+            width: 360 * 3,
+            height: 360 * 3,
+            scale: 1,
           }),
-          exportPadding: 20,
+          exportPadding: 60,
         });
-
+        // converting base64 img of canvas
         const canvasBase64 = canvas.toDataURL();
-
+        // Posting data to backend
         postBoardData(baseURL, {
           boardId,
           boardData: { elements, appState: appState, files },

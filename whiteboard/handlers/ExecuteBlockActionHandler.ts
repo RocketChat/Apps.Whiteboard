@@ -11,10 +11,9 @@ import {
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
-import { getBoardRecordByMessageId } from "../persistence/boardInteraction";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { MessageActionButtonsAlignment } from "@rocket.chat/apps-engine/definition/messages";
 
+// ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
     constructor(
         private readonly app: WhiteboardApp,
@@ -35,6 +34,7 @@ export class ExecuteBlockActionHandler {
                 .getUserReader()
                 .getAppUser()) as IUser;
             switch (actionId) {
+                // handleSettingsButtonAction is used to handle the settings button action
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
                     if (messageId) {
                         const modal = await SettingsModal(appId, messageId);

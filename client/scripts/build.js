@@ -15,9 +15,12 @@ let base64Compressed = `export const compressedString=\`${Buffer.from(
   compressed
 ).toString("base64")}\``;
 
-
-
-let excalidrawHtml=`export const excalidrawContent=\`${readFileSync("./public/index.html","utf8")}\``
+let excalidrawHtml = `export const excalidrawContent=\`${readFileSync(
+  "./public/index.html",
+  "utf8"
+)}\``;
 
 writeFileSync("../whiteboard/assets/excalidrawContent.ts", excalidrawHtml);
 writeFileSync("../whiteboard/assets/excalidraw.ts", base64Compressed);
+
+console.log("Built at", new Date().toLocaleString());
