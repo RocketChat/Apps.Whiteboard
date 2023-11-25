@@ -56,12 +56,12 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 
 3. Build the webpack bundle for the Excalidraw React app:
    ```bash
-   npm build
+   npm run build
    ```
 
 4. Execute the build.js script to generate build scripts for `excalidraw.ts` and `excalidrawContent.ts`:
    ```bash
-   npm build:excalidraw
+   npm run build:excalidraw
    ```
 
 5. Change directory to `whiteboard` and install all Rocket chat app packages :
