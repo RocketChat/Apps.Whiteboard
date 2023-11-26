@@ -44,6 +44,8 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 
 ## Local Setup Guide
 
+#### Make sure you have a working Rocket.Chat server for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup).
+
 1. Navigate to the `client` folder: 
    ```bash
    cd client
