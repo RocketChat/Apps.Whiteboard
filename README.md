@@ -44,7 +44,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 
 ## Local Setup Guide
 
-#### Make sure you have a working Rocket.Chat server for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup).
+#### Make sure you have a working Rocket.Chat server and Apps-Engine CLI for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup) and CLI from [here](https://developer.rocket.chat/apps-engine/getting-started/rocket.chat-app-engine-cli).
 
 1. Navigate to the `client` folder: 
    ```bash
@@ -77,7 +77,8 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
    ```bash
    rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
    ```
-   Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
+   
+   Your username and password are your local server's user credentials .Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
 ## GSoC'23 Work: [Whiteboard App Report]( https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
