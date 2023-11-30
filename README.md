@@ -43,7 +43,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 - [Terms of Use](https://docs.google.com/document/d/10rs2D-b3f7SzT6-liMQNdZ6XqSC6vSiLYsvEG3Ip2d4/edit?usp=sharing)
 
 ## Local Setup Guide
-
+### Join our community from [here](https://open.rocket.chat/channel/white-board-integration-team) 💻🧑‍🤝‍🧑🚀.
 #### Make sure you have a working Rocket.Chat server and Apps-Engine CLI for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup) and CLI from [here](https://developer.rocket.chat/apps-engine/getting-started/rocket.chat-app-engine-cli).
 
 1. Navigate to the `client` folder: 
