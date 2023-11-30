@@ -479,7 +479,7 @@ const ExcalidrawWrapper = () => {
 
         const remoteElements = (await getBoardData(baseURL, boardId)).data
           .boardData.elements;
-          // Reconciling updates for stable updates
+        // Reconciling updates for stable updates
         const reconciledElements = reconcileElements(
           elements,
           remoteElements,
@@ -491,7 +491,7 @@ const ExcalidrawWrapper = () => {
           elements: elements,
           appState: appState,
           files,
-          maxWidthOrHeight:  1600,
+          maxWidthOrHeight: 1600,
           getDimensions: () => ({
             width: 360 * 3,
             height: 360 * 3,

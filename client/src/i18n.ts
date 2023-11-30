@@ -1,15 +1,64 @@
 import fallbackLangData from "./locales/en.json";
+
+// Importing fallbackLangData from language JSON files
+import langData_en from "./locales/en.json";
+import langData_ar_sa from "./locales/ar-SA.json";
+import langData_bg_bg from "./locales/bg-BG.json";
+import langData_ca_es from "./locales/ca-ES.json";
+import langData_cs_cz from "./locales/cs-CZ.json";
+import langData_de_de from "./locales/de-DE.json";
+import langData_el_gr from "./locales/el-GR.json";
+import langData_es_es from "./locales/es-ES.json";
+import langData_eu_es from "./locales/eu-ES.json";
+import langData_fa_ir from "./locales/fa-IR.json";
+import langData_fi_fi from "./locales/fi-FI.json";
+import langData_fr_fr from "./locales/fr-FR.json";
+import langData_gl_es from "./locales/gl-ES.json";
+import langData_he_il from "./locales/he-IL.json";
+import langData_hi_in from "./locales/hi-IN.json";
+import langData_hu_hu from "./locales/hu-HU.json";
+import langData_id_id from "./locales/id-ID.json";
+import langData_it_it from "./locales/it-IT.json";
+import langData_ja_jp from "./locales/ja-JP.json";
+import langData_kab_kab from "./locales/kab-KAB.json";
+import langData_kk_kz from "./locales/kk-KZ.json";
+import langData_ko_kr from "./locales/ko-KR.json";
+import langData_ku_tr from "./locales/ku-TR.json";
+import langData_lt_lt from "./locales/lt-LT.json";
+import langData_lv_lv from "./locales/lv-LV.json";
+import langData_my_mm from "./locales/my-MM.json";
+import langData_nb_no from "./locales/nb-NO.json";
+import langData_nl_nl from "./locales/nl-NL.json";
+import langData_nn_no from "./locales/nn-NO.json";
+import langData_oc_fr from "./locales/oc-FR.json";
+import langData_pa_in from "./locales/pa-IN.json";
+import langData_pl_pl from "./locales/pl-PL.json";
+import langData_pt_br from "./locales/pt-BR.json";
+import langData_pt_pt from "./locales/pt-PT.json";
+import langData_ro_ro from "./locales/ro-RO.json";
+import langData_ru_ru from "./locales/ru-RU.json";
+import langData_sk_sk from "./locales/sk-SK.json";
+import langData_sv_se from "./locales/sv-SE.json";
+import langData_sl_si from "./locales/sl-SI.json";
+import langData_tr_tr from "./locales/tr-TR.json";
+import langData_uk_ua from "./locales/uk-UA.json";
+import langData_zh_cn from "./locales/zh-CN.json";
+import langData_zh_tw from "./locales/zh-TW.json";
+import langData_vi_vn from "./locales/vi-VN.json";
+import langData_mr_in from "./locales/mr-IN.json";
+
 import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
 import { jotaiScope, jotaiStore } from "./jotai";
 import { atom, useAtomValue } from "jotai";
 
+// It represents the minimum completion percentage required for a language to be considered complete.
 const COMPLETION_THRESHOLD = 85;
 
 export interface Language {
   code: string;
   label: string;
-  rtl?: boolean;
+  rtl?: boolean; //rtl : a boolean indicating whether the language is written from right to left
 }
 
 export const defaultLang = { code: "en", label: "English" };
@@ -61,14 +110,64 @@ const allLanguages: Language[] = [
   { code: "mr-IN", label: "मराठी" },
 ].concat([defaultLang]);
 
+// Mapping language codes to their imported json data
+const langImportsMap: Record<string, any> = {
+  en: langData_en,
+  "ar-SA": langData_ar_sa,
+  "bg-BG": langData_bg_bg,
+  "ca-ES": langData_ca_es,
+  "cs-CZ": langData_cs_cz,
+  "de-DE": langData_de_de,
+  "el-GR": langData_el_gr,
+  "es-ES": langData_es_es,
+  "eu-ES": langData_eu_es,
+  "fa-IR": langData_fa_ir,
+  "fi-FI": langData_fi_fi,
+  "fr-FR": langData_fr_fr,
+  "gl-ES": langData_gl_es,
+  "he-IL": langData_he_il,
+  "hi-IN": langData_hi_in,
+  "hu-HU": langData_hu_hu,
+  "id-ID": langData_id_id,
+  "it-IT": langData_it_it,
+  "ja-JP": langData_ja_jp,
+  "kab-KAB": langData_kab_kab,
+  "kk-KZ": langData_kk_kz,
+  "ko-KR": langData_ko_kr,
+  "ku-TR": langData_ku_tr,
+  "lt-LT": langData_lt_lt,
+  "lv-LV": langData_lv_lv,
+  "my-MM": langData_my_mm,
+  "nb-NO": langData_nb_no,
+  "nl-NL": langData_nl_nl,
+  "nn-NO": langData_nn_no,
+  "oc-FR": langData_oc_fr,
+  "pa-IN": langData_pa_in,
+  "pl-PL": langData_pl_pl,
+  "pt-BR": langData_pt_br,
+  "pt-PT": langData_pt_pt,
+  "ro-RO": langData_ro_ro,
+  "ru-RU": langData_ru_ru,
+  "sk-SK": langData_sk_sk,
+  "sv-SE": langData_sv_se,
+  "sl-SI": langData_sl_si,
+  "tr-TR": langData_tr_tr,
+  "uk-UA": langData_uk_ua,
+  "zh-CN": langData_zh_cn,
+  "zh-TW": langData_zh_tw,
+  "vi-VN": langData_vi_vn,
+  "mr-IN": langData_mr_in,
+};
+
+// Sorting the languages alphabetically based on the label property and filtering out the languages based on the completion threshold
 export const languages: Language[] = allLanguages
   .sort((left, right) => (left.label > right.label ? 1 : -1))
   .filter(
     (lang) =>
-      (percentages as Record<string, number>)[lang.code] >=
-      COMPLETION_THRESHOLD,
+      (percentages as Record<string, number>)[lang.code] >= COMPLETION_THRESHOLD
   );
 
+// If the environment is set to development (ENV.DEVELOPMENT), two additional languages are added to the beginning of the languages array
 const TEST_LANG_CODE = "__test__";
 if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
   languages.unshift(
@@ -77,7 +176,7 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
       code: `${TEST_LANG_CODE}.rtl`,
       label: "\u{202a}test language (rtl)\u{202c}",
       rtl: true,
-    },
+    }
   );
 }
 
@@ -86,18 +185,22 @@ let currentLangData = {};
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
-  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr";
+  document.documentElement.dir = currentLang.rtl ? "rtl" : "ltr"; // This code is responsible for changing direction of text from right to left for rtl languages
   document.documentElement.lang = currentLang.code;
 
   if (lang.code.startsWith(TEST_LANG_CODE)) {
     currentLangData = {};
   } else {
     try {
-      currentLangData = await import(
-        /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
-      );
+      currentLangData = langImportsMap[currentLang.code];
+      // currentLangData = await import(
+      //   /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
+      // );
     } catch (error: any) {
-      console.error(`Failed to load language ${lang.code}:`, error.message);
+      console.error(
+        `language load karne me dikkat aa rahi hai  ${lang.code}:`,
+        error.message
+      );
       currentLangData = fallbackLangData;
     }
   }
@@ -123,7 +226,7 @@ const findPartsForData = (data: any, parts: string[]) => {
 
 export const t = (
   path: string,
-  replacement?: { [key: string]: string | number },
+  replacement?: { [key: string]: string | number }
 ) => {
   if (currentLang.code.startsWith(TEST_LANG_CODE)) {
     const name = replacement
