@@ -197,10 +197,7 @@ export const setLanguage = async (lang: Language) => {
       //   /* webpackChunkName: "locales/[request]" */ `./locales/${currentLang.code}.json`
       // );
     } catch (error: any) {
-      console.error(
-        `language load karne me dikkat aa rahi hai  ${lang.code}:`,
-        error.message
-      );
+      console.error(`Failed to load language ${lang.code}:`, error.message);
       currentLangData = fallbackLangData;
     }
   }
