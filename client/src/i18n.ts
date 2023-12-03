@@ -49,9 +49,10 @@ import langData_mr_in from "./locales/mr-IN.json";
 
 import langData_af from "./locales/af.json";
 import langData_az from "./locales/az.json";
+import langData_bn_in from "./locales/bn-IN.json";
+
 import langData_bas_cm from "./locales/bas-CM.json";
 import langData_be_by from "./locales/be-BY.json";
-import langData_bn_in from "./locales/bn-IN.json";
 import langData_bs from "./locales/bs.json";
 import langData_cy from "./locales/cy.json";
 import langData_de_at from "./locales/de-AT.json";
@@ -77,6 +78,7 @@ import { atom, useAtomValue } from "jotai";
 
 // It represents the minimum completion percentage required for a language to be considered complete.
 const COMPLETION_THRESHOLD = 85;
+// const COMPLETION_THRESHOLD = 50;
 
 export interface Language {
   code: string;
@@ -133,9 +135,10 @@ const allLanguages: Language[] = [
   { code: "mr-IN", label: "मराठी" },
   { code: "af", label: "Afrikaans", rtl: true },
   { code: "az", label: "Azərbaycan dili" },
+  { code: "bn-IN", label: "বাংলা (ভারত)" },
+
   { code: "bas-CM", label: "Basa (Cameroon)" },
   { code: "be-BY", label: "Беларуская" },
-  { code: "bn-IN", label: "বাংলা (ভারত)" },
   { code: "bs", label: "Bosanski" },
   { code: "cy", label: "Cymraeg" },
   { code: "de-AT", label: "Deutsch (Österreich)" },
@@ -206,9 +209,9 @@ const langImportsMap: Record<string, any> = {
   "mr-IN": langData_mr_in,
   "af": langData_af,
   "az": langData_az,
+  "bn-IN": langData_bn_in,
   "bas-CM": langData_bas_cm,
   "be-BY": langData_be_by,
-  "bn-IN": langData_bn_in,
   "bs": langData_bs,
   "cy": langData_cy,
   "de-AT": langData_de_at,
@@ -231,10 +234,10 @@ const langImportsMap: Record<string, any> = {
 // Sorting the languages alphabetically based on the label property and filtering out the languages based on the completion threshold
 export const languages: Language[] = allLanguages
   .sort((left, right) => (left.label > right.label ? 1 : -1))
-  .filter(
-    (lang) =>
-      (percentages as Record<string, number>)[lang.code] >= COMPLETION_THRESHOLD
-  );
+  .filter((lang) => {
+    // console.log("lang ", lang);
+    return (percentages as Record<string, number>)[lang.code] >= COMPLETION_THRESHOLD;
+  });
 
 // If the environment is set to development (ENV.DEVELOPMENT), two additional languages are added to the beginning of the languages array
 const TEST_LANG_CODE = "__test__";
@@ -251,6 +254,8 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
 
 let currentLang: Language = defaultLang;
 let currentLangData = {};
+
+console.log("Checking languages ", languages)
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
