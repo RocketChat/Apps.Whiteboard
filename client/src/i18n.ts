@@ -47,6 +47,29 @@ import langData_zh_tw from "./locales/zh-TW.json";
 import langData_vi_vn from "./locales/vi-VN.json";
 import langData_mr_in from "./locales/mr-IN.json";
 
+import langData_af from "./locales/af.json";
+import langData_az from "./locales/az.json";
+import langData_bas_cm from "./locales/bas-CM.json";
+import langData_be_by from "./locales/be-BY.json";
+import langData_bn_in from "./locales/bn-IN.json";
+import langData_bs from "./locales/bs.json";
+import langData_cy from "./locales/cy.json";
+import langData_de_at from "./locales/de-AT.json";
+import langData_eo from "./locales/eo.json";
+import langData_et from "./locales/et.json";
+import langData_hr from "./locales/hr.json";
+import langData_ka_ge from "./locales/ka-GE.json";
+import langData_kg from "./locales/kg.json";
+import langData_km from "./locales/km.json";
+import langData_ln from "./locales/ln.json";
+import langData_lo from "./locales/lo.json";
+import langData_mn from "./locales/mn.json";
+import langData_ms_my from "./locales/ms-MY.json";
+import langData_no from "./locales/no.json";
+import langData_sq from "./locales/sq.json";
+import langData_sr from "./locales/sr.json";
+import langData_ug from "./locales/ug.json";
+
 import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
 import { jotaiScope, jotaiStore } from "./jotai";
@@ -108,6 +131,30 @@ const allLanguages: Language[] = [
   { code: "zh-TW", label: "繁體中文" },
   { code: "vi-VN", label: "Tiếng Việt" },
   { code: "mr-IN", label: "मराठी" },
+  { code: "af", label: "Afrikaans", rtl: true },
+  { code: "az", label: "Azərbaycan dili" },
+  { code: "bas-CM", label: "Basa (Cameroon)" },
+  { code: "be-BY", label: "Беларуская" },
+  { code: "bn-IN", label: "বাংলা (ভারত)" },
+  { code: "bs", label: "Bosanski" },
+  { code: "cy", label: "Cymraeg" },
+  { code: "de-AT", label: "Deutsch (Österreich)" },
+  { code: "eo", label: "Esperanto" },
+  { code: "et", label: "Eesti" },
+  { code: "hr", label: "Hrvatski" },
+  { code: "ka-GE", label: "ქართული (Georgia)" },
+  { code: "kg", label: "Kongo" },
+  { code: "km", label: "ភាសាខ្មែរ" },
+  { code: "ln", label: "Lingála" },
+  { code: "lo", label: "ພາສາລາວ" },
+  { code: "mn", label: "Монгол" },
+  { code: "ms-MY", label: "Bahasa Melayu (Malaysia)" },
+  { code: "no", label: "Norsk" },
+  { code: "sq", label: "Shqip" },
+  { code: "sr", label: "Српски" },
+  { code: "ug", label: "Uyƣurqə", rtl: true }
+
+
 ].concat([defaultLang]);
 
 // Mapping language codes to their imported json data
@@ -157,6 +204,28 @@ const langImportsMap: Record<string, any> = {
   "zh-TW": langData_zh_tw,
   "vi-VN": langData_vi_vn,
   "mr-IN": langData_mr_in,
+  "af": langData_af,
+  "az": langData_az,
+  "bas-CM": langData_bas_cm,
+  "be-BY": langData_be_by,
+  "bn-IN": langData_bn_in,
+  "bs": langData_bs,
+  "cy": langData_cy,
+  "de-AT": langData_de_at,
+  "eo": langData_eo,
+  "et": langData_et,
+  "hr": langData_hr,
+  "ka-GE": langData_ka_ge,
+  "kg": langData_kg,
+  "km": langData_km,
+  "ln": langData_ln,
+  "lo": langData_lo,
+  "mn": langData_mn,
+  "ms-MY": langData_ms_my,
+  "no": langData_no,
+  "sq": langData_sq,
+  "sr": langData_sr,
+  "ug": langData_ug
 };
 
 // Sorting the languages alphabetically based on the label property and filtering out the languages based on the completion threshold
