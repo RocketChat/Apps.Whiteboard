@@ -210,6 +210,7 @@ const langImportsMap: Record<string, any> = {
   "af": langData_af,
   "az": langData_az,
   "bn-IN": langData_bn_in,
+  
   "bas-CM": langData_bas_cm,
   "be-BY": langData_be_by,
   "bs": langData_bs,
