@@ -114,5 +114,3 @@ Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosyst
 <a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
 </a>
-
-Made with [contrib.rocks](https://contrib.rocks).
