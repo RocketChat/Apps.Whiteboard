@@ -19,11 +19,19 @@ export const LanguageList = ({ style }: { style?: React.CSSProperties }) => {
       <option key={defaultLang.code} value={defaultLang.code}>
         {defaultLang.label}
       </option>
-      {languages.map((lang) => (
-        <option key={lang.code} value={lang.code}>
-          {lang.label}
-        </option>
-      ))}
+
+      {languages.map((lang) => {
+  console.log("lang.label ",lang.label);
+  return (
+    <React.Fragment key={lang.code}>
+      <option value={lang.code}>
+        {lang.label}
+      </option>
+    </React.Fragment>
+  );
+})}
+
+
     </select>
   );
 };

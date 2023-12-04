@@ -46,6 +46,19 @@ import langData_zh_cn from "./locales/zh-CN.json";
 import langData_zh_tw from "./locales/zh-TW.json";
 import langData_vi_vn from "./locales/vi-VN.json";
 import langData_mr_in from "./locales/mr-IN.json";
+import langData_af from "./locales/af.json";
+import langData_az from "./locales/az.json";
+import langData_bn_in from "./locales/bn-IN.json";
+import langData_be_by from "./locales/be-BY.json";
+import langData_bas_cm from "./locales/bas-CM.json";
+import langData_ms_my from "./locales/ms-MY.json";
+import langData_eo from "./locales/eo.json";
+import langData_kg from "./locales/kg.json";
+import langData_bs from "./locales/bs.json";
+import langData_de_at from "./locales/de-AT.json";
+import langData_ka_ge from "./locales/ka-GE.json";
+import langData_mn from "./locales/mn.json";
+import langData_no from "./locales/no.json";
 
 import percentages from "./locales/percentages.json";
 import { ENV } from "./constants";
@@ -54,6 +67,7 @@ import { atom, useAtomValue } from "jotai";
 
 // It represents the minimum completion percentage required for a language to be considered complete.
 const COMPLETION_THRESHOLD = 85;
+// const COMPLETION_THRESHOLD = 50;
 
 export interface Language {
   code: string;
@@ -108,6 +122,20 @@ const allLanguages: Language[] = [
   { code: "zh-TW", label: "繁體中文" },
   { code: "vi-VN", label: "Tiếng Việt" },
   { code: "mr-IN", label: "मराठी" },
+  { code: "af", label: "Afrikaans", rtl: true },
+  { code: "az", label: "Azərbaycan dili" },
+  { code: "bn-IN", label: "বাংলা (ভারত)" },
+  { code: "be-BY", label: "Беларуская" },
+  { code: "bas-CM", label: "Basa (Cameroon)" },
+  { code: "de-AT", label: "Deutsch (Österreich)" },
+  { code: "ms-MY", label: "Bahasa Melayu (Malaysia)" },
+  { code: "eo", label: "Esperanto" },
+  { code: "ka-GE", label: "ქართული (Georgia)" },
+  { code: "kg", label: "Kongo" },
+  { code: "bs", label: "Bosanski" },
+  { code: "mn", label: "Монгол" },
+  { code: "no", label: "Norsk" },
+
 ].concat([defaultLang]);
 
 // Mapping language codes to their imported json data
@@ -157,15 +185,28 @@ const langImportsMap: Record<string, any> = {
   "zh-TW": langData_zh_tw,
   "vi-VN": langData_vi_vn,
   "mr-IN": langData_mr_in,
+  "af": langData_af,
+  "az": langData_az,
+  "bn-IN": langData_bn_in,
+  "bas-CM": langData_bas_cm,
+  "be-BY": langData_be_by,
+  "bs": langData_bs,
+  "de-AT": langData_de_at,
+  "eo": langData_eo,
+  "ka-GE": langData_ka_ge,
+  "kg": langData_kg,
+  "mn": langData_mn,
+  "ms-MY": langData_ms_my,
+  "no": langData_no,
 };
 
 // Sorting the languages alphabetically based on the label property and filtering out the languages based on the completion threshold
 export const languages: Language[] = allLanguages
   .sort((left, right) => (left.label > right.label ? 1 : -1))
-  .filter(
-    (lang) =>
-      (percentages as Record<string, number>)[lang.code] >= COMPLETION_THRESHOLD
-  );
+  .filter((lang) => {
+    // console.log("lang ", lang);
+    return (percentages as Record<string, number>)[lang.code] >= COMPLETION_THRESHOLD;
+  });
 
 // If the environment is set to development (ENV.DEVELOPMENT), two additional languages are added to the beginning of the languages array
 const TEST_LANG_CODE = "__test__";
@@ -182,6 +223,8 @@ if (process.env.NODE_ENV === ENV.DEVELOPMENT) {
 
 let currentLang: Language = defaultLang;
 let currentLangData = {};
+
+console.log("Checking languages ", languages)
 
 export const setLanguage = async (lang: Language) => {
   currentLang = lang;
