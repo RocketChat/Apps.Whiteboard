@@ -1,31 +1,31 @@
-# Whiteboard App for Rocket.Chat
+# 🚀 Whiteboard App for Rocket.Chat 🎨
 
-Enhance your collaborative experience with diagrams, drawings, and more using Whiteboard Integration in Rocket.Chat. **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
+Enhance your collaborative experience with diagrams, drawings, and more using the Whiteboard Integration in Rocket.Chat. The **Whiteboard App** provides a seamless environment for real-time visual communication and brainstorming.
 
 ![Whiteboard](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/f6b77aa6-cb76-49d2-a83b-445b116fd1f0)
 
-## How to Use App
+## How to Use the App
 
-### Create Whiteboard
+### Create a Whiteboard
 
 #### Through Slash Commands:
 
 - Use `/whiteboard new` to create a new whiteboard.
-
-- Use `/whiteboard help` for a helper message.
+- Use `/whiteboard help` for a helpful message.
 
 #### Through Action Buttons:
 
-- Click on the "Create Whiteboard" action button to create a new whiteboard.
+- Click on the "Create Whiteboard" action button to generate a new whiteboard.
 
 ![Action button](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/58647f66-13ec-4808-814a-e2e1be783328)
 
-### Using Whiteboard
+### Using the Whiteboard
 
-- Click on `Edit board` button and you will be directed to a new whiteboard tab.
+- Click on the `Edit board` button, and you will be directed to a new whiteboard tab.
+
   ![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/8c0107df-9a66-4435-9b17-e7cb73d3881c)
 
-- User's edits will be stored in realtime as a image preview in the message.
+- User edits will be stored in real-time as an image preview in the message.
 
 <table>
   <tr>
@@ -34,7 +34,8 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
   </tr>
 </table>
 
-- Click on `Settings` button to modify `boardname` and make board `public/private`.
+- Click on the `Settings` button to modify the `board name` and make the board `public/private`.
+
 ![image](https://github.com/RocketChat/Apps.Whiteboard/assets/92238941/285896e1-995e-457d-9911-8a77bdf4679c)
 
 ## Whiteboard App Policies
@@ -43,7 +44,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
 - [Terms of Use](https://docs.google.com/document/d/10rs2D-b3f7SzT6-liMQNdZ6XqSC6vSiLYsvEG3Ip2d4/edit?usp=sharing)
 
 ## Local Setup Guide
-### Join our community from [here](https://open.rocket.chat/channel/white-board-integration-team) 💻🧑‍🤝‍🧑🚀.
+### Join our app's community from [here](https://open.rocket.chat/channel/white-board-integration-team) 💻🧑‍🤝‍🧑🚀.
 #### Make sure you have a working Rocket.Chat server and Apps-Engine CLI for your machine. You can setup the server for your local machine from [here](https://developer.rocket.chat/open-source-projects/server/server-environment-setup) and CLI from [here](https://developer.rocket.chat/apps-engine/getting-started/rocket.chat-app-engine-cli).
 
 1. Navigate to the `client` folder: 
@@ -73,16 +74,15 @@ Enhance your collaborative experience with diagrams, drawings, and more using Wh
    ```bash
    npm install
    ```
-7. Deploy your app locally
+6. Deploy your app locally
    ```bash
    rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
    ```
    
    Your username and password are your local server's user credentials .Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
-## GSoC'23 Work: [Whiteboard App Report]( https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
-## Resources
+## GSoC'23 Work: [Whiteboard App Report](https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
 Explore our documentation and engage with the Rocket.Chat Apps community:
 
@@ -102,5 +102,8 @@ Explore our documentation and engage with the Rocket.Chat Apps community:
 
 - **Community Chat Channel**: Join the conversation in our community chat channel.
    - [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
+
+- **Apps Community Channel**: Join the conversation in our app's community channel.
+   - [#white board integration team](https://open.rocket.chat/channel/white-board-integration-team)
 
 Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
