@@ -103,4 +103,7 @@ Explore our documentation and engage with the Rocket.Chat Apps community:
 - **Community Chat Channel**: Join the conversation in our community chat channel.
    - [#rocketchat-apps on Open.Rocket.Chat](https://open.rocket.chat/channel/rocketchat-apps)
 
+- **Whiteboard Apps Community Channel**: Join the conversation in our app's community chat channel.
+- [#white board integration team](https://open.rocket.chat/channel/white-board-integration-team)
+
 Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
