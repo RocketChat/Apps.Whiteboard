@@ -107,3 +107,10 @@ Explore our documentation and engage with the Rocket.Chat Apps community:
    - [#white board integration team](https://open.rocket.chat/channel/white-board-integration-team)
 
 Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
+
+
+## Contributers
+
+<a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
+  <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
+</a>
