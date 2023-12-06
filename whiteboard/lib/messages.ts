@@ -9,6 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
 
@@ -183,4 +184,19 @@ export async function helperMessage(
         .setParseUrls(true);
 
     return await read.getNotifier().notifyRoom(room, msg.getMessage());
+}
+
+// Function to delete a message
+export async function deleteMessage(
+    modify: IModify,
+    sender: IUser,
+    message: IMessage
+): Promise<void> {
+    try {
+        // Call the deleteMessage method from IModifyDeleter
+        await modify.getDeleter().deleteMessage(message, sender);
+        console.log(`Message deleted successfully`);
+    } catch (error) {
+        console.error(`Error deleting message: ${error}`);
+    }
 }

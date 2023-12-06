@@ -20,6 +20,7 @@ export enum UtilityEnum {
     PREVIEW_BUTTON_ACTION_ID = "preview-button-action-id",
     OPEN_BUTTON_ACTION_ID = "open-button-action-id",
     SAVE_BUTTON_ACTION_ID = "save-button-action-id",
+    DELETE_BUTTON_ACTION_ID = "delete-button-action-id",
     RENAME_BUTTON_ACTION_ID = "rename-button-action-id",
     CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID = "create-whiteboard-message-box-action-id",
     SETTINGS_BUTTON_ACTION_ID = "settings-button-action-id",
@@ -32,4 +33,10 @@ export enum UtilityEnum {
     PRIVATE = "PRIVATE",
     PUBLIC = "PUBLIC",
     BOARD_PRIVACY_LABEL = "Update Board Privacy",
+    DELETE = "Delete",
+    ARE_YOU_SURE = "Are you sure?",
+    DELETE_MODAL_DESC = "Do you really want to delete this record?\n This process can't be undone.",
+    DELETE_MODAL_ID = "delete-modal-id",
+    DELETE_ACTION_ID = "delete-action-id",
+    DELETE_BLOCK_ID = "delete-block-id",
 }

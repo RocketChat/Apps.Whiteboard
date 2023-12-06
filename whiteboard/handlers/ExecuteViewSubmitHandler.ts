@@ -5,6 +5,7 @@ import {
     IPersistence,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
     IUIKitResponse,
@@ -12,7 +13,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { buildHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
     getMessageIdByPrivateMessageId,
@@ -20,6 +21,7 @@ import {
     updateBoardStatusByMessageId,
     updateBoardnameByMessageId,
     updatePrivateMessageIdByMessageId,
+    deleteBoardByMessageId,
 } from "../persistence/boardInteraction";
 import { getDirect } from "../lib/messages";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
@@ -47,6 +49,9 @@ export class ExecuteViewSubmitHandler {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
                     if (view.state && appId) {
+                        console.log(
+                            `Under modal execution function SETTINGS modal`
+                        );
                         const boardname =
                             view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
@@ -97,6 +102,8 @@ export class ExecuteViewSubmitHandler {
                                     message.getBlocks()[1]["elements"][1][
                                         "url"
                                     ];
+                                console.log(`message is :${message}`);
+                                console.log(`URL is :${url}`);
                                 // Updating header block for new boardname
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
@@ -180,6 +187,68 @@ export class ExecuteViewSubmitHandler {
                                 }
                             } else {
                                 console.log("Room not found");
+                            }
+                        } else {
+                            console.log("MessageId not found");
+                        }
+                    } else {
+                        console.log("Submit Failed");
+                    }
+
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
+
+                // Add the case for the delete modal
+                case UtilityEnum.DELETE_MODAL_ID:
+                    if (view.state && appId) {
+                        console.log(
+                            `Under modal execution function DELETE modal`
+                        );
+                        const messageId =
+                            this.context.getInteractionData().view.submit
+                                ?.value;
+
+                        if (messageId) {
+                            // Board data is deleted from database
+                            await deleteBoardByMessageId(
+                                this.persistence,
+                                this.read.getPersistenceReader(),
+                                messageId
+                            );
+
+                            // Message is Updated to "Deletion"
+                            const room = await this.read
+                                .getMessageReader()
+                                .getRoom(messageId);
+                            if (room) {
+                                // Extracted the message to be updated
+                                const message = await this.modify
+                                    .getUpdater()
+                                    .message(messageId, AppSender);
+
+                                // Deletion header block as board get deleted
+                                const deleteHeaderBlock =
+                                    await deletionHeaderBlock(user.username);
+
+                                // Some message configurations
+                                message.setEditor(user).setRoom(room);
+                                message.setBlocks(deleteHeaderBlock);
+                                message.removeAttachment(0);
+
+                                // Deletion message
+                                // const deletionMessage: IMessage = {
+                                //     id: messageId,
+                                //     room: room,
+                                //     sender: user,
+                                //     text: "Board is deleted!!",
+                                // };
+
+                                // // Message is modified
+                                // message.setUpdateData(deletionMessage, user);
+
+                                // Message is finished modified and saved to database
+                                await this.modify.getUpdater().finish(message);
                             }
                         } else {
                             console.log("MessageId not found");

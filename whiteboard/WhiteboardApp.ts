@@ -6,6 +6,7 @@ import {
     IHttp,
     IModify,
     IPersistence,
+    IPersistenceRead,
     IRead,
     IAppInstallationContext,
 } from "@rocket.chat/apps-engine/definition/accessors";
@@ -145,6 +146,7 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
                 new UpdateBoardEndpoint(this),
                 new BundleJsEndpoint(this),
                 new GetBoardEndpoint(this),
+                new DeleteBoardEndpoint(this),
             ],
         });
     }
@@ -207,6 +209,7 @@ export class GetBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
+        console.log(`Under GET request`);
         const boardId = request.query.id;
 
         const boardData = await getBoardRecord(
@@ -246,6 +249,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
+        console.log(`Under POST request`);
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
@@ -318,6 +322,41 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 await modify.getUpdater().finish(previewMsg);
             }
         }
+
+        return this.json({
+            status: 200,
+            headers: {
+                "Content-Type": "application/json",
+                "Content-Security-Policy":
+                    "default-src 'self' http: https: data: blob: 'unsafe-inline' 'unsafe-eval'",
+            },
+            content: {
+                success: true,
+            },
+        });
+    }
+}
+
+// New class for the delete endpoint
+export class DeleteBoardEndpoint extends ApiEndpoint {
+    public path = `board/delete`;
+
+    public async delete(
+        request: IApiRequest,
+        endpoint: IApiEndpointInfo,
+        read: IRead,
+        modify: IModify,
+        http: IHttp,
+        persis: IPersistence
+    ): Promise<IApiResponse> {
+        console.log(`Under DELETE request`);
+        const boardId = request.content.boardId;
+
+        // Assuming you have a function named deleteBoardRecord in BoardInteraction.ts
+        // This function should handle the deletion logic
+        // await deleteMessageByMessageID(persis, boardId);
+
+        console.log(`DeleteBoardEndpoint is hit !!!!!!!!!!!!`);
 
         return this.json({
             status: 200,
