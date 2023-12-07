@@ -16,7 +16,6 @@ export async function SettingsModal(
     appId: string,
     messageId: string
 ): Promise<IUIKitSurfaceViewParam> {
-    console.log(``);
     const block: Block[] = [];
 
     /* For Settings Text block */

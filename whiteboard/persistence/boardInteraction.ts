@@ -85,11 +85,9 @@ export const updateBoardnameByMessageId = async (
 ): Promise<void> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     if (!records) {
-        console.log("No records found for boardname");
         return;
     }
     const boardId = records["id"];
-    console.log(`Board id : ${boardId}`);
 
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
@@ -100,7 +98,6 @@ export const updateBoardnameByMessageId = async (
         `${messageId}#MessageId`
     );
     records["title"] = boardName;
-    console.log(`Board id : ${records["title"]}`);
     await persistence.updateByAssociations(
         [boardAssociation, messageAssociation],
         records,
@@ -209,17 +206,12 @@ export const deleteBoardByMessageId = async (
     persistenceRead: IPersistenceRead,
     messageId: string
 ): Promise<void> => {
-    console.log(`Message is deleted !!`);
-    console.log(`Message Id:${messageId}`);
-    // await persistence.remove(messageId);
-
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     if (!records) {
         console.log("No records found for boardname");
         return;
     }
     const boardId = records["id"];
-    console.log(`Board id : ${boardId}`);
 
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,

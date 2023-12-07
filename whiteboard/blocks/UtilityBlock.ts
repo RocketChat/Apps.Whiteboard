@@ -36,10 +36,10 @@ export async function buildHeaderBlock(
     );
 
     const deleteButton = getDeleteButton(
-        "Delete board", // Label Text getting displayed on button
+        "Delete board",
         UtilityEnum.PREVIEW_BLOCK_ID,
-        UtilityEnum.DELETE_BUTTON_ACTION_ID, // Action ID determines the nature of action for the button
-        appId, // ID of rocket.chat app
+        UtilityEnum.DELETE_BUTTON_ACTION_ID,
+        appId,
         "Delete",
         ButtonStyle.DANGER
     );

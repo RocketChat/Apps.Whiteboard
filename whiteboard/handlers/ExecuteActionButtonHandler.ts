@@ -81,7 +81,7 @@ export class ExecuteActionButtonHandler {
                             },
                             messageId,
                             "",
-                            "Untitled Whiteboard Create ho gaya hai!!!!!!!!!!!!!!",
+                            "Untitled Whiteboard",
                             "",
                             "Public"
                         );

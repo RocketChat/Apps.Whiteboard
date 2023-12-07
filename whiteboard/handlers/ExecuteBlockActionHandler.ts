@@ -39,7 +39,6 @@ export class ExecuteBlockActionHandler {
             } = data;
 
             const appSender = this.app;
-            console.log(`appSender : ${appSender}`);
             const appId = data.appId;
             // The id of the message (created when the user created the whiteboard)
             const messageId = data.message?.id;
@@ -50,12 +49,8 @@ export class ExecuteBlockActionHandler {
                 // handleSettingsButtonAction is used to handle the settings button action
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
                     if (messageId) {
-                        console.log(
-                            `Under Modal Settings, button is clicked !!!!`
-                        );
                         const modal = await SettingsModal(appId, messageId);
                         await Promise.all([
-                            console.log("Waiting for response!!!!!!!!!!!!!!"),
                             this.modify.getUiController().openSurfaceView(
                                 modal,
                                 {
@@ -72,10 +67,8 @@ export class ExecuteBlockActionHandler {
                 // Add the case for the delete button action
                 case UtilityEnum.DELETE_BUTTON_ACTION_ID:
                     if (messageId) {
-                        console.log(`Delete button is clicked !!!`);
                         const modal = await DeleteModal(appId, messageId);
                         await Promise.all([
-                            console.log("Waiting for response!!!!!!!!!!!!!!"),
                             this.modify.getUiController().openSurfaceView(
                                 modal,
                                 {
