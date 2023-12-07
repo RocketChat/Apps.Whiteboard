@@ -100,7 +100,7 @@ export const updateBoardnameByMessageId = async (
         `${messageId}#MessageId`
     );
     records["title"] = boardName;
-    console.log(`Board id : ${records["title"]}`);
+    console.log(`Board Title : ${records["title"]}`);
     await persistence.updateByAssociations(
         [boardAssociation, messageAssociation],
         records,

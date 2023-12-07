@@ -52,18 +52,43 @@ export class ExecuteViewSubmitHandler {
                         console.log(
                             `Under modal execution function SETTINGS modal`
                         );
-                        const boardname =
+                        const newBoardname =
                             view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
                             ];
+                        console.log(`New Board Name : ${newBoardname}`);
+
                         // This is used to get the board status(public/private) from the settings modal
-                        const boardStatus =
+                        const newBoardStatus =
                             view.state[UtilityEnum.BOARD_SELECT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_SELECT_ACTION_ID
                             ];
+                        console.log(`New Board Status : ${newBoardStatus}`);
+
                         const messageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
+
+                        // Checking The status of current whiteboard
+                        var currentBoardStatus = "";
+                        if (messageId) {
+                            const messageIdFromPrivateMessageId = (
+                                await getMessageIdByPrivateMessageId(
+                                    this.read.getPersistenceReader(),
+                                    messageId
+                                )
+                            )?.messageId;
+
+                            // Check if the message is a private message or not
+                            if (messageIdFromPrivateMessageId != null) {
+                                currentBoardStatus = "private";
+                            } else {
+                                currentBoardStatus = "public";
+                            }
+                            console.log(
+                                `Previous Board status : ${currentBoardStatus}`
+                            );
+                        }
 
                         if (messageId) {
                             const messageIdFromPrivateMessageId = (
@@ -75,18 +100,20 @@ export class ExecuteViewSubmitHandler {
 
                             // Check if the message is a private message or not
                             if (messageIdFromPrivateMessageId != null) {
+                                console.log("If statment");
                                 await updateBoardnameByMessageId(
                                     this.persistence,
                                     this.read.getPersistenceReader(),
                                     messageIdFromPrivateMessageId,
-                                    boardname
+                                    newBoardname
                                 );
                             } else {
+                                console.log("Else statment");
                                 await updateBoardnameByMessageId(
                                     this.persistence,
                                     this.read.getPersistenceReader(),
                                     messageId,
-                                    boardname
+                                    newBoardname
                                 );
                             }
                             const room = await this.read
@@ -110,75 +137,109 @@ export class ExecuteViewSubmitHandler {
                                         user.username,
                                         url,
                                         appId,
-                                        boardname
+                                        newBoardname
                                     );
 
                                 message.setEditor(user).setRoom(room);
 
-                                if (boardStatus != undefined) {
-                                    // If board status is changed from public to private
+                                // Board status is changed
+                                if (newBoardStatus != undefined) {
                                     if (
-                                        boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PRIVATE &&
-                                        boardname == undefined
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PRIVATE &&
+                                        newBoardname == undefined
                                     ) {
-                                        await this.publicToPrivate(
-                                            message,
-                                            messageId,
-                                            AppSender,
-                                            user,
-                                            undefined
-                                        );
-                                    }
-                                    // If board status is changed from private to public
-                                    else if (
-                                        boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PUBLIC &&
-                                        boardname == undefined
+                                        if (currentBoardStatus == "private") {
+                                            console.log(
+                                                "Board name is not changed & Board status is also not changed"
+                                            );
+                                        } else if (
+                                            currentBoardStatus == "public"
+                                        ) {
+                                            await this.publicToPrivate(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                undefined
+                                            );
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PRIVATE &&
+                                        newBoardname != undefined
                                     ) {
-                                        await this.privateToPublic(
-                                            message,
-                                            messageId,
-                                            AppSender,
-                                            user,
-                                            undefined
-                                        );
-                                    }
-                                    // If board status is changed from public to private and boardname is changed
-                                    else if (
-                                        boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PRIVATE &&
-                                        boardname != undefined
+                                        if (currentBoardStatus == "private") {
+                                            message.setBlocks(
+                                                updateHeaderBlock
+                                            );
+                                            await this.modify
+                                                .getUpdater()
+                                                .finish(message);
+                                        } else if (
+                                            currentBoardStatus == "public"
+                                        ) {
+                                            await this.publicToPrivate(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                updateHeaderBlock
+                                            );
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PUBLIC &&
+                                        newBoardname == undefined
                                     ) {
-                                        await this.publicToPrivate(
-                                            message,
-                                            messageId,
-                                            AppSender,
-                                            user,
-                                            updateHeaderBlock
-                                        );
-                                    }
-                                    // If board status is changed from private to public and boardname is changed
-                                    else if (
-                                        boardStatus != undefined &&
-                                        boardStatus == UtilityEnum.PUBLIC &&
-                                        boardname != undefined
+                                        if (currentBoardStatus == "private") {
+                                            await this.privateToPublic(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                undefined
+                                            );
+                                        } else if (
+                                            currentBoardStatus == "public"
+                                        ) {
+                                            console.log(
+                                                "Board name is not changed & Board status is also not changed"
+                                            );
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PUBLIC &&
+                                        newBoardname != undefined
                                     ) {
-                                        await this.privateToPublic(
-                                            message,
-                                            messageId,
-                                            AppSender,
-                                            user,
-                                            updateHeaderBlock
-                                        );
+                                        if (currentBoardStatus == "private") {
+                                            await this.privateToPublic(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                updateHeaderBlock
+                                            );
+                                        } else if (
+                                            currentBoardStatus == "public"
+                                        ) {
+                                            message.setBlocks(
+                                                updateHeaderBlock
+                                            );
+                                            await this.modify
+                                                .getUpdater()
+                                                .finish(message);
+                                        }
                                     }
                                 }
-                                // If board status is not changed and boardname is changed
+
+                                // Only boardname is changed
                                 else {
                                     if (
-                                        boardStatus == undefined &&
-                                        boardname != undefined
+                                        newBoardStatus == undefined &&
+                                        newBoardname != undefined
                                     ) {
+                                        console.log("Bakchodi");
                                         message.setBlocks(updateHeaderBlock);
                                     }
                                     await this.modify
