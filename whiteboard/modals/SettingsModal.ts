@@ -2,9 +2,7 @@ import {
     ButtonStyle,
     UIKitSurfaceType,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import {
-    IUIKitSurfaceViewParam,
-} from "@rocket.chat/apps-engine/definition/accessors";
+import { IUIKitSurfaceViewParam } from "@rocket.chat/apps-engine/definition/accessors";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { Block, Option, InputBlock } from "@rocket.chat/ui-kit";
 import {
@@ -20,8 +18,11 @@ export async function SettingsModal(
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
+    /* For Settings Text block */
     let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
     block.push(settingsTextBlock);
+
+    /* For Board Input block */
     let boardInputBlock = getInputBox(
         UtilityEnum.BOARD_INPUT_LABEL,
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
@@ -31,6 +32,7 @@ export async function SettingsModal(
     );
     block.push(boardInputBlock);
 
+    /* For input Choice block */
     let options: Array<Option> = [
         {
             text: {
@@ -53,7 +55,7 @@ export async function SettingsModal(
         options,
         appId,
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
-        UtilityEnum.BOARD_SELECT_ACTION_ID,
+        UtilityEnum.BOARD_SELECT_ACTION_ID
     );
     let inputChoiceBlock: InputBlock = {
         type: "input",

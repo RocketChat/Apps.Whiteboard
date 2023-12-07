@@ -2,6 +2,7 @@ import {
     IHttp,
     IModify,
     IPersistence,
+    IPersistenceRead,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
@@ -11,6 +12,7 @@ import {
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
+import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 
 // ExecuteBlockActionHandler is used to handle the block actions
@@ -26,9 +28,19 @@ export class ExecuteBlockActionHandler {
     public async run(): Promise<IUIKitResponse> {
         const data = this.context.getInteractionData();
         try {
-            const { actionId, triggerId, user, room } = data;
+            const {
+                actionId,
+                triggerId,
+                user,
+                room,
+                value,
+                message,
+                container,
+            } = data;
+
             const appSender = this.app;
             const appId = data.appId;
+            // The id of the message (created when the user created the whiteboard)
             const messageId = data.message?.id;
             const AppSender: IUser = (await this.read
                 .getUserReader()
@@ -48,6 +60,25 @@ export class ExecuteBlockActionHandler {
                             ),
                         ]);
                     }
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
+
+                // Add the case for the delete button action
+                case UtilityEnum.DELETE_BUTTON_ACTION_ID:
+                    if (messageId) {
+                        const modal = await DeleteModal(appId, messageId);
+                        await Promise.all([
+                            this.modify.getUiController().openSurfaceView(
+                                modal,
+                                {
+                                    triggerId,
+                                },
+                                user
+                            ),
+                        ]);
+                    }
+
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
