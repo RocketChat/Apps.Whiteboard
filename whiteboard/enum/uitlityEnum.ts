@@ -35,7 +35,7 @@ export enum UtilityEnum {
     BOARD_PRIVACY_LABEL = "Update Board Privacy",
     DELETE = "Delete",
     ARE_YOU_SURE = "Are you sure?",
-    DELETE_MODAL_DESC = "Do you really want to delete this record?\n This process can't be undone.",
+    DELETE_MODAL_DESC = "Do you really want to delete this record?",
     DELETE_MODAL_ID = "delete-modal-id",
     DELETE_ACTION_ID = "delete-action-id",
     DELETE_BLOCK_ID = "delete-block-id",

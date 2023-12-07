@@ -209,7 +209,6 @@ export class GetBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log(`Under GET request`);
         const boardId = request.query.id;
 
         const boardData = await getBoardRecord(
@@ -249,7 +248,6 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log(`Under POST request`);
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
@@ -349,15 +347,9 @@ export class DeleteBoardEndpoint extends ApiEndpoint {
         http: IHttp,
         persis: IPersistence
     ): Promise<IApiResponse> {
-        console.log(`Under DELETE request`);
         const boardId = request.content.boardId;
-
-        // Assuming you have a function named deleteBoardRecord in BoardInteraction.ts
         // This function should handle the deletion logic
         // await deleteMessageByMessageID(persis, boardId);
-
-        console.log(`DeleteBoardEndpoint is hit !!!!!!!!!!!!`);
-
         return this.json({
             status: 200,
             headers: {

@@ -49,21 +49,16 @@ export class ExecuteViewSubmitHandler {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
                     if (view.state && appId) {
-                        console.log(
-                            `Under modal execution function SETTINGS modal`
-                        );
                         const newBoardname =
                             view.state?.[UtilityEnum.BOARD_INPUT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_INPUT_ACTION_ID
                             ];
-                        console.log(`New Board Name : ${newBoardname}`);
 
                         // This is used to get the board status(public/private) from the settings modal
                         const newBoardStatus =
                             view.state[UtilityEnum.BOARD_SELECT_BLOCK_ID]?.[
                                 UtilityEnum.BOARD_SELECT_ACTION_ID
                             ];
-                        console.log(`New Board Status : ${newBoardStatus}`);
 
                         const messageId =
                             this.context.getInteractionData().view.submit
@@ -85,9 +80,6 @@ export class ExecuteViewSubmitHandler {
                             } else {
                                 currentBoardStatus = "public";
                             }
-                            console.log(
-                                `Previous Board status : ${currentBoardStatus}`
-                            );
                         }
 
                         if (messageId) {
@@ -100,7 +92,6 @@ export class ExecuteViewSubmitHandler {
 
                             // Check if the message is a private message or not
                             if (messageIdFromPrivateMessageId != null) {
-                                console.log("If statment");
                                 await updateBoardnameByMessageId(
                                     this.persistence,
                                     this.read.getPersistenceReader(),
@@ -108,7 +99,6 @@ export class ExecuteViewSubmitHandler {
                                     newBoardname
                                 );
                             } else {
-                                console.log("Else statment");
                                 await updateBoardnameByMessageId(
                                     this.persistence,
                                     this.read.getPersistenceReader(),
@@ -129,8 +119,6 @@ export class ExecuteViewSubmitHandler {
                                     message.getBlocks()[1]["elements"][1][
                                         "url"
                                     ];
-                                console.log(`message is :${message}`);
-                                console.log(`URL is :${url}`);
                                 // Updating header block for new boardname
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
@@ -239,7 +227,6 @@ export class ExecuteViewSubmitHandler {
                                         newBoardStatus == undefined &&
                                         newBoardname != undefined
                                     ) {
-                                        console.log("Bakchodi");
                                         message.setBlocks(updateHeaderBlock);
                                     }
                                     await this.modify
@@ -263,9 +250,6 @@ export class ExecuteViewSubmitHandler {
                 // Add the case for the delete modal
                 case UtilityEnum.DELETE_MODAL_ID:
                     if (view.state && appId) {
-                        console.log(
-                            `Under modal execution function DELETE modal`
-                        );
                         const messageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
@@ -296,17 +280,6 @@ export class ExecuteViewSubmitHandler {
                                 message.setEditor(user).setRoom(room);
                                 message.setBlocks(deleteHeaderBlock);
                                 message.removeAttachment(0);
-
-                                // Deletion message
-                                // const deletionMessage: IMessage = {
-                                //     id: messageId,
-                                //     room: room,
-                                //     sender: user,
-                                //     text: "Board is deleted!!",
-                                // };
-
-                                // // Message is modified
-                                // message.setUpdateData(deletionMessage, user);
 
                                 // Message is finished modified and saved to database
                                 await this.modify.getUpdater().finish(message);
