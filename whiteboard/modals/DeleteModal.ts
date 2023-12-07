@@ -18,6 +18,20 @@ export async function DeleteModal(
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
+    /* For Settings Text block */
+    let settingsTextBlock = getSectionBlock(UtilityEnum.DELETE_MODAL_DESC);
+    block.push(settingsTextBlock);
+
+    // Cancel Button
+    let closeButton = getButton(
+        UtilityEnum.CANCEL,
+        UtilityEnum.CLOSE_BLOCK_ID,
+        UtilityEnum.CLOSE_ACTION_ID,
+        appId,
+        "",
+        undefined
+    );
+
     // Delete Button
     const deleteButton = getButton(
         UtilityEnum.DELETE,
@@ -34,8 +48,9 @@ export async function DeleteModal(
         appId: appId,
         title: {
             type: "plain_text" as const,
-            text: UtilityEnum.DELETE,
+            text: UtilityEnum.ARE_YOU_SURE,
         },
+        close: closeButton,
         submit: deleteButton,
         blocks: block,
     };

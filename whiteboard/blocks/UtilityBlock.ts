@@ -72,7 +72,9 @@ export async function deletionHeaderBlock(
     const block: Block[] = [];
 
     let deletionBlock: SectionBlock;
-    deletionBlock = getMarkdownBlock(`Deleted`);
+    deletionBlock = getMarkdownBlock(
+        `*Whiteboard is deleted* by \`@${username}\``
+    );
     block.push(deletionBlock);
     return block;
 }
