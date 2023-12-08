@@ -115,6 +115,7 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             `Whiteboard App Installed Successfully 🎉 \n *Whiteboard App Commands*
             \`/whiteboard new\` - Create a new whiteboard
             \`/whiteboard help\` - Display helper message
+            \`/whiteboard list\` - List all the board names in the room
             You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
             Refer https://github.com/RocketChat/Apps.Whiteboard documentation for more details 🚀`,
             persistence

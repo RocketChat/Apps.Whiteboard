@@ -30,8 +30,14 @@ export const storeBoardRecord = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
+
+    const getAllAssociations = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MISC,
+        "board"
+    );
+
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation],
+        [boardAssociation, messageAssociation, getAllAssociations],
         {
             id: boardId,
             boardData: {
@@ -48,6 +54,26 @@ export const storeBoardRecord = async (
         true
     );
 };
+
+// query all records within the "scope" - board
+export const getAllBoardIds = async (persis: IPersistenceRead): Promise<Array<string>> => {
+    const associations: Array<RocketChatAssociationRecord> = [
+        new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, 'board'),
+    ];
+
+    let result: Array<string> = [];
+    try {
+        const records: Array<{ id: string }> = (await persis.readByAssociations(associations)) as Array<{ id: string }>;
+
+        if (records.length) {
+            result = records.map(({ id }) => id);
+        }
+    } catch (err) {
+        console.warn(err);
+    }
+
+    return result;
+}
 
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,

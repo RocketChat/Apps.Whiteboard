@@ -9,6 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
+import { getAllBoardIds, getBoardRecord} from "../persistence/boardInteraction";
 
 // getDirect is used to get the direct room between the app user and the user
 
@@ -170,6 +171,7 @@ export async function helperMessage(
     const text = `*Whiteboard App Commands*
     \`/whiteboard new\` - Create a new whiteboard
     \`/whiteboard help\` - Display helper message
+    \`/whiteboard list\` - List all the board names in the room
     You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
     Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
@@ -183,4 +185,56 @@ export async function helperMessage(
         .setParseUrls(true);
 
     return await read.getNotifier().notifyRoom(room, msg.getMessage());
+}
+
+
+export async function handleListCommand(
+    read: IRead,
+    modify: IModify,
+    room: IRoom,
+    appUser: IUser,
+) {
+
+    const boardIds = await getAllBoardIds(read.getPersistenceReader());
+    if (boardIds !== undefined) {
+
+
+        interface BoardRecord {
+            title: string;
+        }
+        
+        const boardData: string[] = [];
+        
+        for (let id of boardIds as string[]) {
+            const boardRecord: BoardRecord = await getBoardRecord(read.getPersistenceReader(), id);
+            boardData.push(boardRecord.title);
+        }
+
+        const text = `*All existing boards are*:
+            ${boardData.join("\n")}
+            `;
+
+        const msg = modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(room)
+            .setText(text)
+            .setParseUrls(true);
+
+        return await read.getNotifier().notifyRoom(room, msg.getMessage());
+
+    }
+
+    const text = `No boards found`;
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(appUser)
+        .setRoom(room)
+        .setText(text)
+        .setParseUrls(true);
+
+    return await read.getNotifier().notifyRoom(room, msg.getMessage());
+
 }
