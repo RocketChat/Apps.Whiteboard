@@ -10,6 +10,7 @@ import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 import { getAllBoardIds, getBoardRecord} from "../persistence/boardInteraction";
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
 
@@ -187,7 +188,7 @@ export async function helperMessage(
     return await read.getNotifier().notifyRoom(room, msg.getMessage());
 }
 
-
+// function to handle /whiteboard list command
 export async function handleListCommand(
     read: IRead,
     modify: IModify,
@@ -236,5 +237,19 @@ export async function handleListCommand(
         .setParseUrls(true);
 
     return await read.getNotifier().notifyRoom(room, msg.getMessage());
+}
 
+// Function to delete a message
+export async function deleteMessage(
+    modify: IModify,
+    sender: IUser,
+    message: IMessage
+): Promise<void> {
+    try {
+        // Call the deleteMessage method from IModifyDeleter
+        await modify.getDeleter().deleteMessage(message, sender);
+        console.log(`Message deleted successfully`);
+    } catch (error) {
+        console.error(`Error deleting message: ${error}`);
+    }
 }

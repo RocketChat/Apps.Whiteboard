@@ -84,9 +84,9 @@ export function getButton(
     url?: string
 ) {
     const button: ButtonElement = {
-        type: 'button',
+        type: "button",
         text: {
-            type: 'plain_text',
+            type: "plain_text",
             text: labelText,
             emoji: true,
         },
@@ -161,7 +161,7 @@ export function getStaticSelectElement(
         appId,
         blockId,
         actionId,
-        initialValue
+        initialValue,
     };
     return block;
 }
@@ -179,7 +179,7 @@ export function getActionsBlock(
     elements: Array<ButtonElement> | Array<StaticSelectElement>
 ) {
     const block: ActionsBlock = {
-        type: 'actions',
+        type: "actions",
         blockId,
         elements,
     };
@@ -216,4 +216,30 @@ export function getPreviewBlock(
         thumb: undefined,
     };
     return block;
+}
+
+export function getDeleteButton(
+    labelText: string,
+    blockId: string,
+    actionId: string,
+    appId: string,
+    value?: string,
+    style?: ButtonStyle.PRIMARY | ButtonStyle.DANGER,
+    url?: string
+) {
+    const button: ButtonElement = {
+        type: "button",
+        text: {
+            type: "plain_text",
+            text: labelText,
+            emoji: true,
+        },
+        appId,
+        blockId,
+        actionId,
+        url,
+        value,
+        style,
+    };
+    return button;
 }
