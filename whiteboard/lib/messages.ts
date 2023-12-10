@@ -9,7 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
-import { getAllBoardIds, getBoardRecord, getBoardRecordByRoomId } from "../persistence/boardInteraction";
+import { getBoardRecordByRoomId } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user

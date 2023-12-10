@@ -2,11 +2,9 @@ import {
     IAppAccessors,
     IConfigurationExtend,
     ILogger,
-    IEnvironmentRead,
     IHttp,
     IModify,
     IPersistence,
-    IPersistenceRead,
     IRead,
     IAppInstallationContext,
 } from "@rocket.chat/apps-engine/definition/accessors";

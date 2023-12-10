@@ -5,7 +5,6 @@ import {
     IPersistence,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
     IUIKitResponse,
