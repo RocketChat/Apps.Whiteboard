@@ -89,6 +89,7 @@ export class CommandUtility implements ExecutorProps {
             );
             storeBoardRecord(
                 persistence,
+                room.id,
                 randomBoardId,
                 {
                     elements: [],

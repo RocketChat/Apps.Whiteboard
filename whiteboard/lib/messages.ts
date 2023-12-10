@@ -9,7 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
-import { getAllBoardIds, getBoardRecord} from "../persistence/boardInteraction";
+import { getAllBoardIds, getBoardRecord, getBoardRecordByRoomId } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -196,24 +196,21 @@ export async function handleListCommand(
     appUser: IUser,
 ) {
 
-    const boardIds = await getAllBoardIds(read.getPersistenceReader());
-    if (boardIds !== undefined) {
+    const boardDataArray: string[] = [];
 
+    const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
+    if (boardData !== undefined && boardData.length > 0) {
+        for (let i = 0; i < boardData.length; i++) {
+            boardDataArray.push(boardData[i].title)
+        }
 
-        interface BoardRecord {
-            title: string;
-        }
-        
-        const boardData: string[] = [];
-        
-        for (let id of boardIds as string[]) {
-            const boardRecord: BoardRecord = await getBoardRecord(read.getPersistenceReader(), id);
-            boardData.push(boardRecord.title);
-        }
+        console.log("boardData ", boardData)
+
+        console.log("boardDataArray ", boardDataArray)
 
         const text = `*All existing boards are*:
-            ${boardData.join("\n")}
-            `;
+                ${boardDataArray.join("\n")}
+                `;
 
         const msg = modify
             .getCreator()
@@ -226,8 +223,12 @@ export async function handleListCommand(
         return await read.getNotifier().notifyRoom(room, msg.getMessage());
 
     }
+    console.log("boardDataNull ", boardData)
+
+    console.log("room ", room)
 
     const text = `No boards found`;
+
     const msg = modify
         .getCreator()
         .startMessage()

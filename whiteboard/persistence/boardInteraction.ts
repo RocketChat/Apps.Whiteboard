@@ -6,6 +6,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
+import { IRoom } from "@rocket.chat/apps-engine/definition/rooms";
 
 //functions needed to persist board data while modal and other UI interactions
 // Messages can be retrieved by using the messageId, privateMessageId and boardId
@@ -13,6 +14,7 @@ import {
 
 export const storeBoardRecord = async (
     persistence: IPersistence,
+    roomId: string,
     boardId: string,
     boardData: any,
     messageId: string,
@@ -21,6 +23,12 @@ export const storeBoardRecord = async (
     privateMessageId: string,
     status: string
 ): Promise<void> => {
+
+    const roomAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
+
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
@@ -31,13 +39,13 @@ export const storeBoardRecord = async (
         `${messageId}#MessageId`
     );
 
-    const getAllAssociations = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.MISC,
-        "board"
-    );
+    // const getAllBoardAssocations = new RocketChatAssociationRecord(
+    //     RocketChatAssociationModel.MISC,
+    //     "board"
+    // );
 
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation, getAllAssociations],
+        [boardAssociation, messageAssociation, roomAssociation],
         {
             id: boardId,
             boardData: {
@@ -53,6 +61,22 @@ export const storeBoardRecord = async (
         },
         true
     );
+};
+
+// query all records within the "scope" - room
+export const getBoardRecordByRoomId = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string
+): Promise<any> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+
+    return result;
 };
 
 // query all records within the "scope" - board
@@ -107,7 +131,8 @@ export const updateBoardnameByMessageId = async (
     persistence: IPersistence,
     persistenceRead: IPersistenceRead,
     messageId: string,
-    boardName: string
+    boardName: string,
+    roomId: string
 ): Promise<void> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     if (!records) {
@@ -123,6 +148,7 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
+
     records["title"] = boardName;
 
     await persistence.updateByAssociations(

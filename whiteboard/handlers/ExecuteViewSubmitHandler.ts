@@ -90,25 +90,32 @@ export class ExecuteViewSubmitHandler {
                                 )
                             )?.messageId;
 
-                            // Check if the message is a private message or not
-                            if (messageIdFromPrivateMessageId != null) {
-                                await updateBoardnameByMessageId(
-                                    this.persistence,
-                                    this.read.getPersistenceReader(),
-                                    messageIdFromPrivateMessageId,
-                                    newBoardname
-                                );
-                            } else {
-                                await updateBoardnameByMessageId(
-                                    this.persistence,
-                                    this.read.getPersistenceReader(),
-                                    messageId,
-                                    newBoardname
-                                );
-                            }
                             const room = await this.read
                                 .getMessageReader()
                                 .getRoom(messageId);
+
+                                if(room){
+                                    // Check if the message is a private message or not
+                                    if (messageIdFromPrivateMessageId != null) {
+                                        await updateBoardnameByMessageId(
+                                            this.persistence,
+                                            this.read.getPersistenceReader(),
+                                            messageIdFromPrivateMessageId,
+                                            newBoardname,
+                                            room.id
+                                        );
+                                    } else {
+                                        await updateBoardnameByMessageId(
+                                            this.persistence,
+                                            this.read.getPersistenceReader(),
+                                            messageId,
+                                            newBoardname,
+                                            room.id
+                                        );
+                                    }
+
+                                }
+
 
                             if (room) {
                                 const message = await this.modify

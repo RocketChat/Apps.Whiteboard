@@ -73,6 +73,7 @@ export class ExecuteActionButtonHandler {
                         );
                         storeBoardRecord(
                             this.persistence,
+                            room.id,
                             randomBoardId,
                             {
                                 elements: [],

@@ -271,6 +271,7 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         if (room) {
             await storeBoardRecord(
                 persis,
+                room.id,
                 boardId,
                 boardData,
                 messageId,
