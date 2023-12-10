@@ -148,11 +148,14 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
-
+    const roomAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
     records["title"] = boardName;
 
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation],
+        [boardAssociation, messageAssociation, roomAssociation],
         records,
         true
     );
