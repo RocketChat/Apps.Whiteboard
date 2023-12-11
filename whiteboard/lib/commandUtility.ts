@@ -120,7 +120,6 @@ export class CommandUtility implements ExecutorProps {
         const appSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
-        
         await handleListCommand(this.read, this.modify, this.room, appSender);
     }
 

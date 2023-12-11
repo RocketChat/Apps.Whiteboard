@@ -22,7 +22,6 @@ export const storeBoardRecord = async (
     privateMessageId: string,
     status: string
 ): Promise<void> => {
-
     const roomAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
         `${roomId}#BoardName`
@@ -44,7 +43,12 @@ export const storeBoardRecord = async (
     );
 
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation, roomAssociation, getAllBoardAssocations],
+        [
+            boardAssociation,
+            messageAssociation,
+            roomAssociation,
+            getAllBoardAssocations,
+        ],
         {
             id: boardId,
             boardData: {
@@ -78,15 +82,39 @@ export const getBoardRecordByRoomId = async (
     return result;
 };
 
+export const checkBoardNameByRoomId = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string,
+    boardName: string
+): Promise<any> => {
+    const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
+    if (boardName == "") return 0;
+
+    for (const board of boardData) {
+        if (board.title === boardName) {
+            console.log("Board name found!");
+            return 1;
+        }
+    }
+    return 0;
+};
+
 // query all records within the "scope" - board
-export const getAllBoardIds = async (persis: IPersistenceRead): Promise<Array<string>> => {
+export const getAllBoardIds = async (
+    persis: IPersistenceRead
+): Promise<Array<string>> => {
     const associations: Array<RocketChatAssociationRecord> = [
-        new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, 'board'),
+        new RocketChatAssociationRecord(
+            RocketChatAssociationModel.MISC,
+            "board"
+        ),
     ];
 
     let result: Array<string> = [];
     try {
-        const records: Array<{ id: string }> = (await persis.readByAssociations(associations)) as Array<{ id: string }>;
+        const records: Array<{ id: string }> = (await persis.readByAssociations(
+            associations
+        )) as Array<{ id: string }>;
 
         if (records.length) {
             result = records.map(({ id }) => id);
@@ -96,7 +124,7 @@ export const getAllBoardIds = async (persis: IPersistenceRead): Promise<Array<st
     }
 
     return result;
-}
+};
 
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
