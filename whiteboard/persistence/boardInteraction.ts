@@ -13,6 +13,7 @@ import {
 
 export const storeBoardRecord = async (
     persistence: IPersistence,
+    roomId: string,
     boardId: string,
     boardData: any,
     messageId: string,
@@ -21,6 +22,12 @@ export const storeBoardRecord = async (
     privateMessageId: string,
     status: string
 ): Promise<void> => {
+
+    const roomAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
+
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
@@ -30,8 +37,14 @@ export const storeBoardRecord = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
+
+    const getAllBoardAssocations = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MISC,
+        "board"
+    );
+
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation],
+        [boardAssociation, messageAssociation, roomAssociation, getAllBoardAssocations],
         {
             id: boardId,
             boardData: {
@@ -48,6 +61,42 @@ export const storeBoardRecord = async (
         true
     );
 };
+
+// query all records within the "scope" - room
+export const getBoardRecordByRoomId = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string
+): Promise<any> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+
+    return result;
+};
+
+// query all records within the "scope" - board
+export const getAllBoardIds = async (persis: IPersistenceRead): Promise<Array<string>> => {
+    const associations: Array<RocketChatAssociationRecord> = [
+        new RocketChatAssociationRecord(RocketChatAssociationModel.MISC, 'board'),
+    ];
+
+    let result: Array<string> = [];
+    try {
+        const records: Array<{ id: string }> = (await persis.readByAssociations(associations)) as Array<{ id: string }>;
+
+        if (records.length) {
+            result = records.map(({ id }) => id);
+        }
+    } catch (err) {
+        console.warn(err);
+    }
+
+    return result;
+}
 
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
@@ -81,7 +130,8 @@ export const updateBoardnameByMessageId = async (
     persistence: IPersistence,
     persistenceRead: IPersistenceRead,
     messageId: string,
-    boardName: string
+    boardName: string,
+    roomId: string
 ): Promise<void> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     if (!records) {
@@ -97,10 +147,14 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.MESSAGE,
         `${messageId}#MessageId`
     );
+    const roomAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#BoardName`
+    );
     records["title"] = boardName;
 
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation],
+        [boardAssociation, messageAssociation, roomAssociation],
         records,
         true
     );

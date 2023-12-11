@@ -9,6 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
+import { getBoardRecordByRoomId } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -171,9 +172,62 @@ export async function helperMessage(
     const text = `*Whiteboard App Commands*
     \`/whiteboard new\` - Create a new whiteboard
     \`/whiteboard help\` - Display helper message
+    \`/whiteboard list\` - List all the board names in the room
     You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
     Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
+
+    const msg = modify
+        .getCreator()
+        .startMessage()
+        .setSender(appUser)
+        .setRoom(room)
+        .setText(text)
+        .setParseUrls(true);
+
+    return await read.getNotifier().notifyRoom(room, msg.getMessage());
+}
+
+// function to handle /whiteboard list command
+export async function handleListCommand(
+    read: IRead,
+    modify: IModify,
+    room: IRoom,
+    appUser: IUser,
+) {
+
+    const boardDataArray: string[] = [];
+
+    const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
+    if (boardData !== undefined && boardData.length > 0) {
+        for (let i = 0; i < boardData.length; i++) {
+            boardDataArray.push(boardData[i].title)
+        }
+
+        console.log("boardData ", boardData)
+
+        console.log("boardDataArray ", boardDataArray)
+
+        const text = `*All existing boards are*:
+                ${boardDataArray.join("\n")}
+                `;
+
+        const msg = modify
+            .getCreator()
+            .startMessage()
+            .setSender(appUser)
+            .setRoom(room)
+            .setText(text)
+            .setParseUrls(true);
+
+        return await read.getNotifier().notifyRoom(room, msg.getMessage());
+
+    }
+    console.log("boardDataNull ", boardData)
+
+    console.log("room ", room)
+
+    const text = `No boards found`;
 
     const msg = modify
         .getCreator()

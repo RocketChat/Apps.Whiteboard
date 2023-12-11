@@ -10,6 +10,7 @@ import {
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
+    handleListCommand,
     helperMessage,
     sendMessage,
     sendMessageWithAttachment,
@@ -88,6 +89,7 @@ export class CommandUtility implements ExecutorProps {
             );
             storeBoardRecord(
                 persistence,
+                room.id,
                 randomBoardId,
                 {
                     elements: [],
@@ -112,6 +114,16 @@ export class CommandUtility implements ExecutorProps {
         await helperMessage(this.read, this.modify, this.room, appSender);
     }
 
+    // handleListCommand is used to handle the /whiteboard list command
+
+    private async handleListCommand() {
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
+        
+        await handleListCommand(this.read, this.modify, this.room, appSender);
+    }
+
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
             case "new":
@@ -119,6 +131,9 @@ export class CommandUtility implements ExecutorProps {
                 break;
             case "help":
                 await this.helperMessage();
+                break;
+            case "list":
+                await this.handleListCommand();
                 break;
             default:
                 const appSender: IUser = (await this.read
