@@ -21,6 +21,7 @@ import {
     updateBoardnameByMessageId,
     updatePrivateMessageIdByMessageId,
     deleteBoardByMessageId,
+    checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
 import { getDirect } from "../lib/messages";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
@@ -93,7 +94,25 @@ export class ExecuteViewSubmitHandler {
                                 .getMessageReader()
                                 .getRoom(messageId);
 
-                                if(room){
+                            var checkName = 0;
+                            if (room) {
+                                const checkBoardName =
+                                    await checkBoardNameByRoomId(
+                                        this.read.getPersistenceReader(),
+                                        room.id,
+                                        newBoardname
+                                    );
+
+                                // Board name exists already
+                                if (checkBoardName == 1) {
+                                    checkName = 1;
+                                }
+                            }
+
+                            if (checkName == 1) {
+                                console.log("Check Name equal to 1");
+                            } else {
+                                if (room) {
                                     // Check if the message is a private message or not
                                     if (messageIdFromPrivateMessageId != null) {
                                         await updateBoardnameByMessageId(
@@ -112,135 +131,151 @@ export class ExecuteViewSubmitHandler {
                                             room.id
                                         );
                                     }
-
                                 }
 
-
-                            if (room) {
-                                const message = await this.modify
-                                    .getUpdater()
-                                    .message(messageId, AppSender);
-
-                                const url =
-                                    message.getBlocks()[1]["elements"][1][
-                                        "url"
-                                    ];
-                                // Updating header block for new boardname
-                                const updateHeaderBlock =
-                                    await buildHeaderBlock(
-                                        user.username,
-                                        url,
-                                        appId,
-                                        newBoardname
-                                    );
-
-                                message.setEditor(user).setRoom(room);
-
-                                // Board status is changed
-                                if (newBoardStatus != undefined) {
-                                    if (
-                                        newBoardStatus != undefined &&
-                                        newBoardStatus == UtilityEnum.PRIVATE &&
-                                        newBoardname == undefined
-                                    ) {
-                                        if (currentBoardStatus == "private") {
-                                            console.log(
-                                                "Board name is not changed & Board status is also not changed"
-                                            );
-                                        } else if (
-                                            currentBoardStatus == "public"
-                                        ) {
-                                            await this.publicToPrivate(
-                                                message,
-                                                messageId,
-                                                AppSender,
-                                                user,
-                                                undefined
-                                            );
-                                        }
-                                    } else if (
-                                        newBoardStatus != undefined &&
-                                        newBoardStatus == UtilityEnum.PRIVATE &&
-                                        newBoardname != undefined
-                                    ) {
-                                        if (currentBoardStatus == "private") {
-                                            message.setBlocks(
-                                                updateHeaderBlock
-                                            );
-                                            await this.modify
-                                                .getUpdater()
-                                                .finish(message);
-                                        } else if (
-                                            currentBoardStatus == "public"
-                                        ) {
-                                            await this.publicToPrivate(
-                                                message,
-                                                messageId,
-                                                AppSender,
-                                                user,
-                                                updateHeaderBlock
-                                            );
-                                        }
-                                    } else if (
-                                        newBoardStatus != undefined &&
-                                        newBoardStatus == UtilityEnum.PUBLIC &&
-                                        newBoardname == undefined
-                                    ) {
-                                        if (currentBoardStatus == "private") {
-                                            await this.privateToPublic(
-                                                message,
-                                                messageId,
-                                                AppSender,
-                                                user,
-                                                undefined
-                                            );
-                                        } else if (
-                                            currentBoardStatus == "public"
-                                        ) {
-                                            console.log(
-                                                "Board name is not changed & Board status is also not changed"
-                                            );
-                                        }
-                                    } else if (
-                                        newBoardStatus != undefined &&
-                                        newBoardStatus == UtilityEnum.PUBLIC &&
-                                        newBoardname != undefined
-                                    ) {
-                                        if (currentBoardStatus == "private") {
-                                            await this.privateToPublic(
-                                                message,
-                                                messageId,
-                                                AppSender,
-                                                user,
-                                                updateHeaderBlock
-                                            );
-                                        } else if (
-                                            currentBoardStatus == "public"
-                                        ) {
-                                            message.setBlocks(
-                                                updateHeaderBlock
-                                            );
-                                            await this.modify
-                                                .getUpdater()
-                                                .finish(message);
-                                        }
-                                    }
-                                }
-
-                                // Only boardname is changed
-                                else {
-                                    if (
-                                        newBoardStatus == undefined &&
-                                        newBoardname != undefined
-                                    ) {
-                                        message.setBlocks(updateHeaderBlock);
-                                    }
-                                    await this.modify
+                                if (room) {
+                                    const message = await this.modify
                                         .getUpdater()
-                                        .finish(message);
+                                        .message(messageId, AppSender);
+
+                                    const url =
+                                        message.getBlocks()[1]["elements"][1][
+                                            "url"
+                                        ];
+                                    // Updating header block for new boardname
+                                    const updateHeaderBlock =
+                                        await buildHeaderBlock(
+                                            user.username,
+                                            url,
+                                            appId,
+                                            newBoardname
+                                        );
+
+                                    message.setEditor(user).setRoom(room);
+
+                                    // Board status is changed
+                                    if (newBoardStatus != undefined) {
+                                        if (
+                                            newBoardStatus != undefined &&
+                                            newBoardStatus ==
+                                                UtilityEnum.PRIVATE &&
+                                            newBoardname == undefined
+                                        ) {
+                                            if (
+                                                currentBoardStatus == "private"
+                                            ) {
+                                                console.log(
+                                                    "Board name is not changed & Board status is also not changed"
+                                                );
+                                            } else if (
+                                                currentBoardStatus == "public"
+                                            ) {
+                                                await this.publicToPrivate(
+                                                    message,
+                                                    messageId,
+                                                    AppSender,
+                                                    user,
+                                                    undefined
+                                                );
+                                            }
+                                        } else if (
+                                            newBoardStatus != undefined &&
+                                            newBoardStatus ==
+                                                UtilityEnum.PRIVATE &&
+                                            newBoardname != undefined
+                                        ) {
+                                            // Have to apply changes here
+                                            if (
+                                                currentBoardStatus == "private"
+                                            ) {
+                                                message.setBlocks(
+                                                    updateHeaderBlock
+                                                );
+                                                await this.modify
+                                                    .getUpdater()
+                                                    .finish(message);
+                                            } else if (
+                                                currentBoardStatus == "public"
+                                            ) {
+                                                await this.publicToPrivate(
+                                                    message,
+                                                    messageId,
+                                                    AppSender,
+                                                    user,
+                                                    updateHeaderBlock
+                                                );
+                                            }
+                                        } else if (
+                                            newBoardStatus != undefined &&
+                                            newBoardStatus ==
+                                                UtilityEnum.PUBLIC &&
+                                            newBoardname == undefined
+                                        ) {
+                                            if (
+                                                currentBoardStatus == "private"
+                                            ) {
+                                                await this.privateToPublic(
+                                                    message,
+                                                    messageId,
+                                                    AppSender,
+                                                    user,
+                                                    undefined
+                                                );
+                                            } else if (
+                                                currentBoardStatus == "public"
+                                            ) {
+                                                console.log(
+                                                    "Board name is not changed & Board status is also not changed"
+                                                );
+                                            }
+                                        } else if (
+                                            newBoardStatus != undefined &&
+                                            newBoardStatus ==
+                                                UtilityEnum.PUBLIC &&
+                                            newBoardname != undefined
+                                        ) {
+                                            // Have to apply changes here
+                                            if (
+                                                currentBoardStatus == "private"
+                                            ) {
+                                                await this.privateToPublic(
+                                                    message,
+                                                    messageId,
+                                                    AppSender,
+                                                    user,
+                                                    updateHeaderBlock
+                                                );
+                                            } else if (
+                                                currentBoardStatus == "public"
+                                            ) {
+                                                message.setBlocks(
+                                                    updateHeaderBlock
+                                                );
+                                                await this.modify
+                                                    .getUpdater()
+                                                    .finish(message);
+                                            }
+                                        }
+                                    }
+
+                                    // Only boardname is changed
+                                    else {
+                                        // Have to apply changes here
+                                        if (
+                                            newBoardStatus == undefined &&
+                                            newBoardname != undefined
+                                        ) {
+                                            message.setBlocks(
+                                                updateHeaderBlock
+                                            );
+                                        }
+                                        await this.modify
+                                            .getUpdater()
+                                            .finish(message);
+                                    }
+                                } else {
+                                    console.log("Room not found");
                                 }
-                            } else {
-                                console.log("Room not found");
                             }
                         } else {
                             console.log("MessageId not found");
