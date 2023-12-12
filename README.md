@@ -12,7 +12,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
 - Use `/whiteboard new` to create a new whiteboard.
 - Use `/whiteboard help` for a helpful message.
-- Use `/whiteboard list` to display a comprehensive list of all the boards that have been created within the room.
+- Use `/whiteboard list` to list all created boards in the room.
 
 #### Through Action Buttons:
 
