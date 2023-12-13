@@ -83,7 +83,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    Your username and password are your local server's user credentials .Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
    
-### Instead of running the above commands, you can simply use the shortcut command  
+### Instead of running the above commands, you can simply use the shortcut commands  
 
 1) #### Run the following command within the `Apps.Whiteboard` folder
    ```bash
