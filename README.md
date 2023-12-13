@@ -83,11 +83,12 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    Your username and password are your local server's user credentials .Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
    
-### After running the above commands once, you can simply use the shortcut command  
+### Instead of running the above commands, you can simply use the shortcut command  
 
 Run the following command within the `Apps.Whiteboard` folder
    ```bash
    cd client && npm run build && npm run build:excalidraw && cd ../whiteboard/ && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
+   
    ```
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials
 
