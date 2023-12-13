@@ -87,7 +87,6 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
 1) #### Run the following command within the `Apps.Whiteboard` folder
    ```bash
-   # Navigate to the 'client' directory
    cd client \
    && npm install \
    && npm run build \
