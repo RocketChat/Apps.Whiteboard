@@ -85,7 +85,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    
 ### Instead of running the above commands, you can simply use the shortcut command  
 
-1) Run the following command within the `Apps.Whiteboard` folder
+1) #### Run the following command within the `Apps.Whiteboard` folder
    ```bash
    # Navigate to the 'client' directory
    cd client \
@@ -98,7 +98,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    ```
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials
 
-2) You can use the Makefile to run the server as well
+2) #### You can use the Makefile to run the server as well
 
    ```bash
    make YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
@@ -106,7 +106,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials. Alternatively, you can modify the Makefile directly by replacing the USERNAME and PASSWORD variables.
 
-   Additional Commands:
+   #### Additional Commands:
 
    For build:
 
