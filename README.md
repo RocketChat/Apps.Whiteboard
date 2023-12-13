@@ -87,7 +87,13 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
 1) Run the following command within the `Apps.Whiteboard` folder
    ```bash
-   cd client && npm run build && npm run build:excalidraw && cd ../whiteboard/ && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
+   # Navigate to the 'client' directory
+   cd client \
+   && npm install \
+   && npm run build \
+   && npm run build:excalidraw \
+   && cd ../whiteboard/ \
+   && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
 
    ```
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials
@@ -100,18 +106,18 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
 
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials. Alternatively, you can modify the Makefile directly by replacing the USERNAME and PASSWORD variables.
 
-   Additional Commands(Add YOUR_USERNAME=${username} YOUR_PASSWORD=${password} to the following commands if you have not changed the USERNAME and PASSWORD in the makefile):
+   Additional Commands:
 
    For build:
 
    ```bash
-   make build 
+   make build YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
    ```
 
    For deploy:
 
    ```bash
-   make deploy
+   make deploy YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
    ```
 
 
