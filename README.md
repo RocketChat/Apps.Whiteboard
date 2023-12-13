@@ -147,7 +147,7 @@ Explore our documentation and engage with the Rocket.Chat Apps community:
 Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
 
 
-## Contributers
+## Contributors
 
 <a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
