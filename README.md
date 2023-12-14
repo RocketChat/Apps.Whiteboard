@@ -152,3 +152,5 @@ Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosyst
 <a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
 </a>
+
+![Alt](https://repobeats.axiom.co/api/embed/f94cc230be688e1693940ca25ea39ef39cb143c9.svg "Repobeats analytics image")
