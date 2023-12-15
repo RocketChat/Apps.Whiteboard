@@ -83,13 +83,41 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    Your username and password are your local server's user credentials .Verify the successful build by accessing the `/excalidraw` endpoint in the Whiteboard app settings. You can access the React app through the provided URL.
 
    
-### After running the above commands once, you can simply use the shortcut command  
+### Instead of running the above commands, you can simply use the shortcut commands  
 
-Run the following command within the `Apps.Whiteboard` folder
+1) #### Run the following command within the `Apps.Whiteboard` folder
    ```bash
-   cd client && npm run build && npm run build:excalidraw && cd ../whiteboard/ && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
+   cd client \
+   && npm install \
+   && npm run build \
+   && npm run build:excalidraw \
+   && cd ../whiteboard/ \
+   && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
+
    ```
    Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials
+
+2) #### You can use the Makefile to run the server as well
+
+   ```bash
+   make YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
+   ```
+
+   Make sure to replace ${username} and ${password} with the actual username and password values of your local server's user credentials. Alternatively, you can modify the Makefile directly by replacing the USERNAME and PASSWORD variables.
+
+   #### Additional Commands:
+
+   For build:
+
+   ```bash
+   make build YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
+   ```
+
+   For deploy:
+
+   ```bash
+   make deploy YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
+   ```
 
 
 ## GSoC'23 Work: [Whiteboard App Report](https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
@@ -119,8 +147,10 @@ Explore our documentation and engage with the Rocket.Chat Apps community:
 Feel free to explore, learn, and collaborate within the Rocket.Chat Apps ecosystem. Happy coding!
 
 
-## Contributers
+## Contributors
 
 <a href="https://github.com/RocketChat/Apps.Whiteboard/graphs/contributors">
   <img src="https://contrib.rocks/image?repo=RocketChat/Apps.Whiteboard" />
 </a>
+
+![Alt](https://repobeats.axiom.co/api/embed/f94cc230be688e1693940ca25ea39ef39cb143c9.svg "Repobeats analytics image")
