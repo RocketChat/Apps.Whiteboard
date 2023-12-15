@@ -10,6 +10,7 @@ import {
     IUIKitResponse,
     UIKitViewSubmitInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
+import { UIKitBlockInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
@@ -23,7 +24,7 @@ import {
     deleteBoardByMessageId,
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
-import { getDirect } from "../lib/messages";
+import { getDirect, sendMessage } from "../lib/messages";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
@@ -39,7 +40,8 @@ export class ExecuteViewSubmitHandler {
     ) {}
 
     public async run(): Promise<IUIKitResponse> {
-        const { user, view } = this.context.getInteractionData();
+        const { user, view, triggerId, actionId } =
+            this.context.getInteractionData();
         const AppSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
@@ -110,7 +112,17 @@ export class ExecuteViewSubmitHandler {
                             }
 
                             if (checkName == 1) {
-                                console.log("Check Name equal to 1");
+                                const room = await this.read
+                                    .getMessageReader()
+                                    .getRoom(messageId);
+                                if (room) {
+                                    const newMessage = await sendMessage(
+                                        this.modify,
+                                        room,
+                                        AppSender,
+                                        `"${newBoardname}" Whiteboard name is already taken. Try different name`
+                                    );
+                                }
                             } else {
                                 if (room) {
                                     // Check if the message is a private message or not
