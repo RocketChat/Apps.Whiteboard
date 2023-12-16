@@ -5,7 +5,6 @@ import {
     IHttp,
     IModify,
     IPersistence,
-    IPersistenceRead,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { ExecutorProps } from "../definitions/ExecutorProps";
@@ -34,7 +33,6 @@ export class CommandUtility implements ExecutorProps {
     http: IHttp;
     persistence: IPersistence;
     app: WhiteboardApp;
-    persistanceRead: IPersistenceRead;
 
     constructor(props: ExecutorProps) {
         this.sender = props.sender;
