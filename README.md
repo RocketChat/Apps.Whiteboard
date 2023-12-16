@@ -92,6 +92,7 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    && npm run build \
    && npm run build:excalidraw \
    && cd ../whiteboard/ \
+   && npm install \
    && rc-apps deploy --url http://localhost:3000 --username ${username} --password ${password}
 
    ```

@@ -98,6 +98,21 @@ export const getAllBoardIds = async (persis: IPersistenceRead): Promise<Array<st
     return result;
 }
 
+// function to get new board name
+export const getBoardName = async (persis: IPersistenceRead, roomId: string): Promise<string> => {
+    const boardArray = await getBoardRecordByRoomId(persis, roomId);
+
+    let suffix = 1;
+    let newName = `Untitled Whiteboard`;
+
+    while (boardArray.some(board => board.title === newName)) {
+        suffix++;
+        newName = `Untitled Whiteboard ${suffix}`;
+    }
+
+    return newName;
+};
+
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
     boardId: string

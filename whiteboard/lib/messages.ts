@@ -204,10 +204,6 @@ export async function handleListCommand(
             boardDataArray.push(boardData[i].title)
         }
 
-        console.log("boardData ", boardData)
-
-        console.log("boardDataArray ", boardDataArray)
-
         const text = `*All existing boards are*:
                 ${boardDataArray.join("\n")}
                 `;
@@ -223,9 +219,6 @@ export async function handleListCommand(
         return await read.getNotifier().notifyRoom(room, msg.getMessage());
 
     }
-    console.log("boardDataNull ", boardData)
-
-    console.log("room ", room)
 
     const text = `No boards found`;
 

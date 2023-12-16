@@ -5,6 +5,7 @@ import {
     IHttp,
     IModify,
     IPersistence,
+    IPersistenceRead,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { ExecutorProps } from "../definitions/ExecutorProps";
@@ -17,7 +18,7 @@ import {
 } from "./messages";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
-import { storeBoardRecord } from "../persistence/boardInteraction";
+import { getBoardName, storeBoardRecord } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
 import { defaultPreview } from "../assets/defaultPreview";
 
@@ -33,6 +34,7 @@ export class CommandUtility implements ExecutorProps {
     http: IHttp;
     persistence: IPersistence;
     app: WhiteboardApp;
+    persistanceRead: IPersistenceRead;
 
     constructor(props: ExecutorProps) {
         this.sender = props.sender;
@@ -54,7 +56,7 @@ export class CommandUtility implements ExecutorProps {
         read,
         modify,
         http,
-        persistence,
+        persistence
     }: WhiteboardSlashCommandContext) {
         const appUser = (await read.getUserReader().getAppUser())!;
         const sender = context.getSender()!;
@@ -66,42 +68,49 @@ export class CommandUtility implements ExecutorProps {
             const randomBoardId = randomId();
             const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
 
-            const headerBlock = await buildHeaderBlock(
-                sender.username,
-                boardURL,
-                appId,
-                undefined
-            );
-            const attachments = [
-                {
-                    collapsed: true,
-                    color: "#00000000",
-                    imageUrl: defaultPreview,
-                },
-            ];
-            const messageId = await sendMessageWithAttachment(
-                this.modify,
-                room,
-                appUser,
-                `Whiteboard created by @${sender.username}`,
-                attachments,
-                headerBlock
-            );
-            storeBoardRecord(
-                persistence,
-                room.id,
-                randomBoardId,
-                {
-                    elements: [],
-                    appState: {},
-                    files: [],
-                },
-                messageId,
-                "",
-                "Untitled Whiteboard",
-                "",
-                "Public"
-            );
+            const name = await getBoardName(read.getPersistenceReader(), room.id)
+
+            if(name){
+                const headerBlock = await buildHeaderBlock(
+                    sender.username,
+                    boardURL,
+                    appId,
+                    name
+                );
+                const attachments = [
+                    {
+                        collapsed: true,
+                        color: "#00000000",
+                        imageUrl: defaultPreview,
+                    },
+                ];
+                const messageId = await sendMessageWithAttachment(
+                    this.modify,
+                    room,
+                    appUser,
+                    `Whiteboard created by @${sender.username}`,
+                    attachments,
+                    headerBlock
+                );
+    
+                storeBoardRecord(
+                    persistence,
+                    room.id,
+                    randomBoardId,
+                    {
+                        elements: [],
+                        appState: {},
+                        files: [],
+                    },
+                    messageId,
+                    "",
+                    name,
+                    "",
+                    "Public"
+                );
+                
+            }
+
         }
     }
 

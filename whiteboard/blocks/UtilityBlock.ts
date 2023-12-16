@@ -51,7 +51,7 @@ export async function buildHeaderBlock(
         );
     } else {
         markdownBlock = getMarkdownBlock(
-            `*${boardname} Whiteboard* by \`@${username}\``
+            `*${boardname}* by \`@${username}\``
         );
     }
 

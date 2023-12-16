@@ -6,6 +6,7 @@ import {
     IHttp,
     IModify,
     IPersistence,
+    IPersistenceRead,
     IRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { WhiteboardApp } from "../WhiteboardApp";
@@ -17,7 +18,7 @@ export interface WhiteboardSlashCommandContext {
     read: IRead;
     modify: IModify;
     http: IHttp;
-    persistence: IPersistence;
+    persistence: IPersistence
 }
 // Parent class for all the slash commands
 export class WhiteboardCommand implements ISlashCommand {
@@ -60,7 +61,7 @@ export class WhiteboardCommand implements ISlashCommand {
             read,
             modify,
             http,
-            persistence,
+            persistence
         });
     }
 }
