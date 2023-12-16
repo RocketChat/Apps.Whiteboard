@@ -51,7 +51,7 @@ export async function buildHeaderBlock(
         );
     } else {
         markdownBlock = getMarkdownBlock(
-            `*${boardname} Whiteboard* by \`@${username}\``
+            `*${boardname}* by \`@${username}\``
         );
     }
 
@@ -66,14 +66,29 @@ export async function buildHeaderBlock(
 }
 
 // Header block when whiteboard is deleted
+// export async function deletionHeaderBlock(
+//     username: string,
+//     boardname: string
+// ): Promise<Array<Block>> {
+//     const block: Block[] = [];
+
+//     let deletionBlock: SectionBlock;
+//     deletionBlock = getMarkdownBlock(
+//         `*${boardname} is deleted* by \`@${username}\``
+//     );
+//     block.push(deletionBlock);
+//     return block;
+// }
+
 export async function deletionHeaderBlock(
-    username: string
+    username: string,
+    boardname: string
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
     let deletionBlock: SectionBlock;
     deletionBlock = getMarkdownBlock(
-        `*Whiteboard is deleted* by \`@${username}\``
+        `*${boardname} is deleted* by \`@${username}\``
     );
     block.push(deletionBlock);
     return block;
