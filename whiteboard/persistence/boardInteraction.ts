@@ -275,11 +275,12 @@ export const deleteBoardByMessageId = async (
     persistence: IPersistence,
     persistenceRead: IPersistenceRead,
     messageId: string
-): Promise<void> => {
+): Promise<string> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
+    console.log("records", records)
     if (!records) {
         console.log("No records found for boardname");
-        return;
+        return "";
     }
     const boardId = records["id"];
 
@@ -296,4 +297,6 @@ export const deleteBoardByMessageId = async (
         boardAssociation,
         messageAssociation,
     ]);
+
+    return records.title;
 };
