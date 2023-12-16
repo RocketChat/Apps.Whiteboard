@@ -319,7 +319,7 @@ export class ExecuteViewSubmitHandler {
 
                         if (messageId) {
                             // Board data is deleted from database
-                            await deleteBoardByMessageId(
+                            const boardName = await deleteBoardByMessageId(
                                 this.persistence,
                                 this.read.getPersistenceReader(),
                                 messageId
@@ -337,7 +337,7 @@ export class ExecuteViewSubmitHandler {
 
                                 // Deletion header block as board get deleted
                                 const deleteHeaderBlock =
-                                    await deletionHeaderBlock(user.username);
+                                    await deletionHeaderBlock(user.username, boardName);
 
                                 // Some message configurations
                                 message.setEditor(user).setRoom(room);
