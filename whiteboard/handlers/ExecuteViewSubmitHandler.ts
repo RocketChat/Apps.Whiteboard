@@ -116,12 +116,22 @@ export class ExecuteViewSubmitHandler {
                                     .getMessageReader()
                                     .getRoom(messageId);
                                 if (room) {
-                                    const newMessage = await sendMessage(
-                                        this.modify,
-                                        room,
-                                        AppSender,
-                                        `"${newBoardname}" Whiteboard name is already taken. Try different name`
-                                    );
+                                    const newMessage = this.modify
+                                        .getCreator()
+                                        .startMessage()
+                                        .setSender(AppSender)
+                                        .setRoom(room)
+                                        .setText(
+                                            `"${newBoardname}" Whiteboard name is already taken. Try different name`
+                                        )
+                                        .setParseUrls(true);
+
+                                    await this.read
+                                        .getNotifier()
+                                        .notifyRoom(
+                                            room,
+                                            newMessage.getMessage()
+                                        );
                                 }
                             } else {
                                 if (room) {
