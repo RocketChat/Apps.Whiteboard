@@ -24,5 +24,5 @@ build:
 	@echo "Build completed successfully."
 
 deploy:
-	cd $(WHITEBOARD_DIR) && rc-apps deploy --url $(LOCAL_URL) --username $(USERNAME) --password $(PASSWORD)
+	cd $(WHITEBOARD_DIR) && rc-apps deploy --url $(LOCAL_URL) --username=$(USERNAME) --password=$(PASSWORD)
 	@echo "Deployment completed successfully."
