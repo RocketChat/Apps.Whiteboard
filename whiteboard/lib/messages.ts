@@ -193,15 +193,17 @@ export async function handleList(
     read: IRead,
     modify: IModify,
     room: IRoom,
-    appUser: IUser,
+    appUser: IUser
 ) {
-
     const boardDataArray: string[] = [];
 
-    const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
+    const boardData = await getBoardRecordByRoomId(
+        read.getPersistenceReader(),
+        room.id
+    );
     if (boardData !== undefined && boardData.length > 0) {
         for (let i = 0; i < boardData.length; i++) {
-            boardDataArray.push(boardData[i].title)
+            boardDataArray.push(boardData[i].title);
         }
 
         const text = `*All existing boards are*:
@@ -217,7 +219,6 @@ export async function handleList(
             .setParseUrls(true);
 
         return await read.getNotifier().notifyRoom(room, msg.getMessage());
-
     }
 
     const text = `No boards found`;
