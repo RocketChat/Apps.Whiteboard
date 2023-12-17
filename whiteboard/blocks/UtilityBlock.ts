@@ -50,9 +50,7 @@ export async function buildHeaderBlock(
             `*Untitled Whiteboard* by \`@${username}\``
         );
     } else {
-        markdownBlock = getMarkdownBlock(
-            `*${boardname}* by \`@${username}\``
-        );
+        markdownBlock = getMarkdownBlock(`*${boardname}* by \`@${username}\``);
     }
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
