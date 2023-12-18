@@ -9,7 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
-import { getBoardRecordByRoomId } from "../persistence/boardInteraction";
+import { getBoardRecordByRoomId, getMessagebyMessageID } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -189,7 +189,7 @@ export async function helperMessage(
 }
 
 // function to handle /whiteboard list command
-export async function handleListCommand(
+export async function handleList(
     read: IRead,
     modify: IModify,
     room: IRoom,
@@ -245,5 +245,42 @@ export async function deleteMessage(
         console.log(`Message deleted successfully`);
     } catch (error) {
         console.error(`Error deleting message: ${error}`);
+    }
+}
+
+// Function to search for a board
+
+export async function handleBoardSearch(
+    read: IRead,
+    modify: IModify,
+    room: IRoom,
+    appUser: IUser,
+    boardName: string
+) {
+    try {
+        const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id);
+
+        console.log("boardName in console.log", boardName)
+
+        // console.log("boardData in console.log", boardData)
+
+        const foundBoard = boardData.find(board => board.title === boardName);
+
+        if (foundBoard) {
+            const messageInfo = await getMessagebyMessageID(read.getPersistenceReader(), foundBoard.messageId);
+            console.log("messageInfo", messageInfo);
+            console.log("boardData", foundBoard);
+            // console.log("boardDataInfo-Elements", foundBoard.boardData.elements);
+            // console.log("boardDataInfo-Files", foundBoard.boardData.files);
+            // console.log("boardDataInfo-Appstate", foundBoard.boardData.appState);
+
+            return { id: foundBoard.id, cover: messageInfo[messageInfo.length-1].cover, messageId: messageInfo[0].messageId };
+        }
+
+        return undefined;
+    } catch (error) {
+        console.error('Error in handleBoardSearch:', error);
+        // Handle the error or log it based on your application's needs
+        throw error; // Rethrow the error if you want to propagate it
     }
 }

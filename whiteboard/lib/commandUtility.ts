@@ -10,7 +10,8 @@ import {
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
-    handleListCommand,
+    handleBoardSearch,
+    handleList,
     helperMessage,
     sendMessage,
     sendMessageWithAttachment,
@@ -128,10 +129,80 @@ export class CommandUtility implements ExecutorProps {
             .getUserReader()
             .getAppUser()) as IUser;
         
-        await handleListCommand(this.read, this.modify, this.room, appSender);
+        await handleList(this.read, this.modify, this.room, appSender);
     }
 
+    // handleBoardSearchCommand is used to handle the /whiteboard search {boardname} command
+
+    private async handleBoardSearchCommand(name: string,
+        {
+            app,
+            context,
+            read,
+            modify,
+            http,
+            persistence
+        }: WhiteboardSlashCommandContext) {
+        console.log("name", name)
+        const appUser = (await read.getUserReader().getAppUser())!;
+        const boardData = await handleBoardSearch(this.read, this.modify, this.room,appUser, name)
+        const sender = context.getSender()!;
+        const room = context.getRoom();
+        const endpoints = app.getAccessors().providedApiEndpoints;
+        const boardEndpoint = endpoints[0];
+        const getBoardEndpoint = endpoints[3];
+        const appId = app.getID();
+        const boardURL = `http://localhost:3000${getBoardEndpoint.computedPath}?id=${boardData?.id}`
+        console.log("boardURL", boardURL)
+        const data = await http.get(boardURL)
+        console.log("data", data.data.cover)
+        console.log("boardDataid ,boardDatacover upper and endpoint", boardData?.id, boardData?.cover.slice(0, 10), boardEndpoint)
+        if (room && boardData?.id) {
+            console.log("boardDataid and boardDatacover", boardData.id, boardData.cover.slice(0, 10))
+            const boardURL = `${boardEndpoint.computedPath}?id=${boardData.id}`;
+
+                const headerBlock = await buildHeaderBlock(
+                    sender.username,
+                    boardURL,
+                    appId,
+                    name
+                );
+                const attachments = [
+                    {
+                        collapsed: true,
+                        color: "#00000000",
+                        imageUrl: boardData.cover !== "" ? boardData.cover : defaultPreview,
+                    },
+                ];
+                const messageId = await sendMessageWithAttachment(
+                    this.modify,
+                    room,
+                    appUser,
+                    `Whiteboard created by @${sender.username}`,
+                    attachments,
+                    headerBlock
+                );
+
+                storeBoardRecord(
+                    persistence,
+                    room.id,
+                    boardData.id,
+                    {
+                        elements: [],
+                        appState: {},
+                        files: [],
+                    },
+                    // boardData.messageId,
+                    messageId,
+                    boardData.cover,
+                    name,
+                    "",
+                    "Public"
+                );
+}}
+
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
+        // console.log("params", this.command)
         switch (this.command[0]) {
             case "new":
                 await this.handleNewBoardCommand(context);
@@ -141,6 +212,9 @@ export class CommandUtility implements ExecutorProps {
                 break;
             case "list":
                 await this.handleListCommand();
+                break;
+            case "search":
+                await this.handleBoardSearchCommand(this.command.slice(1).join(' '), context);
                 break;
             default:
                 const appSender: IUser = (await this.read

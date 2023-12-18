@@ -250,13 +250,15 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
-        const title = request.content.title;
-
+        
         const savedBoardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
-        );
-        const { messageId, privateMessageId, status } = savedBoardata;
+            );
+            const { messageId, privateMessageId, status } = savedBoardata;
+            const title = request.content.title ? request.content.title : savedBoardata.title;
+
+            console.log("title", title)
         const user = (await read.getMessageReader().getSenderUser(messageId))!;
         const room = await read.getMessageReader().getRoom(messageId);
         const AppSender = (await read.getUserReader().getAppUser()) as IUser;
