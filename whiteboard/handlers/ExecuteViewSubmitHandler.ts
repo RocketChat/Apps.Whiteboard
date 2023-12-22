@@ -122,7 +122,7 @@ export class ExecuteViewSubmitHandler {
                                         .setSender(AppSender)
                                         .setRoom(room)
                                         .setText(
-                                            `"${newBoardname}" Whiteboard name is already taken. Try different name`
+                                            `*${newBoardname}* Whiteboard name is already taken. Please try using a different name.`
                                         )
                                         .setParseUrls(true);
 
@@ -337,7 +337,10 @@ export class ExecuteViewSubmitHandler {
 
                                 // Deletion header block as board get deleted
                                 const deleteHeaderBlock =
-                                    await deletionHeaderBlock(user.username, boardName);
+                                    await deletionHeaderBlock(
+                                        user.username,
+                                        boardName
+                                    );
 
                                 // Some message configurations
                                 message.setEditor(user).setRoom(room);
