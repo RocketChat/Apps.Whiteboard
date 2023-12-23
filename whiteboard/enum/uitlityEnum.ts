@@ -39,4 +39,5 @@ export enum UtilityEnum {
     DELETE_MODAL_ID = "delete-modal-id",
     DELETE_ACTION_ID = "delete-action-id",
     DELETE_BLOCK_ID = "delete-block-id",
+    NAME_ALREADY_EXISTS = "Name already exists. Try different name",
 }
