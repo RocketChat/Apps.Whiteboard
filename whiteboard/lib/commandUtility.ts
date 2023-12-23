@@ -222,7 +222,6 @@ export class CommandUtility implements ExecutorProps {
         // the name specified in command "/whiteboard delete"
         let deleteBoardName =
             params.length > 1 ? params.slice(1).join(" ") : "";
-        console.log(`deleteBoardName :${deleteBoardName}`);
 
         if (deleteBoardName == "") {
             const message = this.modify
@@ -313,7 +312,7 @@ export class CommandUtility implements ExecutorProps {
                             this.modify,
                             this.room,
                             appSender,
-                            `The "${deleteBoardName}" board has been deleted successfully`
+                            `The *${deleteBoardName}* board has been deleted successfully`
                         ),
                     ]);
                 } else {
@@ -326,7 +325,7 @@ export class CommandUtility implements ExecutorProps {
                     .setSender(appSender)
                     .setRoom(room)
                     .setText(
-                        `Oops! The board named "${deleteBoardName}" is not found in this room. Please check the board name and try again`
+                        `Oops! The board named *${deleteBoardName}* is not found in this room. Please check the board name and try again`
                     )
                     .setParseUrls(true);
 
