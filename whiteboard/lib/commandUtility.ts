@@ -184,14 +184,12 @@ export class CommandUtility implements ExecutorProps {
                 .getNotifier()
                 .notifyRoom(room, message.getMessage());
         } else {
-            console.log("Finding Board :-------------");
             const checkBoard = await checkBoardNameByRoomId(
                 this.read.getPersistenceReader(),
                 room.id,
                 deleteBoardName
             );
             if (checkBoard == 1) {
-                console.log("Board name exist in the room!");
                 const messageId = await getMessageIdByBoardName(
                     this.read.getPersistenceReader(),
                     room.id,
@@ -234,9 +232,6 @@ export class CommandUtility implements ExecutorProps {
 
                         // Message is finished modified and saved to database
                         await this.modify.getUpdater().finish(message);
-                        console.log(
-                            "Message is updated after deleting the board"
-                        );
                     }
                     await Promise.all([
                         sendMessage(
