@@ -127,13 +127,16 @@ export const getAllBoardIds = async (
 };
 
 // function to get new board name
-export const getBoardName = async (persis: IPersistenceRead, roomId: string): Promise<string> => {
+export const getBoardName = async (
+    persis: IPersistenceRead,
+    roomId: string
+): Promise<string> => {
     const boardArray = await getBoardRecordByRoomId(persis, roomId);
 
     let suffix = 1;
     let newName = `Untitled Whiteboard`;
 
-    while (boardArray.some(board => board.title === newName)) {
+    while (boardArray.some((board) => board.title === newName)) {
         suffix++;
         newName = `Untitled Whiteboard ${suffix}`;
     }
@@ -305,7 +308,7 @@ export const deleteBoardByMessageId = async (
     messageId: string
 ): Promise<string> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
-    console.log("records", records)
+    console.log("records", records);
     if (!records) {
         console.log("No records found for boardname");
         return "";
@@ -327,4 +330,21 @@ export const deleteBoardByMessageId = async (
     ]);
 
     return records.title;
+};
+
+export const getMessageIdByBoardName = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string,
+    boardName: string
+): Promise<any> => {
+    const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
+
+    for (const board of boardData) {
+        if (board.title === boardName) {
+            console.log("Board name mil gaya!");
+            let messageId = board.messageId;
+            return messageId;
+        }
+    }
+    return 0;
 };
