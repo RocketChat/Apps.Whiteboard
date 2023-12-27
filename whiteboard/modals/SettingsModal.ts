@@ -93,7 +93,7 @@ export async function SettingsModal(
     );
 
     // Event handling for closing modal
-    closeButton.actionId = UtilityEnum.SUBMIT_ACTION_ID;
+    submitButton.actionId = UtilityEnum.SUBMIT_ACTION_ID;
 
     const value = {
         id: UtilityEnum.SETTINGS_MODAL_ID,
