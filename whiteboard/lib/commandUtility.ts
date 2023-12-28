@@ -75,7 +75,6 @@ export class CommandUtility implements ExecutorProps {
         // the name specified in command "/whiteboard create"
         let createBoardName =
             params.length > 1 ? params.slice(1).join(" ") : "";
-        console.log(`create Board Name :${createBoardName}`);
 
         const checkBoard = await checkBoardNameByRoomId(
             this.read.getPersistenceReader(),
