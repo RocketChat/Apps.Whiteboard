@@ -99,7 +99,7 @@ export default {
     new miniCssExtractPlugin({
       filename: "[name].css",
       chunkFilename: "[id].css",
-    }), // this will extract css to a separate file
+    }), // this will extract css to a separate file during production build
   ].filter(Boolean),
   devServer: {
     static: {
