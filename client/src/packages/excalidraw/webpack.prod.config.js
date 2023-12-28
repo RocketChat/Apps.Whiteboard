@@ -5,7 +5,6 @@ const BundleAnalyzerPlugin =
 const autoprefixer = require("autoprefixer");
 const webpack = require("webpack");
 const { parseEnvVariables } = require("./env");
-const MiniCssExtractPlugin = require("mini-css-extract-plugin");
 
 module.exports = {
   mode: "production",
@@ -30,9 +29,7 @@ module.exports = {
         test: /\.(sa|sc|c)ss$/,
         exclude: /node_modules/,
         use: [
-          MiniCssExtractPlugin.loader,
-          //mini-css-extract-plugin extracts CSS into separate files. It creates a CSS file per JS file which contains CSS.
-          //smaller bundle size
+          "style-loader",
           {
             loader: "css-loader",
           },
@@ -74,26 +71,9 @@ module.exports = {
           },
         ],
       },
-      // Rule for PNG, JPEG, and other media files
-      {
-        test: /\.(png|jpe?g|gif|svg|ico|webp)$/i,
-        type: "asset",
-        // the parser object allows you to specify 8kb as the maximum size
-        // if the file is greater than 8kb, it will emit a separate file(asset/resourse) else it will be inlined(asset/inline)
-        parser: {
-          dataUrlCondition: {
-            maxSize: 8 * 1024, // 8kb
-          },
-        },
-      },
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/,
-        type: "asset",
-        parser: {
-          dataUrlCondition: {
-            maxSize: 8 * 1024, // 8kb
-          },
-        },
+        type: "asset/resource",
       },
     ],
   },
@@ -120,10 +100,6 @@ module.exports = {
       "process.env": parseEnvVariables(
         path.resolve(__dirname, "../../../.env.production"),
       ),
-    }),
-    new MiniCssExtractPlugin({
-      filename: "[name].css",
-      chunkFilename: "excalidraw-assets/[name]-[contenthash].css",
     }),
   ],
   externals: {
