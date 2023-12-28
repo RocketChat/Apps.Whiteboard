@@ -54,7 +54,7 @@ export class CommandUtility implements ExecutorProps {
         this.app = props.app;
     }
 
-    // handleNewBoardCommand is used to handle the /whiteboard new command
+    // handleNewBoardCommand is used to handle the /whiteboard create command
 
     private async handleNewBoardCommand({
         app,
@@ -70,53 +70,91 @@ export class CommandUtility implements ExecutorProps {
         const endpoints = app.getAccessors().providedApiEndpoints;
         const boardEndpoint = endpoints[0];
         const appId = app.getID();
-        if (room) {
-            const randomBoardId = randomId();
-            const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
+        const params = this.context.getArguments();
 
-            const name = await getBoardName(
-                read.getPersistenceReader(),
-                room.id
-            );
+        // the name specified in command "/whiteboard create"
+        let createBoardName =
+            params.length > 1 ? params.slice(1).join(" ") : "";
+        console.log(`create Board Name :${createBoardName}`);
 
-            if (name) {
-                const headerBlock = await buildHeaderBlock(
-                    sender.username,
-                    boardURL,
-                    appId,
-                    name
-                );
-                const attachments = [
-                    {
-                        collapsed: true,
-                        color: "#00000000",
-                        imageUrl: defaultPreview,
-                    },
-                ];
-                const messageId = await sendMessageWithAttachment(
-                    this.modify,
-                    room,
-                    appUser,
-                    `Whiteboard created by @${sender.username}`,
-                    attachments,
-                    headerBlock
+        const checkBoard = await checkBoardNameByRoomId(
+            this.read.getPersistenceReader(),
+            room.id,
+            createBoardName
+        );
+        if (checkBoard == 1) {
+            console.log("Board name exist in the room!");
+            const message = this.modify
+                .getCreator()
+                .startMessage()
+                .setSender(appUser)
+                .setRoom(room)
+                .setText(
+                    `Oops! The board named *${createBoardName}* is already there in the room. Please try again with different board name`
+                )
+                .setParseUrls(true);
+
+            await this.read
+                .getNotifier()
+                .notifyRoom(room, message.getMessage());
+        } else {
+            if (room) {
+                const randomBoardId = randomId();
+                const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
+
+                // The variable "untitledName" stores "Untitled" if the name is not specified
+                const untitledName = await getBoardName(
+                    read.getPersistenceReader(),
+                    room.id
                 );
 
-                storeBoardRecord(
-                    persistence,
-                    room.id,
-                    randomBoardId,
-                    {
-                        elements: [],
-                        appState: {},
-                        files: [],
-                    },
-                    messageId,
-                    "",
-                    name,
-                    "",
-                    "Public"
-                );
+                // The variable "name" stores the board name if specified in the command; otherwise it defaults to "Untitled"
+                let name = "";
+                if (createBoardName == "") {
+                    name = untitledName;
+                } else {
+                    name = createBoardName;
+                }
+
+                if (name) {
+                    const headerBlock = await buildHeaderBlock(
+                        sender.username,
+                        boardURL,
+                        appId,
+                        name
+                    );
+                    const attachments = [
+                        {
+                            collapsed: true,
+                            color: "#00000000",
+                            imageUrl: defaultPreview,
+                        },
+                    ];
+                    const messageId = await sendMessageWithAttachment(
+                        this.modify,
+                        room,
+                        appUser,
+                        `Whiteboard created by @${sender.username}`,
+                        attachments,
+                        headerBlock
+                    );
+
+                    storeBoardRecord(
+                        persistence,
+                        room.id,
+                        randomBoardId,
+                        {
+                            elements: [],
+                            appState: {},
+                            files: [],
+                        },
+                        messageId,
+                        "",
+                        name,
+                        "",
+                        "Public"
+                    );
+                }
             }
         }
     }
@@ -264,7 +302,7 @@ export class CommandUtility implements ExecutorProps {
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
-            case "new":
+            case "create":
                 await this.handleNewBoardCommand(context);
                 break;
             case "help":
