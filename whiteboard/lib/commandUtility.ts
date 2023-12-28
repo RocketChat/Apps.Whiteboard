@@ -208,6 +208,7 @@ export class CommandUtility implements ExecutorProps {
                     "Public"
                 );
 }}
+
     // handleListCommand is used to handle the /whiteboard delete command
 
     private async deleteBoardCommand() {
