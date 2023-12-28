@@ -261,27 +261,18 @@ export async function handleBoardSearch(
     try {
         const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id);
 
-        console.log("boardName in console.log", boardName)
-
-        // console.log("boardData in console.log", boardData)
-
         const foundBoard = boardData.find(board => board.title === boardName);
+
 
         if (foundBoard) {
             const messageInfo = await getMessagebyMessageID(read.getPersistenceReader(), foundBoard.messageId);
-            console.log("messageInfo", messageInfo);
-            console.log("boardData", foundBoard);
-            // console.log("boardDataInfo-Elements", foundBoard.boardData.elements);
-            // console.log("boardDataInfo-Files", foundBoard.boardData.files);
-            // console.log("boardDataInfo-Appstate", foundBoard.boardData.appState);
 
-            return { id: foundBoard.id, cover: messageInfo[messageInfo.length-1].cover, messageId: messageInfo[0].messageId };
+            return { id: foundBoard.id, cover: messageInfo[0].cover, messageId: messageInfo[0].messageId };
         }
 
         return undefined;
     } catch (error) {
-        console.error('Error in handleBoardSearch:', error);
-        // Handle the error or log it based on your application's needs
-        throw error; // Rethrow the error if you want to propagate it
+        console.log('Error in handleBoardSearch:', error);
+        throw error; 
     }
 }
