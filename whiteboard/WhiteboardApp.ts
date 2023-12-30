@@ -115,8 +115,6 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             \`/whiteboard new\` - Create a new whiteboard
             \`/whiteboard help\` - Display helper message
             \`/whiteboard list\` - List all the board names in the room
-            \`/whiteboard delete <board name>\` - Delete a board
-            \`/whiteboard search <board name>\` - Search a board
             You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
             Refer https://github.com/RocketChat/Apps.Whiteboard documentation for more details 🚀`,
             persistence
@@ -252,14 +250,13 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
         const boardId = request.content.boardId;
         const boardData = request.content.boardData;
         const cover = request.content.cover;
-        
+        const title = request.content.title;
+
         const savedBoardata = await getBoardRecord(
             read.getPersistenceReader(),
             boardId
-            );
-            const { messageId, privateMessageId, status } = savedBoardata;
-            const title = request.content.title ? request.content.title : savedBoardata.title;
-
+        );
+        const { messageId, privateMessageId, status } = savedBoardata;
         const user = (await read.getMessageReader().getSenderUser(messageId))!;
         const room = await read.getMessageReader().getRoom(messageId);
         const AppSender = (await read.getUserReader().getAppUser()) as IUser;
