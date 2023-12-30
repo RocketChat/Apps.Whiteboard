@@ -50,17 +50,17 @@ export const Sidebar = Object.assign(
         /** @private internal */
         __isInternal?: boolean;
       }>,
-      ref: React.ForwardedRef<HTMLDivElement>,
+      ref: React.ForwardedRef<HTMLDivElement>
     ) => {
       const [hostSidebarCounters, setHostSidebarCounters] = useAtom(
         hostSidebarCountersAtom,
-        jotaiScope,
+        jotaiScope
       );
 
       const setAppState = useExcalidrawSetAppState();
 
       const [isDockedFallback, setIsDockedFallback] = useState(
-        docked ?? initialDockedState ?? false,
+        docked ?? initialDockedState ?? false
       );
 
       useLayoutEffect(() => {
@@ -131,7 +131,7 @@ export const Sidebar = Object.assign(
           className={clsx(
             "layer-ui__sidebar",
             { "layer-ui__sidebar--docked": isDockedFallback },
-            className,
+            className
           )}
           ref={ref}
         >
@@ -143,9 +143,9 @@ export const Sidebar = Object.assign(
           </SidebarPropsContext.Provider>
         </Island>
       );
-    },
+    }
   ),
   {
     Header: SidebarHeaderComponents.Component,
-  },
+  }
 );
