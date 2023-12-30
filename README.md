@@ -120,6 +120,30 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    make deploy YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
    ```
 
+## Gitpod Setup Guide
+
+Follow these steps to set up your development environment using Gitpod:
+
+1. **Visit Gitpod Website:**
+   - Go to [Gitpod](https://www.gitpod.io/) and click on the dashboard.
+
+2. **Login with GitHub:**
+   - Login to Gitpod using your GitHub account credentials.
+
+3. **Create a New Workspace:**
+   - Click on the "New Workspace" button.
+   - In the dropdown menu, select the repository you want to work on, specifically the `Apps.Whiteboard` repository that you've previously forked on GitHub.
+
+4. **Continue and Wait:**
+   - Click "Continue" and give it some time to initialize your workspace.
+
+5. **Start Coding:**
+   - After a few seconds, you'll see a fully-functional code editor in your browser.
+   - Feel free to start coding, making changes, and contribute to the `Apps.Whiteboard` repository.
+
+That's it! You are now set up and ready to contribute. If you encounter any issues or have questions, refer to the [Gitpod documentation](https://www.gitpod.io/docs/) or reach out to the community for assistance.
+
+Happy coding!
 
 ## GSoC'23 Work: [Whiteboard App Report](https://github.com/CulturalProfessor/Google-Summer-of-Code-23)
 
