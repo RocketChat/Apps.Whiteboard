@@ -66,21 +66,6 @@ export const storeBoardRecord = async (
     );
 };
 
-// query all records with the messageID
-export const getMessagebyMessageID = async (
-    persistenceRead: IPersistenceRead,
-    messageId: string
-): Promise<any> => {
-    const association = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.MESSAGE,
-        `${messageId}#MessageId`
-    );
-    const result = (await persistenceRead.readByAssociation(
-        association
-    )) as Array<any>;
-    return result;
-};
-
 // query all records within the "scope" - room
 export const getBoardRecordByRoomId = async (
     persistenceRead: IPersistenceRead,

@@ -123,6 +123,7 @@ async function getBoardData(baseURL: string, boardId: string) {
     },
   });
   const response = await res.json();
+  //   console.log("getBoardData", response);
   return response;
 }
 // Post board data to backend
@@ -159,6 +160,7 @@ const initializeScene = async (opts: {
   const elements = dataState.elements;
   const appState = dataState.appState;
   const files = dataState.files;
+  console.log("dataState", dataState.appState);
   let scene: RestoredDataState & {
     scrollToContent?: boolean;
   } = {
