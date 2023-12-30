@@ -6,6 +6,7 @@
   "scripts": {
     "dev": "webpack serve",
     "build": "webpack --mode development",
+    "build:prod": "webpack --mode production",
     "build:excalidraw": "node scripts/build.js"
   },
   "dependencies": {
