@@ -14,19 +14,6 @@ ifdef YOUR_PASSWORD
 	PASSWORD := $(YOUR_PASSWORD)
 endif
 
-# For gitpod setup
-.PHONY: gitpod_setup
-
-gitpod_setup: client whiteboard
-
-client:
-	cd $(CLIENT_DIR) && npm install && npm run build && npm run build:excalidraw
-	@echo "Client build completed successfully."
-
-whiteboard:
-	cd $(WHITEBOARD_DIR) && npm install
-	@echo "Whiteboard build completed successfully."
-
 # Define targets and their dependencies/actions
 .PHONY: all
 
