@@ -182,82 +182,82 @@ export class CommandUtility implements ExecutorProps {
     private async handleBoardSearchCommand(
         name: string,
         {
-            app,
-            context,
-            read,
-            modify,
-            http,
-            persistence,
+          app,
+          context,
+          read,
+          modify,
+          http,
+          persistence,
         }: WhiteboardSlashCommandContext
-    ) {
+      ) {
         try {
-            const appUser = (await read.getUserReader().getAppUser())!;
-            const boardData = await handleBoardSearch(
-                this.read,
-                this.modify,
-                this.room,
-                appUser,
-                name
+      
+          const appUser = (await read.getUserReader().getAppUser())!;
+          const boardData = await handleBoardSearch(
+            this.read,
+            this.modify,
+            this.room,
+            appUser,
+            name
+          );
+      
+          const sender = context.getSender()!;
+          const room = context.getRoom();
+          const endpoints = app.getAccessors().providedApiEndpoints;
+      
+          const boardEndpoint = endpoints[0];
+          const getBoardEndpoint = endpoints[3];
+      
+          const appId = app.getID();
+          const boardURL = `${boardEndpoint.computedPath}?id=${boardData?.id}`;
+      
+          if (room && boardData?.id) {
+      
+            const headerBlock = await buildHeaderBlock(
+              sender.username,
+              boardURL,
+              appId,
+              name
             );
-
-            const sender = context.getSender()!;
-            const room = context.getRoom();
-            const endpoints = app.getAccessors().providedApiEndpoints;
-
-            const boardEndpoint = endpoints[0];
-            const getBoardEndpoint = endpoints[3];
-
-            const appId = app.getID();
-            const boardURL = `${boardEndpoint.computedPath}?id=${boardData?.id}`;
-
-            if (room && boardData?.id) {
-                const headerBlock = await buildHeaderBlock(
-                    sender.username,
-                    boardURL,
-                    appId,
-                    name
-                );
-
-                const attachments = [
-                    {
-                        collapsed: true,
-                        color: "#00000000",
-                        imageUrl:
-                            boardData.cover !== ""
-                                ? boardData.cover
-                                : defaultPreview,
-                    },
-                ];
-
-                const messageId = await sendMessageWithAttachment(
-                    this.modify,
-                    room,
-                    appUser,
-                    `Whiteboard created by @${sender.username}`,
-                    attachments,
-                    headerBlock
-                );
-
-                storeBoardRecord(
-                    persistence,
-                    room.id,
-                    boardData.id,
-                    {
-                        elements: [],
-                        appState: {},
-                        files: [],
-                    },
-                    messageId,
-                    boardData.cover,
-                    name,
-                    "",
-                    "Public"
-                );
-            }
+      
+            const attachments = [
+              {
+                collapsed: true,
+                color: "#00000000",
+                imageUrl: boardData.cover !== "" ? boardData.cover : defaultPreview,
+              },
+            ];
+      
+            const messageId = await sendMessageWithAttachment(
+              this.modify,
+              room,
+              appUser,
+              `Whiteboard created by @${sender.username}`,
+              attachments,
+              headerBlock
+            );
+      
+            storeBoardRecord(
+              persistence,
+              room.id,
+              boardData.id,
+              {
+                elements: [],
+                appState: {},
+                files: [],
+              },
+              messageId,
+              boardData.cover,
+              name,
+              "",
+              "Public"
+            );
+          }
         } catch (err) {
-            console.error(err);
+          console.error(err);
         }
-    }
+      }
+      
 
     // handleListCommand is used to handle the /whiteboard delete command
 
@@ -384,7 +384,7 @@ export class CommandUtility implements ExecutorProps {
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
-            case "new":
+            case "create":
                 await this.handleNewBoardCommand(context);
                 break;
             case "help":
@@ -394,10 +394,7 @@ export class CommandUtility implements ExecutorProps {
                 await this.handleListCommand();
                 break;
             case "search":
-                await this.handleBoardSearchCommand(
-                    this.command.slice(1).join(" "),
-                    context
-                );
+                await this.handleBoardSearchCommand(this.command.slice(1).join(' '), context);
                 break;
             case "delete":
                 await this.deleteBoardCommand();
