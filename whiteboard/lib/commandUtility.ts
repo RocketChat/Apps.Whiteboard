@@ -167,6 +167,9 @@ export class CommandUtility implements ExecutorProps {
           const sender = context.getSender()!;
           const room = context.getRoom();
           const endpoints = app.getAccessors().providedApiEndpoints;
+          const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
       
           const boardEndpoint = endpoints[0];
           const getBoardEndpoint = endpoints[3];
@@ -199,6 +202,34 @@ export class CommandUtility implements ExecutorProps {
               attachments,
               headerBlock
             );
+
+            //  // Board data is deleted from database
+            //  await deleteBoardByMessageId(
+            //     this.persistence,
+            //     this.read.getPersistenceReader(),
+            //     messageId
+            // );
+            // console.log("Board is deleted from database!!!!");
+
+            //      // Message is Updated to "Deletion"
+            //      // Extracted the message to be updated
+            //      const message = await this.modify
+            //          .getUpdater()
+            //          .message(messageId, appSender);
+
+            //      // Deletion header block as board get deleted
+            //      const deleteHeaderBlock = await deletionHeaderBlock(
+            //          sender.username,
+            //          name
+            //      );
+
+            //      // Some message configurations
+            //      message.setEditor(sender).setRoom(room);
+            //      message.setBlocks(deleteHeaderBlock);
+            //      message.removeAttachment(0);
+
+            //      // Message is finished modified and saved to database
+            //      await this.modify.getUpdater().finish(message);
       
             storeBoardRecord(
               persistence,

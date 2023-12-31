@@ -207,6 +207,8 @@ export async function handleList(
         for (let i = 0; i < boardData.length; i++) {
             boardDataArray.push(boardData[i].title);
         }
+    
+    console.log("boardData checking list" , boardData)
 
         const text = `*All existing boards are*:
                 ${boardDataArray.join("\n")}
@@ -265,6 +267,7 @@ export async function handleBoardSearch(
 
         const foundBoard = boardData.find(board => board.title === boardName);
 
+        console.log("boardData ", boardData)
 
         if (foundBoard) {
             const messageInfo = await getMessagebyMessageID(read.getPersistenceReader(), foundBoard.messageId);
