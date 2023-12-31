@@ -24,7 +24,12 @@ export const storeBoardRecord = async (
 ): Promise<void> => {
     const roomAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
-        `${roomId}#BoardName`
+        `${roomId}#RoomName`
+    );
+
+    const roomAndBoardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
     );
 
     const boardAssociation = new RocketChatAssociationRecord(
@@ -48,6 +53,7 @@ export const storeBoardRecord = async (
             messageAssociation,
             roomAssociation,
             getAllBoardAssocations,
+            roomAndBoardAssociation,
         ],
         {
             id: boardId,
@@ -81,6 +87,25 @@ export const getBoardRecordByRoomId = async (
 
     return result;
 };
+
+export const getBoardRecordByRoomIdandBoardId = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string,
+    boardId: string
+): Promise<any | undefined> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+
+    console.log("checking error in getBoardRecordByRoomIdandBoardId", result, result[0])
+    // Return the first element of the array or undefined if the array is empty
+    return result.length > 0 ? result[0] : undefined;
+};
+
 
 export const checkBoardNameByRoomId = async (
     persistenceRead: IPersistenceRead,
@@ -185,6 +210,8 @@ export const updateBoardnameByMessageId = async (
     }
     const boardId = records["id"];
 
+    const initialBoardName = records["title"];
+
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
@@ -197,13 +224,30 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.ROOM,
         `${roomId}#BoardName`
     );
+
+    const roomAndBoardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
+    );
+
     records["title"] = boardName;
 
-    await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation, roomAssociation],
+    console.log("records", records, boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation);
+
+    
+    await deleteBoardByMessageId(
+        persistence,
+        persistenceRead,
+        messageId
+    );
+
+    const checkingIdReturn = await persistence.updateByAssociations(
+        [boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation],
         records,
         true
     );
+
+    console.log("checkingIdReturn", checkingIdReturn)
 };
 
 export const updatePrivateMessageIdByMessageId = async (
@@ -332,6 +376,36 @@ export const deleteBoardByMessageId = async (
     return records.title;
 };
 
+export const deleteBoards = async (
+    persistence: IPersistence,
+    persistenceRead: IPersistenceRead,
+    messageId: string
+): Promise<string> => {
+    let records = await getBoardRecordByMessageId(persistenceRead, messageId);
+    console.log("records", records);
+    if (!records) {
+        console.log("No records found for boardname");
+        return "";
+    }
+    const boardId = records["id"];
+
+    const boardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.USER,
+        `${boardId}#BoardName`
+    );
+    const messageAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
+
+    await persistence.removeByAssociations([
+        boardAssociation,
+        messageAssociation,
+    ]);
+
+    return records.title;
+};
+
 export const getMessageIdByBoardName = async (
     persistenceRead: IPersistenceRead,
     roomId: string,
@@ -348,3 +422,15 @@ export const getMessageIdByBoardName = async (
     }
     return 0;
 };
+
+export const getMessageIdByRoomName = async(
+    persistenceRead: IPersistenceRead,
+    roomId: string
+): Promise<[{messageId:string,boardName:string}]>=>{
+    const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
+    const boardDataArray:any= [];
+    for (const board of boardData) {
+        boardDataArray.push({messageId: board.messageId, boardName: board.title});
+    }
+    return boardDataArray;
+}

@@ -9,7 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
-import { getBoardRecordByRoomId } from "../persistence/boardInteraction";
+import { getBoardRecordByRoomId, getBoardRecordByRoomIdandBoardId } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -201,9 +201,13 @@ export async function handleListCommand(
         read.getPersistenceReader(),
         room.id
     );
+
+    
+    // console.log("boardData in handleListCommand",boardData)
     if (boardData !== undefined && boardData.length > 0) {
         for (let i = 0; i < boardData.length; i++) {
-            boardDataArray.push(boardData[i].title);
+            const boardDataCheck = await getBoardRecordByRoomIdandBoardId(read.getPersistenceReader(),room.id,boardData[i].id)
+            boardDataArray.push(boardDataCheck?boardDataCheck.title:"Error here messages.ts");
         }
 
         const text = `*All existing boards are*:

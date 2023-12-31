@@ -18,7 +18,9 @@ import {
 import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
+    deleteBoards,
     getBoardName,
+    getMessageIdByRoomName,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
@@ -168,7 +170,69 @@ export class CommandUtility implements ExecutorProps {
             await this.read
                 .getNotifier()
                 .notifyRoom(room, message.getMessage());
-        } else if (
+        } 
+        
+        else if(
+            deleteBoardName == "_all"
+        ){
+
+             // Message is Updated to "Deletion"
+             // Extracted the message to be updated
+
+             const messageData = await getMessageIdByRoomName(
+                this.read.getPersistenceReader(),
+                room.id
+            );
+
+            if (messageData) {
+                for(let i=0;i<messageData.length;i++){
+                    const AppSender: IUser = (await this.read
+                        .getUserReader()
+                        .getAppUser()) as IUser;
+    
+                        await deleteBoards(
+                            this.persistence,
+                            this.read.getPersistenceReader(),
+                            messageData[i].messageId
+                        )
+                        console.log(`Board ${messageData[i].boardName} has been deleted from database!!!!`);
+    
+                    // Message is Updated to "Deletion"
+                        const message = await this.modify
+                            .getUpdater()
+                            .message(messageData[i].messageId, AppSender);
+    
+                        // Deletion header block as board get deleted
+                        const deleteHeaderBlock = await deletionHeaderBlock(
+                            user.username,
+                            messageData[i].boardName
+                        );
+    
+                        // Some message configurations
+                        message.setEditor(user).setRoom(room);
+                        message.setBlocks(deleteHeaderBlock);
+                        message.removeAttachment(0);
+    
+                        // Message is finished modified and saved to database
+                        await this.modify.getUpdater().finish(message);
+                    }
+                    await Promise.all([
+                        sendMessage(
+                            this.modify,
+                            this.room,
+                            appSender,
+                            `All boards have been deleted successfully`
+                        ),
+                    ]);
+                }
+               
+                else{
+                    console.log("MessageId not found");
+                }
+
+        }
+        
+        else if (
             deleteBoardName == "untitled" ||
             deleteBoardName == "Untitled"
         ) {
