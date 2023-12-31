@@ -24,7 +24,7 @@ export const storeBoardRecord = async (
 ): Promise<void> => {
     const roomAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
-        `${roomId}#RoomName`
+        `${roomId}#BoardName`
     );
 
     const roomAndBoardAssociation = new RocketChatAssociationRecord(
