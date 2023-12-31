@@ -101,8 +101,6 @@ export const getBoardRecordByRoomIdandBoardId = async (
         association
     )) as Array<any>;
 
-    console.log("checking error in getBoardRecordByRoomIdandBoardId", result, result[0])
-    // Return the first element of the array or undefined if the array is empty
     return result.length > 0 ? result[0] : undefined;
 };
 
@@ -214,8 +212,6 @@ export const updateBoardnameByMessageId = async (
     }
     const boardId = records["id"];
 
-    const initialBoardName = records["title"];
-
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
@@ -236,8 +232,6 @@ export const updateBoardnameByMessageId = async (
 
     records["title"] = boardName;
 
-    console.log("records", records, boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation);
-
     
     await deleteBoardByMessageId(
         persistence,
@@ -245,13 +239,12 @@ export const updateBoardnameByMessageId = async (
         messageId
     );
 
-    const checkingIdReturn = await persistence.updateByAssociations(
+    await persistence.updateByAssociations(
         [boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation],
         records,
         true
     );
 
-    console.log("checkingIdReturn", checkingIdReturn)
 };
 
 export const updatePrivateMessageIdByMessageId = async (
@@ -386,7 +379,6 @@ export const deleteBoards = async (
     messageId: string
 ): Promise<string> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
-    console.log("records", records);
     if (!records) {
         console.log("No records found for boardname");
         return "";

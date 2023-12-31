@@ -202,8 +202,6 @@ export async function handleListCommand(
         room.id
     );
 
-    
-    // console.log("boardData in handleListCommand",boardData)
     if (boardData !== undefined && boardData.length > 0) {
         for (let i = 0; i < boardData.length; i++) {
             const boardDataCheck = await getBoardRecordByRoomIdandBoardId(read.getPersistenceReader(),room.id,boardData[i].id)
