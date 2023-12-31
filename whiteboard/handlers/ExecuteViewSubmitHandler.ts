@@ -109,6 +109,11 @@ export class ExecuteViewSubmitHandler {
                                 if (checkBoardName == 1) {
                                     checkName = 1;
                                 }
+
+                                // Board name cannot be kept as _all
+                                else if (checkBoardName == 2) {
+                                    checkName = 2;
+                                }
                             }
 
                             if (checkName == 1) {
@@ -133,7 +138,32 @@ export class ExecuteViewSubmitHandler {
                                             newMessage.getMessage()
                                         );
                                 }
-                            } else {
+                            } 
+                            if (checkName == 2) {
+                                const room = await this.read
+                                    .getMessageReader()
+                                    .getRoom(messageId);
+                                if (room) {
+                                    const newMessage = this.modify
+                                        .getCreator()
+                                        .startMessage()
+                                        .setSender(AppSender)
+                                        .setRoom(room)
+                                        .setText(
+                                            "The term *_all* is already in use and cannot be selected."
+                                        )
+                                        .setParseUrls(true);
+
+                                    await this.read
+                                        .getNotifier()
+                                        .notifyRoom(
+                                            room,
+                                            newMessage.getMessage()
+                                        );
+                                }
+                            }
+                            
+                            else {
                                 if (room) {
                                     // Check if the message is a private message or not
                                     if (messageIdFromPrivateMessageId != null) {

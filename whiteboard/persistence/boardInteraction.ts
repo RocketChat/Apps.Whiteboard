@@ -120,6 +120,10 @@ export const checkBoardNameByRoomId = async (
             console.log("Board name found!");
             return 1;
         }
+        else if (board.title === "_all") {
+            console.log("Board name is _all!");
+            return 2;
+        }
     }
     return 0;
 };
