@@ -114,6 +114,8 @@ export class ExecuteViewSubmitHandler {
                                 else if (checkBoardName == 2) {
                                     checkName = 2;
                                 }
+
+
                             }
 
                             if (checkName == 1) {
