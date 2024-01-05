@@ -170,11 +170,12 @@ export async function helperMessage(
     appUser: IUser
 ) {
     const text = `*Whiteboard App Commands*
-    \`/whiteboard new\` - Create a new whiteboard
     \`/whiteboard help\` - Display helper message
-    \`/whiteboard list\` - List all the board names in the room
+    \`/whiteboard list\` - List all the whiteboard names in the room
     \`/whiteboard delete <board name>\` - Delete a board
     \`/whiteboard search <board name>\` - Search a board
+    \`/whiteboard new <board name>\` - Create a new whiteboard
+    \`/whiteboard delete <board name>\` - Delete a whiteboard
     You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
     Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
