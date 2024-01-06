@@ -19,7 +19,9 @@ import {
 import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
+    deleteBoards,
     getBoardName,
+    getMessageIdByRoomName,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
@@ -77,12 +79,12 @@ export class CommandUtility implements ExecutorProps {
         let createBoardName =
             params.length > 1 ? params.slice(1).join(" ") : "";
 
-        const checkBoard = await checkBoardNameByRoomId(
+        const repeatBoardName = await checkBoardNameByRoomId(
             this.read.getPersistenceReader(),
             room.id,
             createBoardName
         );
-        if (checkBoard == 1) {
+        if (repeatBoardName) {
             console.log("Whiteboard name exist in the room!");
             const message = this.modify
                 .getCreator()
@@ -319,7 +321,9 @@ export class CommandUtility implements ExecutorProps {
             await this.read
                 .getNotifier()
                 .notifyRoom(room, message.getMessage());
-        } else if (
+        } 
+                
+        else if (
             deleteBoardName == "untitled" ||
             deleteBoardName == "Untitled"
         ) {
@@ -335,12 +339,12 @@ export class CommandUtility implements ExecutorProps {
                 .getNotifier()
                 .notifyRoom(room, message.getMessage());
         } else {
-            const checkBoard = await checkBoardNameByRoomId(
+            const repeatBoardName:boolean = await checkBoardNameByRoomId(
                 this.read.getPersistenceReader(),
                 room.id,
                 deleteBoardName
             );
-            if (checkBoard == 1) {
+            if (repeatBoardName) {
                 const messageId = await getMessageIdByBoardName(
                     this.read.getPersistenceReader(),
                     room.id,

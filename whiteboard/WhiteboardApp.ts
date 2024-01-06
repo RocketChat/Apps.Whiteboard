@@ -112,7 +112,8 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             modify,
             context.user,
             `Whiteboard App Installed Successfully 🎉 \n *Whiteboard App Commands*
-            \`/whiteboard new\` - Create a new whiteboard
+            \`/whiteboard new <board name>\` - Create a new whiteboard
+            \`/whiteboard delete <board name>\` - Delete a whiteboard
             \`/whiteboard help\` - Display helper message
             \`/whiteboard list\` - List all the board names in the room
             \`/whiteboard delete <board name>\` - Delete a board
