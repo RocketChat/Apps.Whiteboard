@@ -111,19 +111,15 @@ export const checkBoardNameByRoomId = async (
     boardName: string
 ): Promise<any> => {
     const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
-    if (boardName == "") return 0;
+    if (boardName == "") return false;
 
     for (const board of boardData) {
         if (board.title === boardName) {
             console.log("Board name found!");
-            return 1;
-        }
-        else if (boardName === "_all") {
-            console.log("Board name is _all!");
-            return 2;
+            return true;
         }
     }
-    return 0;
+    return false;
 };
 
 // query all records within the "scope" - board

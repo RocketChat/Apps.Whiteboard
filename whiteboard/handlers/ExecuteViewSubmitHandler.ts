@@ -96,29 +96,19 @@ export class ExecuteViewSubmitHandler {
                                 .getMessageReader()
                                 .getRoom(messageId);
 
-                            var checkName = 0;
+                            var repeatBoardName = false;
                             if (room) {
-                                const checkBoardName =
+                                 repeatBoardName =
                                     await checkBoardNameByRoomId(
                                         this.read.getPersistenceReader(),
                                         room.id,
                                         newBoardname
                                     );
 
-                                // Board name exists already
-                                if (checkBoardName == 1) {
-                                    checkName = 1;
-                                }
-
-                                // Board name cannot be kept as _all
-                                else if (checkBoardName == 2) {
-                                    checkName = 2;
-                                }
-
 
                             }
 
-                            if (checkName == 1) {
+                            if (repeatBoardName) {
                                 const room = await this.read
                                     .getMessageReader()
                                     .getRoom(messageId);
@@ -129,7 +119,7 @@ export class ExecuteViewSubmitHandler {
                                         .setSender(AppSender)
                                         .setRoom(room)
                                         .setText(
-                                            `*${newBoardname}* Whiteboard name is already taken. Please try using a different name.`
+                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
                                         )
                                         .setParseUrls(true);
 
@@ -141,29 +131,6 @@ export class ExecuteViewSubmitHandler {
                                         );
                                 }
                             } 
-                            if (checkName == 2) {
-                                const room = await this.read
-                                    .getMessageReader()
-                                    .getRoom(messageId);
-                                if (room) {
-                                    const newMessage = this.modify
-                                        .getCreator()
-                                        .startMessage()
-                                        .setSender(AppSender)
-                                        .setRoom(room)
-                                        .setText(
-                                            "The term *_all* is already in use and cannot be selected."
-                                        )
-                                        .setParseUrls(true);
-
-                                    await this.read
-                                        .getNotifier()
-                                        .notifyRoom(
-                                            room,
-                                            newMessage.getMessage()
-                                        );
-                                }
-                            }
                             
                             else {
                                 if (room) {
