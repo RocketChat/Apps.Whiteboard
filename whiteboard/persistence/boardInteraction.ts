@@ -351,8 +351,7 @@ export const deleteBoardByMessageId = async (
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     console.log("records", records);
     if (!records) {
-        console.log("No records found for boardname");
-        return "";
+        console.log("No records found for boardname with messageId as", messageId);
     }
     const boardId = records["id"];
 

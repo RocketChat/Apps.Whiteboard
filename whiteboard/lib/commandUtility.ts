@@ -223,35 +223,42 @@ export class CommandUtility implements ExecutorProps {
 
             if (messageData) {
                 for(let i=0;i<messageData.length;i++){
-                    const AppSender: IUser = (await this.read
-                        .getUserReader()
-                        .getAppUser()) as IUser;
-    
-                        await deleteBoards(
-                            this.persistence,
-                            this.read.getPersistenceReader(),
-                            messageData[i].messageId
-                        )
-                        console.log(`Board ${messageData[i].boardName} has been deleted from database!!!!`);
-    
-                    // Message is Updated to "Deletion"
-                        const message = await this.modify
-                            .getUpdater()
-                            .message(messageData[i].messageId, AppSender);
-    
-                        // Deletion header block as board get deleted
-                        const deleteHeaderBlock = await deletionHeaderBlock(
-                            user.username,
-                            messageData[i].boardName
-                        );
-    
-                        // Some message configurations
-                        message.setEditor(user).setRoom(room);
-                        message.setBlocks(deleteHeaderBlock);
-                        message.removeAttachment(0);
-    
-                        // Message is finished modified and saved to database
-                        await this.modify.getUpdater().finish(message);
+                    if(messageData[i].messageId && messageData[i].boardName){
+                        const AppSender: IUser = (await this.read
+                            .getUserReader()
+                            .getAppUser()) as IUser;
+        
+                            await deleteBoards(
+                                this.persistence,
+                                this.read.getPersistenceReader(),
+                                messageData[i].messageId
+                            )
+                            console.log(`Board ${messageData[i].boardName} has been deleted from database!!!!`);
+        
+                        // Message is Updated to "Deletion"
+                            const message = await this.modify
+                                .getUpdater()
+                                .message(messageData[i].messageId, AppSender);
+        
+                            // Deletion header block as board get deleted
+                            const deleteHeaderBlock = await deletionHeaderBlock(
+                                user.username,
+                                messageData[i].boardName
+                            );
+        
+                            // Some message configurations
+                            message.setEditor(user).setRoom(room);
+                            message.setBlocks(deleteHeaderBlock);
+                            message.removeAttachment(0);
+        
+                            // Message is finished modified and saved to database
+                            await this.modify.getUpdater().finish(message);
+                        }
+
+                        else{
+                            console.log(`MessageData not found for element number ${i}`);
+                        }
+
                     }
                     await Promise.all([
                         sendMessage(
