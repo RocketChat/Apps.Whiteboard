@@ -209,7 +209,7 @@ export class CommandUtility implements ExecutorProps {
             .getAppUser()) as IUser;
       
           const boardEndpoint = endpoints[0];
-          const getBoardEndpoint = endpoints[3];
+        //   const getBoardEndpoint = endpoints[3];
       
           const appId = app.getID();
           const boardURL = `${boardEndpoint.computedPath}?id=${boardData?.id}`;
