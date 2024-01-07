@@ -213,10 +213,6 @@ export async function handleListCommand(
                 room.id,
                 boardData[i].id
             );
-            console.log(
-                "Board data check:",
-                JSON.stringify(boardDataCheck, null, 2)
-            );
 
             boardDataArray.push(
                 boardDataCheck ? boardDataCheck.title : "Error here messages.ts"
