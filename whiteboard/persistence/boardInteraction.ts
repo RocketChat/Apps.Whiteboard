@@ -343,7 +343,6 @@ export const deleteBoardByMessageId = async (
     messageId: string
 ): Promise<string> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
-    // console.log("records", records);
     if (!records) {
         console.log(
             "No records found for boardname with messageId as",
