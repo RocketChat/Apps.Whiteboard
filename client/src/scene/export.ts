@@ -138,7 +138,7 @@ export const exportToSvg = async (
     if (assetPath?.startsWith("/")) {
       assetPath = assetPath.replace("/", `${window.location.origin}/`);
     }
-    assetPath = `${assetPath}/dist/excalidraw-assets/`;
+    assetPath = `${assetPath}/dist/`;
   }
   svgRoot.innerHTML = `
   ${SVG_EXPORT_TAG}
