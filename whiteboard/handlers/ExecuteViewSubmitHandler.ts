@@ -98,14 +98,11 @@ export class ExecuteViewSubmitHandler {
 
                             var repeatBoardName = false;
                             if (room) {
-                                 repeatBoardName =
-                                    await checkBoardNameByRoomId(
-                                        this.read.getPersistenceReader(),
-                                        room.id,
-                                        newBoardname
-                                    );
-
-
+                                repeatBoardName = await checkBoardNameByRoomId(
+                                    this.read.getPersistenceReader(),
+                                    room.id,
+                                    newBoardname
+                                );
                             }
 
                             if (repeatBoardName) {
@@ -119,7 +116,7 @@ export class ExecuteViewSubmitHandler {
                                         .setSender(AppSender)
                                         .setRoom(room)
                                         .setText(
-                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
+                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room.`
                                         )
                                         .setParseUrls(true);
 
@@ -130,9 +127,7 @@ export class ExecuteViewSubmitHandler {
                                             newMessage.getMessage()
                                         );
                                 }
-                            } 
-                            
-                            else {
+                            } else {
                                 if (room) {
                                     // Check if the message is a private message or not
                                     if (messageIdFromPrivateMessageId != null) {
@@ -196,6 +191,7 @@ export class ExecuteViewSubmitHandler {
                                                     messageId,
                                                     AppSender,
                                                     user,
+                                                    newBoardname,
                                                     undefined
                                                 );
                                             }
@@ -223,6 +219,7 @@ export class ExecuteViewSubmitHandler {
                                                     messageId,
                                                     AppSender,
                                                     user,
+                                                    newBoardname,
                                                     updateHeaderBlock
                                                 );
                                             }
@@ -240,6 +237,7 @@ export class ExecuteViewSubmitHandler {
                                                     messageId,
                                                     AppSender,
                                                     user,
+                                                    newBoardname,
                                                     undefined
                                                 );
                                             } else if (
@@ -264,6 +262,7 @@ export class ExecuteViewSubmitHandler {
                                                     messageId,
                                                     AppSender,
                                                     user,
+                                                    newBoardname,
                                                     updateHeaderBlock
                                                 );
                                             } else if (
@@ -377,6 +376,7 @@ export class ExecuteViewSubmitHandler {
         messageId: string,
         AppSender: IUser,
         user: IUser,
+        newBoardName: string,
         updateHeaderBlock?: any
     ) {
         const directRoom = await getDirect(
@@ -388,6 +388,15 @@ export class ExecuteViewSubmitHandler {
         const publicRoom = await this.read
             .getMessageReader()
             .getRoom(messageId);
+
+        // Below functionality is storing the name of the whiteboard getting changed from Private to Public in displayName variable
+        const msg = await this.read.getMessageReader().getById(messageId);
+        const nameString = msg?.blocks?.[0]["text"]?.["text"];
+        const nameFromMessage = nameString.match(/\*(.*?)\*/)[1];
+        var displayName = nameFromMessage;
+        if (newBoardName != undefined) {
+            displayName = newBoardName;
+        }
 
         if (directRoom && publicRoom) {
             const privateMessageId = (
@@ -466,7 +475,7 @@ export class ExecuteViewSubmitHandler {
                 .setRoom(publicRoom)
                 .setAttachments([])
                 .setText(
-                    `(This whiteboard has been made private by \`@${user.username}\`)`
+                    `Whiteboard named *${displayName}* has been made private by \`@${user.username}\``
                 )
                 .setUsernameAlias(AppEnum.APP_NAME);
             await this.modify.getUpdater().finish(message);
@@ -481,6 +490,7 @@ export class ExecuteViewSubmitHandler {
         privateMessageId: string,
         AppSender: IUser,
         user: IUser,
+        newBoardName: string,
         updateHeaderBlock?: any
     ) {
         const messageId = (
@@ -498,6 +508,27 @@ export class ExecuteViewSubmitHandler {
         const publicRoom = await this.read
             .getMessageReader()
             .getRoom(messageId);
+
+        // Below functionality is storing the name of the whiteboard getting changed from Private to Public in displayName variable
+        const msg = await this.read.getMessageReader().getById(messageId);
+        const nameString = msg?.text;
+        let nameFromMessage = "";
+        if (nameString !== undefined) {
+            const matchResult = nameString.match(/\*(.*?)\*/);
+
+            if (matchResult !== null) {
+                nameFromMessage = matchResult[1];
+            } else {
+                console.log("No match found");
+            }
+        } else {
+            console.log("nameString is undefined or null");
+        }
+        var displayName = nameFromMessage;
+        if (newBoardName != undefined) {
+            displayName = newBoardName;
+        }
+
         if (!publicRoom) {
             console.log("Public room not found");
             return;
@@ -535,7 +566,7 @@ export class ExecuteViewSubmitHandler {
             .setEditor(AppSender)
             .setUsernameAlias(AppEnum.APP_NAME)
             .setText(
-                `(This whiteboard has been made public by \`@${user.username}\`)`
+                `Whiteboard named *${displayName}* has been made public by \`@${user.username}\``
             );
         await this.modify.getUpdater().finish(privateMessage);
     }
