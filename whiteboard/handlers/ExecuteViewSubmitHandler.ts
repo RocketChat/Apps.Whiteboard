@@ -116,7 +116,7 @@ export class ExecuteViewSubmitHandler {
                                         .setSender(AppSender)
                                         .setRoom(room)
                                         .setText(
-                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room.`
+                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
                                         )
                                         .setParseUrls(true);
 
