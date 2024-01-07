@@ -15,7 +15,9 @@ export default {
   output: {
     path: path.resolve(process.cwd(), "dist"),
     filename: "bundle.js",
-    clean: true,
+    clean: {
+      keep: /ignored\/dir\//, // Keep these assets under 'ignored/dir'.
+    },
   },
   resolve: {
     fallback: {
@@ -66,8 +68,6 @@ export default {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: "asset",
-        // parser will be used for files that exceed the specified limit (in bytes)
-        // asset/inline default otherwise, asset/resource is used
         parser: {
           dataUrlCondition: {
             maxSize: 8 * 1024, // 8kb
