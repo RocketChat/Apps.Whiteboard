@@ -68,6 +68,9 @@ export default {
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
         type: "asset",
+        generator: {
+          filename: "fonts/[name][ext]",
+        },
         parser: {
           dataUrlCondition: {
             maxSize: 8 * 1024, // 8kb
