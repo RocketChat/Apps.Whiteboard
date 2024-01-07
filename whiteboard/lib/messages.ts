@@ -9,7 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
-import { getBoardRecordByRoomId } from "../persistence/boardInteraction";
+import { getBoardRecordByRoomId, getBoardRecordByRoomIdandBoardId } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -170,7 +170,8 @@ export async function helperMessage(
     appUser: IUser
 ) {
     const text = `*Whiteboard App Commands*
-    \`/whiteboard new\` - Create a new whiteboard
+    \`/whiteboard new <board name>\` - Create a new whiteboard
+    \`/whiteboard delete <board name>\` - Delete a whiteboard
     \`/whiteboard help\` - Display helper message
     \`/whiteboard list\` - List all the board names in the room
     You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
@@ -201,9 +202,11 @@ export async function handleListCommand(
         read.getPersistenceReader(),
         room.id
     );
+
     if (boardData !== undefined && boardData.length > 0) {
         for (let i = 0; i < boardData.length; i++) {
-            boardDataArray.push(boardData[i].title);
+            const boardDataCheck = await getBoardRecordByRoomIdandBoardId(read.getPersistenceReader(),room.id,boardData[i].id)
+            boardDataArray.push(boardDataCheck?boardDataCheck.title:"Error here messages.ts");
         }
 
         const text = `*All existing boards are*:

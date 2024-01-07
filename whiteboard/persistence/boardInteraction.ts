@@ -27,6 +27,11 @@ export const storeBoardRecord = async (
         `${roomId}#BoardName`
     );
 
+    const roomAndBoardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
+    );
+
     const boardAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.USER,
         `${boardId}#BoardName`
@@ -48,6 +53,7 @@ export const storeBoardRecord = async (
             messageAssociation,
             roomAssociation,
             getAllBoardAssocations,
+            roomAndBoardAssociation,
         ],
         {
             id: boardId,
@@ -82,21 +88,38 @@ export const getBoardRecordByRoomId = async (
     return result;
 };
 
+export const getBoardRecordByRoomIdandBoardId = async (
+    persistenceRead: IPersistenceRead,
+    roomId: string,
+    boardId: string
+): Promise<any | undefined> => {
+    const association = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
+    );
+    const result = (await persistenceRead.readByAssociation(
+        association
+    )) as Array<any>;
+
+    return result.length > 0 ? result[0] : undefined;
+};
+
+
 export const checkBoardNameByRoomId = async (
     persistenceRead: IPersistenceRead,
     roomId: string,
     boardName: string
 ): Promise<any> => {
     const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
-    if (boardName == "") return 0;
+    if (boardName == "") return false;
 
     for (const board of boardData) {
         if (board.title === boardName) {
             console.log("Board name found!");
-            return 1;
+            return true;
         }
     }
-    return 0;
+    return false;
 };
 
 // query all records within the "scope" - board
@@ -197,13 +220,27 @@ export const updateBoardnameByMessageId = async (
         RocketChatAssociationModel.ROOM,
         `${roomId}#BoardName`
     );
+
+    const roomAndBoardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${roomId}#${boardId}#BoardName`
+    );
+
     records["title"] = boardName;
 
+    
+    await deleteBoardByMessageId(
+        persistence,
+        persistenceRead,
+        messageId
+    );
+
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation, roomAssociation],
+        [boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation],
         records,
         true
     );
+
 };
 
 export const updatePrivateMessageIdByMessageId = async (
@@ -310,6 +347,34 @@ export const deleteBoardByMessageId = async (
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
     console.log("records", records);
     if (!records) {
+        console.log("No records found for boardname with messageId as", messageId);
+    }
+    const boardId = records["id"];
+
+    const boardAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.USER,
+        `${boardId}#BoardName`
+    );
+    const messageAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
+
+    await persistence.removeByAssociations([
+        boardAssociation,
+        messageAssociation,
+    ]);
+
+    return records.title;
+};
+
+export const deleteBoards = async (
+    persistence: IPersistence,
+    persistenceRead: IPersistenceRead,
+    messageId: string
+): Promise<string> => {
+    let records = await getBoardRecordByMessageId(persistenceRead, messageId);
+    if (!records) {
         console.log("No records found for boardname");
         return "";
     }
@@ -348,3 +413,15 @@ export const getMessageIdByBoardName = async (
     }
     return 0;
 };
+
+export const getMessageIdByRoomName = async(
+    persistenceRead: IPersistenceRead,
+    roomId: string
+): Promise<[{messageId:string,boardName:string}]>=>{
+    const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
+    const boardDataArray:any= [];
+    for (const board of boardData) {
+        boardDataArray.push({messageId: board.messageId, boardName: board.title});
+    }
+    return boardDataArray;
+}
