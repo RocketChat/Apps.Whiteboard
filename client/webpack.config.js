@@ -2,6 +2,8 @@ import path from "path";
 import webpack from "webpack";
 import CopyPlugin from "copy-webpack-plugin";
 import miniCssExtractPlugin from "mini-css-extract-plugin";
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 const isEnvDevelopment = process.env.NODE_ENV !== "production";
 const isEnvProduction = process.env.NODE_ENV === "production";
@@ -80,6 +82,9 @@ export default {
     ],
   },
   plugins: [
+    new BundleAnalyzerPlugin({
+      generateStatsFile: true,
+    }),
     new CopyPlugin({
       patterns: [{ from: "public" }],
     }),
