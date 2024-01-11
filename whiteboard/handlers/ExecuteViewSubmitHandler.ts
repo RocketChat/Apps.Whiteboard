@@ -104,7 +104,6 @@ export class ExecuteViewSubmitHandler {
                                     newBoardname
                                 );
                             }
-                            console.log(`Rpeat Board name :${repeatBoardName}`);
 
                             if (room) {
                                 // Check if the message is a private message or not
