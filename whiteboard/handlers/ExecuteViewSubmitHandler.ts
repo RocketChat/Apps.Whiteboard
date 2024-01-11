@@ -47,6 +47,7 @@ export class ExecuteViewSubmitHandler {
             .getAppUser()) as IUser;
         const appId = AppSender.appId;
         try {
+            console.log("View Id: ", view);
             switch (view.id) {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:

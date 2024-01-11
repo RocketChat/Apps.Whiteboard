@@ -14,6 +14,7 @@ import {
     getBoardRecordByRoomIdandBoardId,
 } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
+import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
 
 // getDirect is used to get the direct room between the app user and the user
 
@@ -260,4 +261,39 @@ export async function deleteMessage(
     } catch (error) {
         console.error(`Error deleting message: ${error}`);
     }
+}
+
+// Function to check if the user has rights or not
+export async function hasPermission(
+    user: IUser,
+    room: IRoom | undefined,
+    read: IRead,
+    messageId: string | undefined
+) {
+    console.log("messageId", messageId)
+    console.log("user", user)
+    console.log("room", room)
+
+    let checkBoolean = false;
+    if (user.roles.includes("admin")) {
+        checkBoolean = true;
+    }
+
+    const roomAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.ROOM,
+        `${room?.id}#BoardName`
+    );
+
+    const roomRecord = await read.getPersistenceReader().readByAssociation(roomAssociation)
+
+    // console.log("roomRecord", roomRecord)
+
+    const messageAssociation = new RocketChatAssociationRecord(
+        RocketChatAssociationModel.MESSAGE,
+        `${messageId}#MessageId`
+    );
+
+    const messageRecord = await read.getPersistenceReader().readByAssociation(messageAssociation)
+    
+    console.log("messageRecord", messageRecord)
 }

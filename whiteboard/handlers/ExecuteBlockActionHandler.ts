@@ -14,6 +14,7 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
 import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
+import { hasPermission } from "../lib/messages";
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -38,13 +39,17 @@ export class ExecuteBlockActionHandler {
                 container,
             } = data;
 
-            const appSender = this.app;
+            // const appSender = this.app;
+            const read = this.read;
             const appId = data.appId;
             // The id of the message (created when the user created the whiteboard)
             const messageId = data.message?.id;
-            const AppSender: IUser = (await this.read
+            const appSender: IUser = (await this.read
                 .getUserReader()
                 .getAppUser()) as IUser;
+
+            console.log("actionId", actionId);
+            await hasPermission(appSender, room, read, messageId)
             switch (actionId) {
                 // handleSettingsButtonAction is used to handle the settings button action
                 case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
