@@ -13,7 +13,7 @@ import {
 import { UIKitBlockInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, deletionHeaderBlock, permissionHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
     getMessageIdByPrivateMessageId,
@@ -377,9 +377,29 @@ export class ExecuteViewSubmitHandler {
                                         console.log("Board data", boardData)
                                         for(let i=0; i<boardData.boardOwner.length; i++){
                                             const user = boardData.boardOwner[i]
-                                            if(user){
-                                                const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
-                                                this.modify.getNotifier().notifyUser(user, message)
+                                            if(user && appId){
+                                                const boardName = boardData.title;
+                                                const message = await this.modify
+                                                .getUpdater()
+                                                .message(messageId, AppSender);
+            
+                                            // Deletion header block as board get deleted
+                                            const permissionBlock =
+                                                await permissionHeaderBlock(
+                                                    user.username,
+                                                    boardName,
+                                                    appId
+                                                );
+            
+                                            // Some message configurations
+                                            message.setEditor(user).setRoom(room);
+                                            message.setBlocks(permissionBlock);
+                                            message.removeAttachment(0);
+            
+                                            // Message is finished modified and saved to database
+                                            await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                                                // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
+                                                // this.modify.getNotifier().notifyUser(user, message)
                                             }
                                         }
                                   }
