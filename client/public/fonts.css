@@ -1,20 +1,20 @@
 /* http://www.eaglefonts.com/fg-virgil-ttf-131249.htm */
 @font-face {
   font-family: "Virgil";
-  src: url("./fonts/Virgil.woff2");
+  src: url("./fonts/Virgil.woff2")format("woff2"), url("./fonts/FG_Virgil.ttf")format("truetype");
   font-display: swap;
 }
 
 /* https://github.com/microsoft/cascadia-code */
 @font-face {
   font-family: "Cascadia";
-  src: url("./fonts/Cascadia.woff2");
+  src: url("./fonts/Cascadia.woff2")format("woff2"), url("./fonts/Cascadia.ttf")format("truetype");
   font-display: swap;
 }
 
 @font-face {
   font-family: "Assistant";
-  src: url("./fonts/Assistant-Regular.woff2");
+  src: url("./fonts/Assistant-Regular.woff2")format("woff2");
   font-display: swap;
   font-weight: 400;
 }
