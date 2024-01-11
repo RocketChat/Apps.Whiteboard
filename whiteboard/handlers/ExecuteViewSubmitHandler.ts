@@ -25,7 +25,7 @@ import {
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
 import { getDirect, sendMessage } from "../lib/messages";
-import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
+import { IMessage, IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
 //This class will handle all the view submit interactions from the modals
@@ -360,6 +360,38 @@ export class ExecuteViewSubmitHandler {
                         .getInteractionResponder()
                         .successResponse();
 
+                        case UtilityEnum.PERMISSION_MODAL_ID:
+                            const messageId =
+                            this.context.getInteractionData().view.submit
+                                ?.value;
+                             if(messageId){
+
+                                 const room = await this.read
+                                     .getMessageReader()
+                                     .getRoom(messageId);
+                                     if(room){
+                                //   console.log("Checking interaction data", this.context.getInteractionData().view.submit?.value)
+                                  const boardMessageId = this.context.getInteractionData().view.submit?.value
+                                  if(boardMessageId){
+                                      const boardData = await getBoardRecordByMessageId(this.read.getPersistenceReader(), boardMessageId)
+                                        console.log("Board data", boardData)
+                                        for(let i=0; i<boardData.boardOwner.length; i++){
+                                            const user = boardData.boardOwner[i]
+                                            if(user){
+                                                const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
+                                                this.modify.getNotifier().notifyUser(user, message)
+                                            }
+                                        }
+                                  }
+                                  
+                                
+                                    // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
+                                    // this.modify.getNotifier().notifyUser(user, message)
+
+                                }
+                             }   
+                            return this.context.getInteractionResponder().successResponse();
+                        
                 default:
                     console.log("View Id not found");
                     return this.context
@@ -572,3 +604,6 @@ export class ExecuteViewSubmitHandler {
         await this.modify.getUpdater().finish(privateMessage);
     }
 }
+
+
+// 

@@ -40,4 +40,14 @@ export enum UtilityEnum {
     DELETE_ACTION_ID = "delete-action-id",
     DELETE_BLOCK_ID = "delete-block-id",
     NAME_ALREADY_EXISTS = "Name already exists. Try different name",
+
+    PERMISSION_DESC = "You don't have permission to edit or delete this whiteboard. Do you want to request permission?",
+    PERMISSION_MODAL_ID = "permission-modal-id",
+    PERMISSION_DENIED = "Permission Denied",   
+    NO = "No",
+    NO_BLOCK_ID = "no-block-id",
+    NO_ACTION_ID = "no-action-id",
+    YES = "Yes",
+    YES_BLOCK_ID = "yes-block-id",
+    YES_ACTION_ID = "yes-action-id",
 }

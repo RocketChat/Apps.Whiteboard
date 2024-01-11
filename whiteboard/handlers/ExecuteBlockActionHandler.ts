@@ -15,6 +15,7 @@ import { SettingsModal } from "../modals/SettingsModal";
 import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { hasPermission } from "../lib/messages";
+import { PermissionModal } from '../modals/PermissionModal';
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -25,7 +26,7 @@ export class ExecuteBlockActionHandler {
         private readonly persistence: IPersistence,
         private readonly modify: IModify,
         private readonly context: UIKitBlockInteractionContext
-    ) {}
+    ) { }
     public async run(): Promise<IUIKitResponse> {
         const data = this.context.getInteractionData();
         try {
@@ -39,6 +40,7 @@ export class ExecuteBlockActionHandler {
                 container,
             } = data;
 
+            // console.log("data", data)
             // const appSender = this.app;
             const read = this.read;
             const appId = data.appId;
@@ -48,52 +50,76 @@ export class ExecuteBlockActionHandler {
                 .getUserReader()
                 .getAppUser()) as IUser;
 
-            console.log("actionId", actionId);
-            await hasPermission(appSender, room, read, messageId)
-            switch (actionId) {
-                // handleSettingsButtonAction is used to handle the settings button action
-                case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
-                    if (messageId) {
-                        const modal = await SettingsModal(appId, messageId);
-                        await Promise.all([
-                            this.modify.getUiController().openSurfaceView(
-                                modal,
-                                {
-                                    triggerId,
-                                },
-                                user
-                            ),
-                        ]);
-                    }
-                    return this.context
-                        .getInteractionResponder()
-                        .successResponse();
-
-                // Add the case for the delete button action
-                case UtilityEnum.DELETE_BUTTON_ACTION_ID:
-                    if (messageId) {
-                        const modal = await DeleteModal(appId, messageId);
-                        await Promise.all([
-                            this.modify.getUiController().openSurfaceView(
-                                modal,
-                                {
-                                    triggerId,
-                                },
-                                user
-                            ),
-                        ]);
-                    }
-
-                    return this.context
-                        .getInteractionResponder()
-                        .successResponse();
-
-                default:
-                    return this.context
-                        .getInteractionResponder()
-                        .successResponse();
+            let boolean = true
+            if (messageId) {
+                boolean = await hasPermission(user, room, read, messageId, this.modify, this.context)
             }
-        } catch (err) {
+
+
+            if (boolean) {
+                switch (actionId) {
+                    // handleSettingsButtonAction is used to handle the settings button action
+                    case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
+                        if (messageId) {
+                            const modal = await SettingsModal(appId, messageId);
+                            await Promise.all([
+                                this.modify.getUiController().openSurfaceView(
+                                    modal,
+                                    {
+                                        triggerId,
+                                    },
+                                    user
+                                ),
+                            ]);
+                        }
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+
+                    // Add the case for the delete button action
+                    case UtilityEnum.DELETE_BUTTON_ACTION_ID:
+                        if (messageId) {
+                            const modal = await DeleteModal(appId, messageId);
+                            await Promise.all([
+                                this.modify.getUiController().openSurfaceView(
+                                    modal,
+                                    {
+                                        triggerId,
+                                    },
+                                    user
+                                ),
+                            ]);
+                        }
+
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+
+                    default:
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+                }
+
+            }
+            else {
+                if (messageId) {
+                    const modal = await PermissionModal(appId, messageId);
+                    await Promise.all([
+                        this.modify.getUiController().openSurfaceView(
+                            modal,
+                            {
+                                triggerId,
+                            },
+                            user
+                        ),
+                    ]);
+                }
+                return this.context.getInteractionResponder().successResponse();
+
+            }
+        }
+        catch (err) {
             console.log(err);
             return this.context.getInteractionResponder().errorResponse();
         }

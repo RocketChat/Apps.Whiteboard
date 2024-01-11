@@ -257,7 +257,8 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
             read.getPersistenceReader(),
             boardId
         );
-        const { messageId, privateMessageId, status } = savedBoardata;
+        console.log("savedBoardata", savedBoardata)
+        const { messageId, privateMessageId, status, boardOwner } = savedBoardata;
         const user = (await read.getMessageReader().getSenderUser(messageId))!;
         const room = await read.getMessageReader().getRoom(messageId);
         const AppSender = (await read.getUserReader().getAppUser()) as IUser;
@@ -277,7 +278,8 @@ export class UpdateBoardEndpoint extends ApiEndpoint {
                 cover,
                 title,
                 privateMessageId,
-                status
+                status,
+                boardOwner
             );
             if (privateMessageId.length > 0 && status == UtilityEnum.PRIVATE) {
                 if (directRoom) {

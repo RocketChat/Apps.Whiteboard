@@ -10,11 +10,15 @@ import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 import {
+    getBoardRecordByMessageId,
     getBoardRecordByRoomId,
     getBoardRecordByRoomIdandBoardId,
 } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
-import {RocketChatAssociationModel, RocketChatAssociationRecord} from '@rocket.chat/apps-engine/definition/metadata';
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
+import { DeleteModal } from '../modals/DeleteModal';
+import { PermissionModal } from "../modals/PermissionModal";
+import { UIKitBlockInteractionContext } from '@rocket.chat/apps-engine/definition/uikit';
 
 // getDirect is used to get the direct room between the app user and the user
 
@@ -268,32 +272,37 @@ export async function hasPermission(
     user: IUser,
     room: IRoom | undefined,
     read: IRead,
-    messageId: string | undefined
+    messageId: string,
+    modify: IModify,
+    context: any
 ) {
     console.log("messageId", messageId)
     console.log("user", user)
-    console.log("room", room)
+    // console.log("room", room)
+    // console.log("triggerString", triggerId)
 
+    // Get the board data from the database
+    const boardData = await getBoardRecordByMessageId(read.getPersistenceReader(), messageId)
+
+    // console.log("boardData", boardData)
+
+    // Check whethet boardData.boardOwner contains user
     let checkBoolean = false;
-    if (user.roles.includes("admin")) {
-        checkBoolean = true;
+    for (let i = 0; i < boardData.boardOwner.length; i++) {
+        console.log("boardOwner", boardData.boardOwner[i])
+        if (boardData.boardOwner[i].id === user.id) {
+            checkBoolean = true;
+            break;
+        }
     }
 
-    const roomAssociation = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.ROOM,
-        `${room?.id}#BoardName`
-    );
+    console.log("checkBoolean", checkBoolean)
+    // If checkBoolean is false then ask the user for permision
+    if (checkBoolean === false) {
+        return false 
+    }
 
-    const roomRecord = await read.getPersistenceReader().readByAssociation(roomAssociation)
+    return true
 
-    // console.log("roomRecord", roomRecord)
-
-    const messageAssociation = new RocketChatAssociationRecord(
-        RocketChatAssociationModel.MESSAGE,
-        `${messageId}#MessageId`
-    );
-
-    const messageRecord = await read.getPersistenceReader().readByAssociation(messageAssociation)
-    
-    console.log("messageRecord", messageRecord)
+    // If checkBoolean is true then allow user to perform the action
 }
