@@ -50,4 +50,10 @@ export enum UtilityEnum {
     YES = "Yes",
     YES_BLOCK_ID = "yes-block-id",
     YES_ACTION_ID = "yes-action-id",
+
+    PERMISSION_BLOCK_ID = "permission-block-id",
+    ALLOW_BLOCK_ID = "allow-block-id",
+    ALLOW_BUTTON_ACTION_ID = "allow_button_action_id",
+    DENY_BLOCK_ID = "deny-block-id",
+    DENY_BUTTON_ACTION_ID = "deny_button_action_id",
 }

@@ -47,7 +47,7 @@ export class ExecuteViewSubmitHandler {
             .getAppUser()) as IUser;
         const appId = AppSender.appId;
         try {
-            console.log("View Id: ", view);
+            // console.log("View Id: ", view);
             switch (view.id) {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
@@ -315,7 +315,7 @@ export class ExecuteViewSubmitHandler {
                         const messageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
-
+                        // console.log("MessageId inside Delete Modal ID", messageId)
                         if (messageId) {
                             // Board data is deleted from database
                             const boardName = await deleteBoardByMessageId(
@@ -374,30 +374,36 @@ export class ExecuteViewSubmitHandler {
                                   const boardMessageId = this.context.getInteractionData().view.submit?.value
                                   if(boardMessageId){
                                       const boardData = await getBoardRecordByMessageId(this.read.getPersistenceReader(), boardMessageId)
-                                        console.log("Board data", boardData)
+                                        // console.log("Board data", boardData)
                                         for(let i=0; i<boardData.boardOwner.length; i++){
-                                            const user = boardData.boardOwner[i]
-                                            if(user && appId){
+                                            const userBoardOwner = boardData.boardOwner[i]
+                                            if(userBoardOwner && appId){
                                                 const boardName = boardData.title;
-                                                const message = await this.modify
-                                                .getUpdater()
-                                                .message(messageId, AppSender);
+                                                // const message = await this.modify
+                                                // .getUpdater()
+                                                // .message(messageId, AppSender);
+                                                const message = this.modify.getCreator().startMessage();
+                                                const userBoardPermission = this.context.getInteractionData().user;
+
+                                                
+                                                // console.log("board_permission_kaun_le_rha_viewsubmithandler.ts", this.context.getInteractionData())
             
-                                            // Deletion header block as board get deleted
+                                            // Permission header block as other user is trying to edit the board
                                             const permissionBlock =
                                                 await permissionHeaderBlock(
-                                                    user.username,
+                                                    userBoardOwner.username,
+                                                    userBoardPermission.username,
                                                     boardName,
                                                     appId
                                                 );
             
                                             // Some message configurations
-                                            message.setEditor(user).setRoom(room);
+                                            message.setEditor(userBoardOwner).setRoom(room);
                                             message.setBlocks(permissionBlock);
-                                            message.removeAttachment(0);
+                                            // message.removeAttachment(0);
             
                                             // Message is finished modified and saved to database
-                                            await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                                            await this.modify.getNotifier().notifyUser(userBoardOwner, message.getMessage());
                                                 // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
                                                 // this.modify.getNotifier().notifyUser(user, message)
                                             }
@@ -411,6 +417,8 @@ export class ExecuteViewSubmitHandler {
                                 }
                              }   
                             return this.context.getInteractionResponder().successResponse();
+
+                        // case UtilityEnum.ALLOW_MODAL_ID
                         
                 default:
                     console.log("View Id not found");

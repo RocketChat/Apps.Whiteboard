@@ -14,8 +14,9 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
 import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { hasPermission } from "../lib/messages";
+import { addUsertoBoardOwner, hasPermission } from "../lib/messages";
 import { PermissionModal } from '../modals/PermissionModal';
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -78,6 +79,7 @@ export class ExecuteBlockActionHandler {
 
                     // Add the case for the delete button action
                     case UtilityEnum.DELETE_BUTTON_ACTION_ID:
+                        console.log("delete_button_action_id", messageId)
                         if (messageId) {
                             const modal = await DeleteModal(appId, messageId);
                             await Promise.all([
@@ -94,6 +96,45 @@ export class ExecuteBlockActionHandler {
                         return this.context
                             .getInteractionResponder()
                             .successResponse();
+                    
+                    case UtilityEnum.ALLOW_BUTTON_ACTION_ID:
+                        const data = this.context.getInteractionData();
+                        const userName = data.value?.split(",")[0];
+                        const boardName = data.value?.split(",")[1];
+                        const userForBoardPermission = data.value?.split(",")[2];
+                        // console.log("names ", userName, boardName)
+                        if(room && userName && boardName && userForBoardPermission){
+                            const userData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName.trim(), userForBoardPermission.trim(), "allow")
+                            const message:IMessage = {text:"Permission granted", room:room, sender: appSender} 
+                            if(userData)
+                            this.modify.getNotifier().notifyUser(userData, message)
+                            else
+                            console.log("UserData", userData)
+                        }
+                        
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+
+                    case UtilityEnum.DENY_BUTTON_ACTION_ID:
+                        // const data = this.context.getInteractionData();
+                        // const userName = data.value?.split(",")[0];
+                        // const boardName = data.value?.split(",")[1];
+                        if(room && userName && boardName && userForBoardPermission){
+                            const userData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName.trim(), userForBoardPermission.trim(), "deny")
+    
+                            const message:IMessage = {text:"Permission denied", room:room, sender: appSender} 
+                            if(userData)
+                            this.modify.getNotifier().notifyUser(userData, message)
+                            else
+                            console.log("UserData", userData)
+
+                        }
+
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+
 
                     default:
                         return this.context
@@ -104,6 +145,10 @@ export class ExecuteBlockActionHandler {
             }
             else {
                 if (messageId) {
+                    // const messageIdNew =
+                    //         this.context.getInteractionData()
+
+                    // console.log("messageIdNew", messageIdNew)
                     const modal = await PermissionModal(appId, messageId);
                     await Promise.all([
                         this.modify.getUiController().openSurfaceView(

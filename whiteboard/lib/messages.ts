@@ -13,6 +13,7 @@ import {
     getBoardRecordByMessageId,
     getBoardRecordByRoomId,
     getBoardRecordByRoomIdandBoardId,
+    storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from '@rocket.chat/apps-engine/definition/metadata';
@@ -276,27 +277,36 @@ export async function hasPermission(
     modify: IModify,
     context: any
 ) {
-    console.log("messageId", messageId)
-    console.log("user", user)
+    // console.log("messageId", messageId)
+    // console.log("user_hasPermission", user)
     // console.log("room", room)
     // console.log("triggerString", triggerId)
+    if(room){
+        const boardDataInRoom = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
+        console.log("boardDataInRoom", boardDataInRoom)
+    }
+
 
     // Get the board data from the database
     const boardData = await getBoardRecordByMessageId(read.getPersistenceReader(), messageId)
 
-    // console.log("boardData", boardData)
+    console.log("boardData_hasPermission", boardData.boardOwner)
 
     // Check whethet boardData.boardOwner contains user
     let checkBoolean = false;
     for (let i = 0; i < boardData.boardOwner.length; i++) {
-        console.log("boardOwner", boardData.boardOwner[i])
+        // console.log("boardOwner_hasPermission", boardData.boardOwner[i], user)
         if (boardData.boardOwner[i].id === user.id) {
             checkBoolean = true;
             break;
         }
     }
 
-    console.log("checkBoolean", checkBoolean)
+    if(user.roles.includes("admin") || user.roles.includes("owner") || user.roles.includes("moderator")){
+        checkBoolean = true
+    }
+
+    // console.log("checkBoolean", checkBoolean)
     // If checkBoolean is false then ask the user for permision
     if (checkBoolean === false) {
         return false 
@@ -305,4 +315,81 @@ export async function hasPermission(
     return true
 
     // If checkBoolean is true then allow user to perform the action
+}
+
+export async function addUsertoBoardOwner(
+    read: IRead,
+    room: IRoom,
+    persistance: IPersistence,
+    userName: string,
+    boardName: string,
+    userNameForBoardPermission: string,
+    permission: string
+){
+    if(permission==="allow"){
+        // Get the user data from the database
+        const userData = await read.getUserReader().getByUsername(userName)
+
+        const userForBoardPermission = await read.getUserReader().getByUsername(userNameForBoardPermission)
+    
+        // Get the board data from the database
+        const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
+        let requiredBoardData;
+        for (let i = 0; i < boardData.length; i++) {
+            // console.log("boardData boolean check", boardData[i].title, boardName, boardData[i].title==boardName)
+            if (boardData[i].title == boardName) {
+                requiredBoardData = boardData[i]
+                break;
+            }
+        }
+        // Add the user to the boardOwner
+        const boardOwnerArray = [ userForBoardPermission ]
+        // console.log("boardOwner length", requiredBoardData)
+        for(let i=0;i<requiredBoardData.boardOwner.length;i++){
+            boardOwnerArray.push(requiredBoardData.boardOwner[i])
+        }
+
+        // console.log("boardDataArray ", boardOwnerArray)
+
+        // console.log("BoardData ", boardData)
+
+    // persistence: IPersistence,
+    // roomId: string,
+    // boardId: string,
+    // boardData: any,
+    // messageId: string,
+    // cover: string,
+    // title: string,
+    // privateMessageId: string,
+    // status: string,
+    // boardOwner?: IUser[]
+
+    console.log("boardDataCheck", requiredBoardData)
+
+    // Update the boardData in the database
+    const recordId = await storeBoardRecord(
+        persistance,
+        room.id,
+        requiredBoardData.id,
+        requiredBoardData.boardData,
+        requiredBoardData.messageId,
+        requiredBoardData.cover,
+        requiredBoardData.title,
+        requiredBoardData.privateMessageId,
+        requiredBoardData.status,
+        boardOwnerArray
+        )
+    console.log("recordId", recordId)
+
+    return userForBoardPermission
+    }
+    else if(permission==="deny"){
+        const userForBoardPermission = await read.getUserReader().getByUsername(userNameForBoardPermission)
+        return userForBoardPermission
+    }
+
+    else{
+        console.log("Error has occured! ", read, room, userName, boardName, userNameForBoardPermission, permission)
+        return undefined
+    }
 }

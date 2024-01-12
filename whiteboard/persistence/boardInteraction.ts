@@ -23,7 +23,7 @@ export const storeBoardRecord = async (
     privateMessageId: string,
     status: string,
     boardOwner?: IUser[]
-): Promise<void> => {
+): Promise<string> => {
     const roomAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
         `${roomId}#BoardName`
@@ -49,7 +49,7 @@ export const storeBoardRecord = async (
         "board"
     );
 
-    await persistence.updateByAssociations(
+    const recordId = await persistence.updateByAssociations(
         [
             boardAssociation,
             messageAssociation,
@@ -73,6 +73,8 @@ export const storeBoardRecord = async (
         },
         true
     );
+
+    return recordId
 };
 
 // query all records within the "scope" - room

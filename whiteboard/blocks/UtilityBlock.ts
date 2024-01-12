@@ -95,27 +95,29 @@ export async function deletionHeaderBlock(
 // Header block for boardOwners to give permissions to the user
 export async function permissionHeaderBlock(
     username: string,
+    userForBoardPermission: string,
     boardname: string,
     appId: string,
 ): Promise<Array<Block>> {
     const block: Block[] = [];
 
     const grantPermissionButton = getButton(
-        "Edit board",
-        UtilityEnum.PREVIEW_BLOCK_ID,
-        UtilityEnum.OPEN_BUTTON_ACTION_ID,
+        "Allow",
+        UtilityEnum.PERMISSION_BLOCK_ID,
+        UtilityEnum.ALLOW_BUTTON_ACTION_ID,
         appId,
-        "Open",
+        `${username}, ${boardname}, ${userForBoardPermission}`,
         ButtonStyle.PRIMARY
     );
+    
 
     const denyPermissionButton = getButton(
-        "Settings",
-        UtilityEnum.PREVIEW_BLOCK_ID,
-        UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
+        "Deny",
+        UtilityEnum.PERMISSION_BLOCK_ID,
+        UtilityEnum.DENY_BUTTON_ACTION_ID,
         appId,
-        "Settings",
-        undefined
+        `${username}, ${boardname}, ${userForBoardPermission}`,
+        ButtonStyle.DANGER
     );
 
     let markdownBlock: SectionBlock;
@@ -123,7 +125,7 @@ export async function permissionHeaderBlock(
             `${username} wants to edit *${boardname}*`
         );
 
-    const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
+    const actionBlock = getActionsBlock(UtilityEnum.PERMISSION_BLOCK_ID, [
         grantPermissionButton,
         denyPermissionButton
     ]);
