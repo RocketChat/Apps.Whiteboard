@@ -122,7 +122,7 @@ export async function permissionHeaderBlock(
 
     let markdownBlock: SectionBlock;
         markdownBlock = getMarkdownBlock(
-            `${username} wants to edit *${boardname}*`
+            `${userForBoardPermission} wants to edit *${boardname}*`
         );
 
     const actionBlock = getActionsBlock(UtilityEnum.PERMISSION_BLOCK_ID, [

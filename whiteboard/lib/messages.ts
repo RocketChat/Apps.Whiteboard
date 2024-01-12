@@ -283,14 +283,14 @@ export async function hasPermission(
     // console.log("triggerString", triggerId)
     if(room){
         const boardDataInRoom = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id)
-        console.log("boardDataInRoom", boardDataInRoom)
+        // console.log("boardDataInRoom", boardDataInRoom)
     }
 
 
     // Get the board data from the database
     const boardData = await getBoardRecordByMessageId(read.getPersistenceReader(), messageId)
 
-    console.log("boardData_hasPermission", boardData.boardOwner)
+    // console.log("boardData_hasPermission", boardData.boardOwner)
 
     // Check whethet boardData.boardOwner contains user
     let checkBoolean = false;

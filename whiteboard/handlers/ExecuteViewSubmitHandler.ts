@@ -24,7 +24,7 @@ import {
     deleteBoardByMessageId,
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
-import { getDirect, sendMessage } from "../lib/messages";
+import { getDirect, sendMessage, sendMessageWithAttachment } from "../lib/messages";
 import { IMessage, IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
@@ -361,18 +361,18 @@ export class ExecuteViewSubmitHandler {
                         .successResponse();
 
                         case UtilityEnum.PERMISSION_MODAL_ID:
-                            const messageId =
+                            const boardMessageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
-                             if(messageId){
+
+                            // console.log("MessageId inside Permission Modal ID", messageId)
+                             if(boardMessageId){
 
                                  const room = await this.read
                                      .getMessageReader()
-                                     .getRoom(messageId);
+                                     .getRoom(boardMessageId);
                                      if(room){
                                 //   console.log("Checking interaction data", this.context.getInteractionData().view.submit?.value)
-                                  const boardMessageId = this.context.getInteractionData().view.submit?.value
-                                  if(boardMessageId){
                                       const boardData = await getBoardRecordByMessageId(this.read.getPersistenceReader(), boardMessageId)
                                         // console.log("Board data", boardData)
                                         for(let i=0; i<boardData.boardOwner.length; i++){
@@ -383,27 +383,27 @@ export class ExecuteViewSubmitHandler {
                                                 // .getUpdater()
                                                 // .message(messageId, AppSender);
                                                 const message = this.modify.getCreator().startMessage();
-                                                const userBoardPermission = this.context.getInteractionData().user;
-
+                                                const userForBoardPermission = this.context.getInteractionData().user; 
                                                 
+                                                // Some message configurations
+                                                message.setEditor(userBoardOwner).setRoom(room);
+                
                                                 // console.log("board_permission_kaun_le_rha_viewsubmithandler.ts", this.context.getInteractionData())
-            
-                                            // Permission header block as other user is trying to edit the board
-                                            const permissionBlock =
+                                                // Permission header block as other user is trying to edit the board
+                                                const permissionBlock =
                                                 await permissionHeaderBlock(
                                                     userBoardOwner.username,
-                                                    userBoardPermission.username,
+                                                    userForBoardPermission.username,
                                                     boardName,
                                                     appId
-                                                );
-            
-                                            // Some message configurations
-                                            message.setEditor(userBoardOwner).setRoom(room);
-                                            message.setBlocks(permissionBlock);
-                                            // message.removeAttachment(0);
-            
-                                            // Message is finished modified and saved to database
-                                            await this.modify.getNotifier().notifyUser(userBoardOwner, message.getMessage());
+                                                    );
+
+                                                    message.setBlocks(permissionBlock);
+                                                    // message.removeAttachment(0);
+                                        
+                                                    await this.modify.getNotifier().notifyUser(userBoardOwner, message.getMessage());
+                    
+                                                    
                                                 // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
                                                 // this.modify.getNotifier().notifyUser(user, message)
                                             }
@@ -413,8 +413,6 @@ export class ExecuteViewSubmitHandler {
                                 
                                     // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
                                     // this.modify.getNotifier().notifyUser(user, message)
-
-                                }
                              }   
                             return this.context.getInteractionResponder().successResponse();
 
@@ -427,7 +425,7 @@ export class ExecuteViewSubmitHandler {
                         .successResponse();
             }
         } catch (err) {
-            console.log(err);
+            console.log("error is executeViewSubmitHandler",err);
             return this.context.getInteractionResponder().errorResponse();
         }
     }

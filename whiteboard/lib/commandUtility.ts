@@ -81,10 +81,15 @@ export class CommandUtility implements ExecutorProps {
         const users =  await read.getRoomReader().getMembers(room.id)
         for(const user of users){
             if(user.roles.includes('admin') || user.roles.includes('owner') || user.roles.includes('moderator')){
-                boardOwner.push(user)
+                if(sender.username != user.username){
+                
+                    // console.log("here again", user, sender.username)
+                    boardOwner.push(user)
+                }
+
             }
         }
-        
+
         // the name specified in command "/whiteboard new"
         let createBoardName =
             params.length > 1 ? params.slice(1).join(" ") : "";

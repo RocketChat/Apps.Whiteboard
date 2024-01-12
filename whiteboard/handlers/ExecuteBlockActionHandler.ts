@@ -17,6 +17,7 @@ import { IUser } from "@rocket.chat/apps-engine/definition/users";
 import { addUsertoBoardOwner, hasPermission } from "../lib/messages";
 import { PermissionModal } from '../modals/PermissionModal';
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
+import { RocketChatAssociationModel, RocketChatAssociationRecord } from "@rocket.chat/apps-engine/definition/metadata";
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -59,6 +60,11 @@ export class ExecuteBlockActionHandler {
 
             if (boolean) {
                 switch (actionId) {
+                    // case UtilityEnum.OPEN_BUTTON_ACTION_ID:
+                    //     if(messageId && room){
+                    //         const messageNew:IMessage = {room: room, sender: appSender, text:"Permission not allowed!"}
+                    //         this.modify.getNotifier().notifyUser(user, messageNew)
+                    //     }
                     // handleSettingsButtonAction is used to handle the settings button action
                     case UtilityEnum.SETTINGS_BUTTON_ACTION_ID:
                         if (messageId) {
@@ -99,17 +105,34 @@ export class ExecuteBlockActionHandler {
                     
                     case UtilityEnum.ALLOW_BUTTON_ACTION_ID:
                         const data = this.context.getInteractionData();
-                        const userName = data.value?.split(",")[0];
-                        const boardName = data.value?.split(",")[1];
-                        const userForBoardPermission = data.value?.split(",")[2];
+                        // console.log("data", data)
+                        const userName = data.value?.split(",")[0].trim();
+                        const boardName = data.value?.split(",")[1].trim();
+                        const userForBoardPermission = data.value?.split(",")[2].trim();
+                        const permissionMessageId = data.container.id;
+                        const messageAssociation = new RocketChatAssociationRecord(
+                            RocketChatAssociationModel.MESSAGE,
+                            `${permissionMessageId}#MessageId`
+                        );
+                        const messageRead = await read.getPersistenceReader().readByAssociation(messageAssociation)
+                        console.log("messageRead", messageRead)
                         // console.log("names ", userName, boardName)
                         if(room && userName && boardName && userForBoardPermission){
-                            const userData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName.trim(), userForBoardPermission.trim(), "allow")
-                            const message:IMessage = {text:"Permission granted", room:room, sender: appSender} 
-                            if(userData)
-                            this.modify.getNotifier().notifyUser(userData, message)
-                            else
-                            console.log("UserData", userData)
+                            const userForBoardPermissionData = await addUsertoBoardOwner(this.read, room, this.persistence, userName.trim(), boardName, userForBoardPermission, "allow")
+                            const boardOwnerData = await read.getUserReader().getByUsername(userName)
+                            const message:IMessage = {text:`Permission granted for board ${boardName}`, room:room, sender: appSender} 
+                            if(userForBoardPermissionData){
+                                this.modify.getNotifier().notifyUser(userForBoardPermissionData, message)
+                                // this.modify.getUpdater().message(permissionMessageId, boardOwnerData)
+                            }
+                            else{
+                                console.log("UserData", userForBoardPermissionData)
+                            }
+
+                            
+                            // const messageToOwners:IMessage = {text:"Permission granted", room:room, sender: appSender} 
+
+                            
                         }
                         
                         return this.context

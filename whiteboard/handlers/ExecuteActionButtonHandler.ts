@@ -32,7 +32,6 @@ export class ExecuteActionButtonHandler {
 
         try {
             const { actionId } = data;
-            console.log("actionId", actionId)
             switch (actionId) {
                 // handleCreateWhiteboardButtonAction is used to handle the create whiteboard button action
                 case UtilityEnum.CREATE_WHITEBOARD_MESSAGE_BOX_ACTION_ID:
