@@ -119,7 +119,6 @@ export const getBoardRecordByRoomIdandBoardId = async (
     return result.length > 0 ? result[0] : undefined;
 };
 
-
 export const checkBoardNameByRoomId = async (
     persistenceRead: IPersistenceRead,
     roomId: string,
@@ -243,19 +242,18 @@ export const updateBoardnameByMessageId = async (
 
     records["title"] = boardName;
 
-    
-    await deleteBoardByMessageId(
-        persistence,
-        persistenceRead,
-        messageId
-    );
+    await deleteBoardByMessageId(persistence, persistenceRead, messageId);
 
     await persistence.updateByAssociations(
-        [boardAssociation, messageAssociation, roomAssociation, roomAndBoardAssociation],
+        [
+            boardAssociation,
+            messageAssociation,
+            roomAssociation,
+            roomAndBoardAssociation,
+        ],
         records,
         true
     );
-
 };
 
 export const updatePrivateMessageIdByMessageId = async (
@@ -360,9 +358,11 @@ export const deleteBoardByMessageId = async (
     messageId: string
 ): Promise<string> => {
     let records = await getBoardRecordByMessageId(persistenceRead, messageId);
-    console.log("records", records);
     if (!records) {
-        console.log("No records found for boardname with messageId as", messageId);
+        console.log(
+            "No records found for boardname with messageId as",
+            messageId
+        );
     }
     const boardId = records["id"];
 
@@ -429,14 +429,17 @@ export const getMessageIdByBoardName = async (
     return 0;
 };
 
-export const getMessageIdByRoomName = async(
+export const getMessageIdByRoomName = async (
     persistenceRead: IPersistenceRead,
     roomId: string
-): Promise<[{messageId:string,boardName:string}]>=>{
+): Promise<[{ messageId: string; boardName: string }]> => {
     const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
-    const boardDataArray:any= [];
+    const boardDataArray: any = [];
     for (const board of boardData) {
-        boardDataArray.push({messageId: board.messageId, boardName: board.title});
+        boardDataArray.push({
+            messageId: board.messageId,
+            boardName: board.title,
+        });
     }
     return boardDataArray;
-}
+};

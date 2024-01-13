@@ -10,7 +10,10 @@ import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 import { getMessagebyMessageID } from "../persistence/boardInteraction";
-import { getBoardRecordByRoomId, getBoardRecordByRoomIdandBoardId } from "../persistence/boardInteraction";
+import {
+    getBoardRecordByRoomId,
+    getBoardRecordByRoomIdandBoardId,
+} from "../persistence/boardInteraction";
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 
 // getDirect is used to get the direct room between the app user and the user
@@ -210,8 +213,15 @@ export async function handleList(
 
     if (boardData !== undefined && boardData.length > 0) {
         for (let i = 0; i < boardData.length; i++) {
-            const boardDataCheck = await getBoardRecordByRoomIdandBoardId(read.getPersistenceReader(),room.id,boardData[i].id)
-            boardDataArray.push(boardDataCheck?boardDataCheck.title:"Error here messages.ts");
+            const boardDataCheck = await getBoardRecordByRoomIdandBoardId(
+                read.getPersistenceReader(),
+                room.id,
+                boardData[i].id
+            );
+
+            boardDataArray.push(
+                boardDataCheck ? boardDataCheck.title : "Error here messages.ts"
+            );
         }
     
     console.log("boardData checking list" , boardData)
