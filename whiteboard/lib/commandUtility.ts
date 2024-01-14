@@ -18,9 +18,7 @@ import {
 import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
-    deleteBoards,
     getBoardName,
-    getMessageIdByRoomName,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";

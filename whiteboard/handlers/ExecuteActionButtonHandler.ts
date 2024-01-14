@@ -10,7 +10,7 @@ import {
     UIKitActionButtonInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
-import { sendMessage, sendMessageWithAttachment } from "../lib/messages";
+import { sendMessageWithAttachment } from "../lib/messages";
 import { randomId } from "../lib/utilts";
 import { buildHeaderBlock } from "../blocks/UtilityBlock";
 import { defaultPreview } from "../assets/defaultPreview";
