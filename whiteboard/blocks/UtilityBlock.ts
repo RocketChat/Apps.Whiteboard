@@ -63,7 +63,34 @@ export async function buildHeaderBlock(
     return block;
 }
 
-// Header block when whiteboard is deleted
+// Header block to take user back to the board
+
+export async function goToBoardBlock(
+    boardURL: string,
+    appId: string,
+    boardname?: string
+): Promise<Array<Block>> {
+    const block: Block[] = [];
+    const goToBoardButton = getButton(
+        `Go to the ${boardname} board`,
+        UtilityEnum.GOTO_BOARD_BLOCK_ID,
+        UtilityEnum.GOTO_BOARD_BUTTON_ACTION_ID,
+        appId,
+        "GOTO",
+        ButtonStyle.PRIMARY,
+        boardURL
+    );
+
+    let markdownBlock: SectionBlock;
+        markdownBlock = getMarkdownBlock(`*${boardname}* board`);
+
+    const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
+        goToBoardButton,
+    ]);
+    block.push(markdownBlock);
+    block.push(actionBlock);
+    return block;
+}
 // export async function deletionHeaderBlock(
 //     username: string,
 //     boardname: string

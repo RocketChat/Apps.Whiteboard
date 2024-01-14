@@ -40,4 +40,7 @@ export enum UtilityEnum {
     DELETE_ACTION_ID = "delete-action-id",
     DELETE_BLOCK_ID = "delete-block-id",
     NAME_ALREADY_EXISTS = "Name already exists. Try different name",
+
+    GOTO_BOARD_BLOCK_ID = "goto-board-block-id",
+    GOTO_BOARD_BUTTON_ACTION_ID = "goto-board-button-action-id"
 }

@@ -273,17 +273,13 @@ export async function deleteMessage(
 
 export async function handleBoardSearch(
     read: IRead,
-    modify: IModify,
     room: IRoom,
-    appUser: IUser,
     boardName: string
 ) {
     try {
         const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id);
 
         const foundBoard = boardData.find(board => board.title === boardName);
-
-        console.log("boardData ", boardData)
 
         if (foundBoard) {
             const messageInfo = await getMessagebyMessageID(read.getPersistenceReader(), foundBoard.messageId);

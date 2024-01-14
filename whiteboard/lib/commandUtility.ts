@@ -16,12 +16,10 @@ import {
     sendMessage,
     sendMessageWithAttachment,
 } from "./messages";
-import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, deletionHeaderBlock, goToBoardBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
-    deleteBoards,
     getBoardName,
-    getMessageIdByRoomName,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
@@ -32,6 +30,7 @@ import {
     getMessageIdByBoardName,
     deleteBoardByMessageId,
 } from "../persistence/boardInteraction";
+
 //CommandUtility is used to handle the commands
 
 export class CommandUtility implements ExecutorProps {
@@ -103,7 +102,7 @@ export class CommandUtility implements ExecutorProps {
             if (room) {
                 const randomBoardId = randomId();
                 const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
-
+                console.log("boardURL ", boardURL)
                 // The variable "untitledName" stores "Untitled" if the name is not specified
                 const untitledName = await getBoardName(
                     read.getPersistenceReader(),
@@ -187,9 +186,6 @@ export class CommandUtility implements ExecutorProps {
           app,
           context,
           read,
-          modify,
-          http,
-          persistence,
         }: WhiteboardSlashCommandContext
       ) {
         try {
@@ -197,33 +193,36 @@ export class CommandUtility implements ExecutorProps {
           const appUser = (await read.getUserReader().getAppUser())!;
           const boardData = await handleBoardSearch(
             this.read,
-            this.modify,
             this.room,
-            appUser,
             name
           );
       
           const sender = context.getSender()!;
           const room = context.getRoom();
-          const endpoints = app.getAccessors().providedApiEndpoints;
-          const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-      
-          const boardEndpoint = endpoints[0];
-        //   const getBoardEndpoint = endpoints[3];
+          let roomType = "channel"
+          if(room.type === "c"){
+            roomType = "channel"
+          }
+            else if(room.type === "p"){
+                roomType = "group"
+            }
+            else if(room.type === "d"){
+                roomType = "direct"
+            }
+
       
           const appId = app.getID();
-          const boardURL = `${boardEndpoint.computedPath}?id=${boardData?.id}`;
+          console.log("room info ", room.slugifiedName, room.type)
+        const boardURL = `/${roomType}/${room.slugifiedName}?msg=${boardData?.messageId}`
+            
       
           if (room && boardData?.id) {
-      
-            const headerBlock = await buildHeaderBlock(
-              sender.username,
+ 
+            const goToBoard = await goToBoardBlock(
               boardURL,
               appId,
               name
-            );
+            )
       
             const attachments = [
               {
@@ -233,57 +232,13 @@ export class CommandUtility implements ExecutorProps {
               },
             ];
       
-            const messageId = await sendMessageWithAttachment(
+            await sendMessageWithAttachment(
               this.modify,
               room,
               appUser,
               `Whiteboard created by @${sender.username}`,
               attachments,
-              headerBlock
-            );
-
-            //  // Board data is deleted from database
-            //  await deleteBoardByMessageId(
-            //     this.persistence,
-            //     this.read.getPersistenceReader(),
-            //     messageId
-            // );
-            // console.log("Board is deleted from database!!!!");
-
-            //      // Message is Updated to "Deletion"
-            //      // Extracted the message to be updated
-            //      const message = await this.modify
-            //          .getUpdater()
-            //          .message(messageId, appSender);
-
-            //      // Deletion header block as board get deleted
-            //      const deleteHeaderBlock = await deletionHeaderBlock(
-            //          sender.username,
-            //          name
-            //      );
-
-            //      // Some message configurations
-            //      message.setEditor(sender).setRoom(room);
-            //      message.setBlocks(deleteHeaderBlock);
-            //      message.removeAttachment(0);
-
-            //      // Message is finished modified and saved to database
-            //      await this.modify.getUpdater().finish(message);
-      
-            storeBoardRecord(
-              persistence,
-              room.id,
-              boardData.id,
-              {
-                elements: [],
-                appState: {},
-                files: [],
-              },
-              messageId,
-              boardData.cover,
-              name,
-              "",
-              "Public"
+              goToBoard
             );
           }
         } catch (err) {
@@ -292,7 +247,7 @@ export class CommandUtility implements ExecutorProps {
       }
       
 
-    // handleListCommand is used to handle the /whiteboard delete command
+    // deleteBoardCommand is used to handle the /whiteboard delete command
 
     private async deleteBoardCommand() {
         const appId = this.app.getID();
