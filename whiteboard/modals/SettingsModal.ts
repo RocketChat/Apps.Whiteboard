@@ -57,6 +57,10 @@ export async function SettingsModal(
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
         UtilityEnum.BOARD_SELECT_ACTION_ID
     );
+
+    // Event handling for dropdown selection
+    StaticSelectElement.actionId = UtilityEnum.BOARD_SELECT_ACTION_ID;
+
     let inputChoiceBlock: InputBlock = {
         type: "input",
         label: {
@@ -75,6 +79,10 @@ export async function SettingsModal(
         "",
         undefined
     );
+
+    // Event handling for closing modal
+    closeButton.actionId = UtilityEnum.CLOSE_ACTION_ID;
+
     let submitButton = getButton(
         UtilityEnum.SUBMIT,
         UtilityEnum.SUBMIT_BLOCK_ID,
@@ -83,6 +91,9 @@ export async function SettingsModal(
         messageId,
         ButtonStyle.PRIMARY
     );
+
+    // Event handling for closing modal
+    submitButton.actionId = UtilityEnum.SUBMIT_ACTION_ID;
 
     const value = {
         id: UtilityEnum.SETTINGS_MODAL_ID,
