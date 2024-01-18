@@ -18,6 +18,7 @@ import { addUsertoBoardOwner, hasPermission } from "../lib/messages";
 import { PermissionModal } from '../modals/PermissionModal';
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 import { RocketChatAssociationModel, RocketChatAssociationRecord } from "@rocket.chat/apps-engine/definition/metadata";
+import { EditModal } from "../modals/EditModal";
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -99,6 +100,35 @@ export class ExecuteBlockActionHandler {
                             ]);
                         }
 
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+                        
+                    case UtilityEnum.YES_ACTION_ID:
+                        return this.context
+                            .getInteractionResponder()
+                            .successResponse();
+
+                    case UtilityEnum.OPEN_BUTTON_ACTION_ID:
+                        const boardData = this.context.getInteractionData().value
+                        const interactionData = this.context.getInteractionData();
+                        console.log("boardData in open_button_action_id", boardData, interactionData)
+                        const boardURL = boardData?.split(",")[0].trim();
+                        const interactionBoardName = boardData?.split(",")[1].trim();
+                        console.log("boardURL", boardURL)
+                        if (boardURL && messageId && interactionBoardName) {
+                            const modal = await EditModal(appId, boardURL, messageId, interactionBoardName);
+                            await Promise.all([
+                                this.modify.getUiController().openSurfaceView(
+                                    modal,
+                                    {
+                                        triggerId,
+                                    },
+                                    user
+                                ),
+                            ]);
+                            
+                        }
                         return this.context
                             .getInteractionResponder()
                             .successResponse();

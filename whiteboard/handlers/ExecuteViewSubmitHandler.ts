@@ -13,7 +13,7 @@ import {
 import { UIKitBlockInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { buildHeaderBlock, deletionHeaderBlock, permissionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, buildHeaderBlockAfterPermission, deletionHeaderBlock, permissionHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
     getMessageIdByPrivateMessageId,
@@ -47,7 +47,7 @@ export class ExecuteViewSubmitHandler {
             .getAppUser()) as IUser;
         const appId = AppSender.appId;
         try {
-            // console.log("View Id: ", view);
+            console.log("View Id: ", view);
             switch (view.id) {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
@@ -308,7 +308,50 @@ export class ExecuteViewSubmitHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+                
+                case UtilityEnum.EDIT_MODAL_ID:
+                    if (view.state && appId) {
 
+                        const boardData = this.context.getInteractionData().view.submit?.value
+                        const interactionData = this.context.getInteractionData().view
+                        console.log("interactionData", interactionData)
+                        if(boardData){
+                            console.log("boardData in edit_modal_id", boardData)
+                            const messageId = boardData?.split(",")[0].trim()
+                            const boardName = boardData?.split(",")[1].trim()
+                            const boardURL =
+                                this.context.getInteractionData().view.submit
+                                    ?.url;
+                            // console.log("MessageId inside Edit Modal ID", messageId)
+                            if (messageId) {
+    
+                                // Message is Updated to "Deletion"
+                                const room = await this.read
+                                    .getMessageReader()
+                                    .getRoom(messageId);
+                                if (room) {
+                                    // Extracted the message to be updated
+                                    const message = await this.modify
+                                        .getUpdater()
+                                        .message(messageId, AppSender);
+                                    if(boardURL){
+                                        const headerBlock = await buildHeaderBlockAfterPermission(user.username, boardURL, appId, boardName)
+                                        message.setBlocks(headerBlock)
+                                        await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                                    }
+                                }
+                            } else {
+                                console.log("MessageId not found");
+                            }
+
+                        }
+                    } else {
+                        console.log("Submit Failed");
+                    }
+
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 // Add the case for the delete modal
                 case UtilityEnum.DELETE_MODAL_ID:
                     if (view.state && appId) {
@@ -359,6 +402,16 @@ export class ExecuteViewSubmitHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+
+                        // case UtilityEnum.EDIT_MODAL_ID:
+                        //     const boardURL = this.context.getInteractionData().view.submit?.url
+                        //     console.log("boardURL", boardURL)
+                        //     if(boardURL){
+                        //     this.http.get(boardURL)
+                        //     }
+                        //     return this.context
+                        //     .getInteractionResponder()
+                        //     .successResponse();
 
                         case UtilityEnum.PERMISSION_MODAL_ID:
                             const boardMessageId =

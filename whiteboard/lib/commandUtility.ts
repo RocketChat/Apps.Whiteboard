@@ -15,7 +15,7 @@ import {
     sendMessage,
     sendMessageWithAttachment,
 } from "./messages";
-import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, buildHeaderBlockAfterPermission, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
     deleteBoards,
@@ -140,6 +140,7 @@ export class CommandUtility implements ExecutorProps {
                         appId,
                         name
                     );
+
                     const attachments = [
                         {
                             collapsed: true,
@@ -157,6 +158,22 @@ export class CommandUtility implements ExecutorProps {
                     );
 
                     console.log("MessageId", messageId);
+
+                    // const headerBlockAfterPermission = await buildHeaderBlockAfterPermission(
+                    //     sender.username,
+                    //     boardURL,
+                    //     appId,
+                    //     name
+                    // )
+                    // const message = await this.modify
+                    //                     .getUpdater()
+                    //                     .message(messageId, sender);
+                    // message.setBlocks(headerBlockAfterPermission)
+                    // for(let user of boardOwner){
+
+                    //     await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                    //     // await this.modify.getUpdater().finish(message);
+                    // }
 
                     storeBoardRecord(
                         persistence,

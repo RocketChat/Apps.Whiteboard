@@ -128,6 +128,7 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         const whiteboardBoardCommand: WhiteboardCommand = new WhiteboardCommand(
             this
         );
+    
         await configuration.slashCommands.provideSlashCommand(
             whiteboardBoardCommand
         );
