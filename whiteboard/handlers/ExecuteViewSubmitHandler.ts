@@ -10,7 +10,6 @@ import {
     IUIKitResponse,
     UIKitViewSubmitInteractionContext,
 } from "@rocket.chat/apps-engine/definition/uikit";
-import { UIKitBlockInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
 import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
@@ -24,7 +23,7 @@ import {
     deleteBoardByMessageId,
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
-import { getDirect, sendMessage } from "../lib/messages";
+import { getDirect } from "../lib/messages";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
