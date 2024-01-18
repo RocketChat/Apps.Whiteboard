@@ -313,16 +313,15 @@ export class ExecuteViewSubmitHandler {
                     if (view.state && appId) {
 
                         const boardData = this.context.getInteractionData().view.submit?.value
-                        const interactionData = this.context.getInteractionData().view
-                        console.log("interactionData", interactionData)
+                        
                         if(boardData){
-                            console.log("boardData in edit_modal_id", boardData)
+                            
                             const messageId = boardData?.split(",")[0].trim()
                             const boardName = boardData?.split(",")[1].trim()
                             const boardURL =
                                 this.context.getInteractionData().view.submit
                                     ?.url;
-                            // console.log("MessageId inside Edit Modal ID", messageId)
+
                             if (messageId) {
     
                                 // Message is Updated to "Deletion"

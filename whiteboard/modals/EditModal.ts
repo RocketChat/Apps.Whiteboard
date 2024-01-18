@@ -12,8 +12,6 @@ export async function EditModal(
     boardURL: string,
     messageId: string,
     boardName: string,
-    // userName: string,
-// ): Promise<Array<Block>> {
     ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -42,19 +40,6 @@ export async function EditModal(
         boardURL
     );
 
-    // let inputBlock:SectionBlock;
-    // const yesActionBlock = getActionsBlock(UtilityEnum.YES_EDIT_BLOCK_ID, 
-    //     [
-    //         // dismissalButton,
-    //         approveButton
-    //     ])
-        
-    //     inputBlock = getSectionBlock(UtilityEnum.ARE_YOU_SURE, yesActionBlock);
-    // block.push(inputBlock);
-    // return block
-
-    // block.push(yesActionBlock);
-
 
     const value = {
         id: UtilityEnum.EDIT_MODAL_ID,
@@ -72,20 +57,3 @@ export async function EditModal(
 
     return value;
 }
-
-    // let markdownBlock: SectionBlock;
-    // if (boardName == undefined) {
-    //     markdownBlock = getMarkdownBlock(
-    //         `*Untitled Whiteboard* by \`@${userName}\``
-    //     );
-    // } else {
-    //     markdownBlock = getMarkdownBlock(`*${boardName}* by \`@${userName}\``);
-    // }
-
-    // const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
-    //     dismissalButton,
-    //     approveButton
-    // ]);
-    // block.push(markdownBlock);
-    // block.push(actionBlock);
-    // return block;
