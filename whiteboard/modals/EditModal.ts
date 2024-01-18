@@ -33,7 +33,7 @@ export async function EditModal(
 
     // Approve Button
     const approveButton = getButton(
-        UtilityEnum.YES,
+        UtilityEnum.EDIT,
         UtilityEnum.YES_EDIT_BLOCK_ID,
         UtilityEnum.YES_EDIT_ACTION_ID,
         appId,
