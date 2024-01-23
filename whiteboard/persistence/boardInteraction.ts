@@ -110,6 +110,8 @@ export const checkBoardNameByRoomId = async (
     boardName: string
 ): Promise<any> => {
     const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
+    console.log(boardData);
+    
     if (boardName == "") return false;
 
     for (const board of boardData) {
@@ -192,6 +194,7 @@ export const getBoardRecordByMessageId = async (
         association
     )) as Array<any>;
     return result && result.length ? result[0] : null;
+    
 };
 
 export const updateBoardnameByMessageId = async (

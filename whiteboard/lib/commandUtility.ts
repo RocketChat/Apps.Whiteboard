@@ -77,6 +77,8 @@ export class CommandUtility implements ExecutorProps {
         // the name specified in command "/whiteboard new"
         let createBoardName =
             params.length > 1 ? params.slice(1).join(" ") : "";
+            console.log(createBoardName);
+            
 
         const repeatBoardName = await checkBoardNameByRoomId(
             this.read.getPersistenceReader(),
@@ -304,6 +306,8 @@ export class CommandUtility implements ExecutorProps {
     }
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
+        console.log(this.command);
+        
         switch (this.command[0]) {
             case "new":
                 await this.handleNewBoardCommand(context);

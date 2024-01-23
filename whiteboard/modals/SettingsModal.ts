@@ -11,12 +11,16 @@ import {
     getSectionBlock,
     getStaticSelectElement,
 } from "../helpers/blockBuilder";
+import { getBoardRecordByRoomId } from '../persistence/boardInteraction';
 
 export async function SettingsModal(
     appId: string,
     messageId: string
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
+
+    // Call the modified function to get the board name
+    const boardRecords = await getBoardRecordByRoomId(persistenceRead, roomId);
 
     /* For Settings Text block */
     let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
