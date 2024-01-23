@@ -20,7 +20,7 @@ export async function SettingsModal(
     const block: Block[] = [];
 
     // Call the modified function to get the board name
-    const boardRecords = await getBoardRecordByRoomId(persistenceRead, roomId);
+    // const boardRecords = await getBoardRecordByRoomId(persistenceRead, roomId);
 
     /* For Settings Text block */
     let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
