@@ -7,6 +7,7 @@ import {
     IPersistence,
     IRead,
     IAppInstallationContext,
+    IPersistenceRead,
 } from "@rocket.chat/apps-engine/definition/accessors";
 import { App } from "@rocket.chat/apps-engine/definition/App";
 import { IAppInfo } from "@rocket.chat/apps-engine/definition/metadata";
@@ -53,6 +54,7 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
+        // persisenceRead: IPersistenceRead,
         modify: IModify
     ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
@@ -60,6 +62,7 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             read,
             http,
             persistence,
+            // persisenceRead,
             modify,
             context
         );
