@@ -6,6 +6,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
+import { UtilityEnum } from '../enum/uitlityEnum';
 
 //functions needed to persist board data while modal and other UI interactions
 // Messages can be retrieved by using the messageId, privateMessageId and boardId
@@ -178,6 +179,18 @@ export const getCurrentBoardName = async (
 
     // Return the board name if found, otherwise a default name
     return boardRecord ? boardRecord.title : 'Untitled Board';
+};
+
+// function to get the current board name
+export const getCurrentBoardLabel = async (
+    persistenceRead: IPersistenceRead,
+    messageId: string | undefined,
+): Promise<string> => {
+    // Retrieve the board record based on the messageId
+    const boardRecord = await getBoardRecordByMessageId(persistenceRead, messageId);
+
+    // Return the board name if found, otherwise a default name
+    return boardRecord ? boardRecord.status : UtilityEnum.PUBLIC;
 };
 
 export const getBoardRecord = async (
