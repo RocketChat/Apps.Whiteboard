@@ -11,12 +11,18 @@ import {
     getSectionBlock,
     getStaticSelectElement,
 } from "../helpers/blockBuilder";
+import { getBoardRecordByRoomId } from '../persistence/boardInteraction';
 
 export async function SettingsModal(
     appId: string,
-    messageId: string
+    messageId: string,
+    boardName: string,
+    boardLabel: string,
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
+
+    // Call the modified function to get the board name
+    // const boardRecords = await getBoardRecordByRoomId(persistenceRead, roomId);
 
     /* For Settings Text block */
     let settingsTextBlock = getSectionBlock(UtilityEnum.SETTINGS_LABEL);
@@ -28,7 +34,8 @@ export async function SettingsModal(
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
         UtilityEnum.BOARD_INPUT_BLOCK_ID,
         UtilityEnum.BOARD_INPUT_ACTION_ID,
-        appId
+        appId,
+        boardName,
     );
     block.push(boardInputBlock);
 
@@ -55,7 +62,8 @@ export async function SettingsModal(
         options,
         appId,
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
-        UtilityEnum.BOARD_SELECT_ACTION_ID
+        UtilityEnum.BOARD_SELECT_ACTION_ID,
+        boardLabel,
     );
 
     // Event handling for dropdown selection
