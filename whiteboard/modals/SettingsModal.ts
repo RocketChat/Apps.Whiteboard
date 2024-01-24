@@ -17,6 +17,7 @@ export async function SettingsModal(
     appId: string,
     messageId: string,
     boardName: string,
+    boardLabel: string,
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -61,7 +62,8 @@ export async function SettingsModal(
         options,
         appId,
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
-        UtilityEnum.BOARD_SELECT_ACTION_ID
+        UtilityEnum.BOARD_SELECT_ACTION_ID,
+        boardLabel,
     );
 
     // Event handling for dropdown selection

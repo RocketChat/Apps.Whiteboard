@@ -14,7 +14,7 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
 import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { getCurrentBoardName } from '../persistence/boardInteraction';
+import { getCurrentBoardName, getCurrentBoardLabel } from '../persistence/boardInteraction';
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -33,6 +33,15 @@ export class ExecuteBlockActionHandler {
 
         // Call the helper function to get the current board name
         return getCurrentBoardName(this.read.getPersistenceReader(), messageId);
+    }
+
+    // Add a method to get the current board label
+    private async getCurrentBoardLabel(): Promise<string> {
+        // Assuming you have a method to get the messageId from the context
+        const messageId = this.context.getInteractionData().message?.id;
+
+        // Call the helper function to get the current board name
+        return getCurrentBoardLabel(this.read.getPersistenceReader(), messageId);
     }
 
     public async run(): Promise<IUIKitResponse> {
@@ -62,7 +71,8 @@ export class ExecuteBlockActionHandler {
                     if (messageId) {
                         // Call the method to get the current board name
                         const currentBoardName = await this.getCurrentBoardName();
-                        const modal = await SettingsModal(appId, messageId, currentBoardName);
+                        const currentBoardLabel = await this.getCurrentBoardLabel();
+                        const modal = await SettingsModal(appId, messageId, currentBoardName, currentBoardLabel);
                         await Promise.all([
                             this.modify.getUiController().openSurfaceView(
                                 modal,
