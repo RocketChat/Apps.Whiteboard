@@ -73,6 +73,8 @@ export class CommandUtility implements ExecutorProps {
         const boardEndpoint = endpoints[0];
         const appId = app.getID();
         const params = this.context.getArguments();
+        console.log("Params: " + params);
+        
 
         // the name specified in command "/whiteboard new"
         let createBoardName =

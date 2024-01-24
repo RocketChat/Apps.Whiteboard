@@ -75,7 +75,7 @@ export const storeBoardRecord = async (
 // query all records within the "scope" - room
 export const getBoardRecordByRoomId = async (
     persistenceRead: IPersistenceRead,
-    roomId: string
+    roomId: string | undefined,
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
@@ -168,6 +168,18 @@ export const getBoardName = async (
     return newName;
 };
 
+// function to get the current board name
+export const getCurrentBoardName = async (
+    persistenceRead: IPersistenceRead,
+    messageId: string | undefined,
+): Promise<string> => {
+    // Retrieve the board record based on the messageId
+    const boardRecord = await getBoardRecordByMessageId(persistenceRead, messageId);
+
+    // Return the board name if found, otherwise a default name
+    return boardRecord ? boardRecord.title : 'Untitled Board';
+};
+
 export const getBoardRecord = async (
     persistenceRead: IPersistenceRead,
     boardId: string
@@ -184,7 +196,7 @@ export const getBoardRecord = async (
 
 export const getBoardRecordByMessageId = async (
     persistenceRead: IPersistenceRead,
-    messageId: string
+    messageId: string | undefined,
 ): Promise<any> => {
     const association = new RocketChatAssociationRecord(
         RocketChatAssociationModel.MESSAGE,

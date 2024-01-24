@@ -15,7 +15,8 @@ import { getBoardRecordByRoomId } from '../persistence/boardInteraction';
 
 export async function SettingsModal(
     appId: string,
-    messageId: string
+    messageId: string,
+    boardName: string,
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -32,7 +33,8 @@ export async function SettingsModal(
         UtilityEnum.BOARD_INPUT_PLACEHOLDER,
         UtilityEnum.BOARD_INPUT_BLOCK_ID,
         UtilityEnum.BOARD_INPUT_ACTION_ID,
-        appId
+        appId,
+        boardName,
     );
     block.push(boardInputBlock);
 
