@@ -181,8 +181,8 @@ export const getCurrentBoardName = async (
     return boardRecord ? boardRecord.title : 'Untitled Board';
 };
 
-// function to get the current board name
-export const getCurrentBoardLabel = async (
+// function to get the current board status
+export const getCurrentBoardStatus = async (
     persistenceRead: IPersistenceRead,
     messageId: string | undefined,
 ): Promise<string> => {

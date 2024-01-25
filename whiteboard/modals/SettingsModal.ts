@@ -11,13 +11,13 @@ import {
     getSectionBlock,
     getStaticSelectElement,
 } from "../helpers/blockBuilder";
-import { getBoardRecordByRoomId } from '../persistence/boardInteraction';
+import { getBoardRecordByRoomId, updateBoardnameByMessageId } from '../persistence/boardInteraction';
 
 export async function SettingsModal(
     appId: string,
     messageId: string,
     boardName: string,
-    boardLabel: string,
+    boardStatus: string,
 ): Promise<IUIKitSurfaceViewParam> {
     const block: Block[] = [];
 
@@ -63,7 +63,7 @@ export async function SettingsModal(
         appId,
         UtilityEnum.BOARD_SELECT_BLOCK_ID,
         UtilityEnum.BOARD_SELECT_ACTION_ID,
-        boardLabel,
+        boardStatus,
     );
 
     // Event handling for dropdown selection

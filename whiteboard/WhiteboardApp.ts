@@ -54,7 +54,6 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
         read: IRead,
         http: IHttp,
         persistence: IPersistence,
-        // persisenceRead: IPersistenceRead,
         modify: IModify
     ): Promise<IUIKitResponse> {
         const handler = new ExecuteBlockActionHandler(
@@ -62,7 +61,6 @@ export class WhiteboardApp extends App implements IUIKitInteractionHandler {
             read,
             http,
             persistence,
-            // persisenceRead,
             modify,
             context
         );

@@ -14,7 +14,7 @@ import { UtilityEnum } from "../enum/uitlityEnum";
 import { SettingsModal } from "../modals/SettingsModal";
 import { DeleteModal } from "../modals/DeleteModal";
 import { IUser } from "@rocket.chat/apps-engine/definition/users";
-import { getCurrentBoardName, getCurrentBoardLabel } from '../persistence/boardInteraction';
+import { getCurrentBoardName, getCurrentBoardStatus } from '../persistence/boardInteraction';
 
 // ExecuteBlockActionHandler is used to handle the block actions
 export class ExecuteBlockActionHandler {
@@ -28,7 +28,6 @@ export class ExecuteBlockActionHandler {
     ) {}
     // Add a method to get the current board name
     private async getCurrentBoardName(): Promise<string> {
-        // Assuming you have a method to get the messageId from the context
         const messageId = this.context.getInteractionData().message?.id;
 
         // Call the helper function to get the current board name
@@ -36,12 +35,11 @@ export class ExecuteBlockActionHandler {
     }
 
     // Add a method to get the current board label
-    private async getCurrentBoardLabel(): Promise<string> {
-        // Assuming you have a method to get the messageId from the context
+    private async getCurrentBoardStatus(): Promise<string> {
         const messageId = this.context.getInteractionData().message?.id;
 
-        // Call the helper function to get the current board name
-        return getCurrentBoardLabel(this.read.getPersistenceReader(), messageId);
+        // Call the helper function to get the current board label
+        return getCurrentBoardStatus(this.read.getPersistenceReader(), messageId);
     }
 
     public async run(): Promise<IUIKitResponse> {
@@ -51,17 +49,34 @@ export class ExecuteBlockActionHandler {
                 actionId,
                 triggerId,
                 user,
-                // messageId,
                 room,
                 value,
                 message,
                 container,
             } = data;
+            console.log("Data: " + data);
+            
 
             const appSender = this.app;
+            console.log("AppSender: " + appSender);
+            
             const appId = data.appId;
+            console.log("AppId: " + appId);
+            
             // The id of the message (created when the user created the whiteboard)
             const messageId = data.message?.id;
+            console.log("MessageId: " + messageId);
+
+            const roomId = data.room?.id;
+            console.log("RoomId: " + roomId);
+
+            const userId = data.user?.id;
+            console.log("UserId: " + userId);
+            
+            const containerId = data.container?.id;
+            console.log("ContainerId: " + containerId);
+            
+            
             const AppSender: IUser = (await this.read
                 .getUserReader()
                 .getAppUser()) as IUser;
@@ -71,8 +86,10 @@ export class ExecuteBlockActionHandler {
                     if (messageId) {
                         // Call the method to get the current board name
                         const currentBoardName = await this.getCurrentBoardName();
-                        const currentBoardLabel = await this.getCurrentBoardLabel();
-                        const modal = await SettingsModal(appId, messageId, currentBoardName, currentBoardLabel);
+                        const currentBoardStatus = await this.getCurrentBoardStatus();
+                        console.log(currentBoardStatus + " / " + currentBoardName);
+                        
+                        const modal = await SettingsModal(appId, messageId, currentBoardName, currentBoardStatus);
                         await Promise.all([
                             this.modify.getUiController().openSurfaceView(
                                 modal,
