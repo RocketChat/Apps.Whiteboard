@@ -31,6 +31,7 @@ import {
     deleteBoardByMessageId,
 } from "../persistence/boardInteraction";
 
+import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 //CommandUtility is used to handle the commands
 
 export class CommandUtility implements ExecutorProps {
@@ -73,6 +74,21 @@ export class CommandUtility implements ExecutorProps {
         const boardEndpoint = endpoints[0];
         const appId = app.getID();
         const params = this.context.getArguments();
+
+        const boardOwner = [sender]
+        
+        // check the roomAdmin
+        const users =  await read.getRoomReader().getMembers(room.id)
+        for(const user of users){
+            if(user.roles.includes('admin') || user.roles.includes('owner') || user.roles.includes('moderator')){
+                if(sender.username != user.username){
+                
+                    // console.log("here again", user, sender.username)
+                    boardOwner.push(user)
+                }
+
+            }
+        }
 
         // the name specified in command "/whiteboard new"
         let createBoardName =
@@ -124,6 +140,7 @@ export class CommandUtility implements ExecutorProps {
                         appId,
                         name
                     );
+
                     const attachments = [
                         {
                             collapsed: true,
@@ -140,6 +157,24 @@ export class CommandUtility implements ExecutorProps {
                         headerBlock
                     );
 
+                    console.log("MessageId", messageId);
+
+                    // const headerBlockAfterPermission = await buildHeaderBlockAfterPermission(
+                    //     sender.username,
+                    //     boardURL,
+                    //     appId,
+                    //     name
+                    // )
+                    // const message = await this.modify
+                    //                     .getUpdater()
+                    //                     .message(messageId, sender);
+                    // message.setBlocks(headerBlockAfterPermission)
+                    // for(let user of boardOwner){
+
+                    //     await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                    //     // await this.modify.getUpdater().finish(message);
+                    // }
+
                     storeBoardRecord(
                         persistence,
                         room.id,
@@ -153,7 +188,8 @@ export class CommandUtility implements ExecutorProps {
                         "",
                         name,
                         "",
-                        "Public"
+                        "Public",
+                        boardOwner
                     );
                 }
             }
@@ -372,6 +408,27 @@ export class CommandUtility implements ExecutorProps {
         }
     }
 
+    // private async checkCommand() {
+    //     const appId = this.app.getID();
+    //     const user = this.context.getSender();
+    //     const params = this.context.getArguments();
+    //     const room: IRoom = this.context.getRoom();
+    //     const appSender: IUser = (await this.read
+    //         .getUserReader()
+    //         .getAppUser()) as IUser;
+    //         const attachments = [
+    //             {
+    //                 collapsed: true,
+    //                 color: "#00000000",
+    //                 imageUrl: defaultPreview,
+    //             },
+    //         ];
+
+    //     const message:IMessage = {text:"Board Here", room:room, sender:appSender, pinned:true, attachments:attachments}
+
+    //     await this.read.getNotifier().notifyRoom(room, message);
+    // }
+
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
             case "new":
@@ -389,6 +446,9 @@ export class CommandUtility implements ExecutorProps {
             case "delete":
                 await this.deleteBoardCommand();
                 break;
+            // case "check":
+            //     await this.checkCommand();
+            //     break;
             default:
                 const appSender: IUser = (await this.read
                     .getUserReader()

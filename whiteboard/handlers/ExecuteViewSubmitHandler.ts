@@ -13,7 +13,7 @@ import {
 import { UIKitBlockInteractionContext } from "@rocket.chat/apps-engine/definition/uikit";
 import { UtilityEnum } from "../enum/uitlityEnum";
 import { IUser } from "@rocket.chat/apps-engine/definition/users/IUser";
-import { buildHeaderBlock, deletionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, buildHeaderBlockAfterPermission, deletionHeaderBlock, permissionHeaderBlock } from "../blocks/UtilityBlock";
 import {
     getBoardRecordByMessageId,
     getMessageIdByPrivateMessageId,
@@ -24,8 +24,8 @@ import {
     deleteBoardByMessageId,
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
-import { getDirect, sendMessage } from "../lib/messages";
-import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
+import { getDirect, sendMessage, sendMessageWithAttachment } from "../lib/messages";
+import { IMessage, IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
 //This class will handle all the view submit interactions from the modals
@@ -47,6 +47,7 @@ export class ExecuteViewSubmitHandler {
             .getAppUser()) as IUser;
         const appId = AppSender.appId;
         try {
+            console.log("View Id: ", view);
             switch (view.id) {
                 // This case is used to handle the submit interaction from the settings modal
                 case UtilityEnum.SETTINGS_MODAL_ID:
@@ -105,102 +106,99 @@ export class ExecuteViewSubmitHandler {
                                 );
                             }
 
-                            if (repeatBoardName) {
-                                const room = await this.read
-                                    .getMessageReader()
-                                    .getRoom(messageId);
-                                if (room) {
-                                    const newMessage = this.modify
-                                        .getCreator()
-                                        .startMessage()
-                                        .setSender(AppSender)
-                                        .setRoom(room)
-                                        .setText(
-                                            `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
-                                        )
-                                        .setParseUrls(true);
-
-                                    await this.read
-                                        .getNotifier()
-                                        .notifyRoom(
-                                            room,
-                                            newMessage.getMessage()
-                                        );
+                            if (room) {
+                                // Check if the message is a private message or not
+                                if (messageIdFromPrivateMessageId != null) {
+                                    await updateBoardnameByMessageId(
+                                        this.persistence,
+                                        this.read.getPersistenceReader(),
+                                        messageIdFromPrivateMessageId,
+                                        newBoardname,
+                                        room.id
+                                    );
+                                } else {
+                                    await updateBoardnameByMessageId(
+                                        this.persistence,
+                                        this.read.getPersistenceReader(),
+                                        messageId,
+                                        newBoardname,
+                                        room.id
+                                    );
                                 }
-                            } else {
-                                if (room) {
-                                    // Check if the message is a private message or not
-                                    if (messageIdFromPrivateMessageId != null) {
-                                        await updateBoardnameByMessageId(
-                                            this.persistence,
-                                            this.read.getPersistenceReader(),
-                                            messageIdFromPrivateMessageId,
-                                            newBoardname,
-                                            room.id
-                                        );
-                                    } else {
-                                        await updateBoardnameByMessageId(
-                                            this.persistence,
-                                            this.read.getPersistenceReader(),
-                                            messageId,
-                                            newBoardname,
-                                            room.id
-                                        );
-                                    }
-                                }
+                            }
 
-                                if (room) {
-                                    const message = await this.modify
-                                        .getUpdater()
-                                        .message(messageId, AppSender);
+                            if (room) {
+                                const message = await this.modify
+                                    .getUpdater()
+                                    .message(messageId, AppSender);
 
-                                    const url =
-                                        message.getBlocks()[1]["elements"][1][
-                                            "url"
-                                        ];
-                                    // Updating header block for new boardname
-                                    const updateHeaderBlock =
-                                        await buildHeaderBlock(
-                                            user.username,
-                                            url,
-                                            appId,
-                                            newBoardname
-                                        );
+                                const url =
+                                    message.getBlocks()[1]["elements"][1][
+                                        "url"
+                                    ];
+                                // Updating header block for new boardname
+                                const updateHeaderBlock =
+                                    await buildHeaderBlock(
+                                        user.username,
+                                        url,
+                                        appId,
+                                        newBoardname
+                                    );
 
-                                    message.setEditor(user).setRoom(room);
+                                message.setEditor(user).setRoom(room);
 
-                                    // Board status is changed
-                                    if (newBoardStatus != undefined) {
-                                        if (
-                                            newBoardStatus != undefined &&
-                                            newBoardStatus ==
-                                                UtilityEnum.PRIVATE &&
-                                            newBoardname == undefined
-                                        ) {
-                                            if (
-                                                currentBoardStatus == "private"
-                                            ) {
-                                                console.log(
-                                                    "Board name is not changed & Board status is also not changed"
-                                                );
-                                            } else if (
-                                                currentBoardStatus == "public"
-                                            ) {
-                                                await this.publicToPrivate(
-                                                    message,
-                                                    messageId,
-                                                    AppSender,
-                                                    user,
-                                                    newBoardname,
-                                                    undefined
-                                                );
-                                            }
+                                // Board status is changed
+                                if (newBoardStatus != undefined) {
+                                    if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PRIVATE &&
+                                        newBoardname == undefined
+                                    ) {
+                                        if (currentBoardStatus == "private") {
+                                            console.log(
+                                                "Board name is not changed & Board status is also not changed"
+                                            );
                                         } else if (
-                                            newBoardStatus != undefined &&
-                                            newBoardStatus ==
-                                                UtilityEnum.PRIVATE &&
-                                            newBoardname != undefined
+                                            currentBoardStatus == "public"
                                         ) {
+                                            await this.publicToPrivate(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                newBoardname,
+                                                undefined
+                                            );
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PRIVATE &&
+                                        newBoardname != undefined
+                                    ) {
+                                        // new board name is repeated(i.e., already there in the room)
+                                        if (repeatBoardName) {
+                                            const room = await this.read
+                                                .getMessageReader()
+                                                .getRoom(messageId);
+                                            if (room) {
+                                                const newMessage = this.modify
+                                                    .getCreator()
+                                                    .startMessage()
+                                                    .setSender(AppSender)
+                                                    .setRoom(room)
+                                                    .setText(
+                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
+                                                    )
+                                                    .setParseUrls(true);
+
+                                                await this.read
+                                                    .getNotifier()
+                                                    .notifyRoom(
+                                                        room,
+                                                        newMessage.getMessage()
+                                                    );
+                                            }
+                                        } else {
                                             // Have to apply changes here
                                             if (
                                                 currentBoardStatus == "private"
@@ -223,36 +221,57 @@ export class ExecuteViewSubmitHandler {
                                                     updateHeaderBlock
                                                 );
                                             }
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PUBLIC &&
+                                        newBoardname == undefined
+                                    ) {
+                                        if (currentBoardStatus == "private") {
+                                            await this.privateToPublic(
+                                                message,
+                                                messageId,
+                                                AppSender,
+                                                user,
+                                                newBoardname,
+                                                undefined
+                                            );
                                         } else if (
-                                            newBoardStatus != undefined &&
-                                            newBoardStatus ==
-                                                UtilityEnum.PUBLIC &&
-                                            newBoardname == undefined
+                                            currentBoardStatus == "public"
                                         ) {
-                                            if (
-                                                currentBoardStatus == "private"
-                                            ) {
-                                                await this.privateToPublic(
-                                                    message,
-                                                    messageId,
-                                                    AppSender,
-                                                    user,
-                                                    newBoardname,
-                                                    undefined
-                                                );
-                                            } else if (
-                                                currentBoardStatus == "public"
-                                            ) {
-                                                console.log(
-                                                    "Board name is not changed & Board status is also not changed"
-                                                );
+                                            console.log(
+                                                "Board name is not changed & Board status is also not changed"
+                                            );
+                                        }
+                                    } else if (
+                                        newBoardStatus != undefined &&
+                                        newBoardStatus == UtilityEnum.PUBLIC &&
+                                        newBoardname != undefined
+                                    ) {
+                                        // new board name is repeated(i.e., already there in the room)
+                                        if (repeatBoardName) {
+                                            const room = await this.read
+                                                .getMessageReader()
+                                                .getRoom(messageId);
+                                            if (room) {
+                                                const newMessage = this.modify
+                                                    .getCreator()
+                                                    .startMessage()
+                                                    .setSender(AppSender)
+                                                    .setRoom(room)
+                                                    .setText(
+                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
+                                                    )
+                                                    .setParseUrls(true);
+
+                                                await this.read
+                                                    .getNotifier()
+                                                    .notifyRoom(
+                                                        room,
+                                                        newMessage.getMessage()
+                                                    );
                                             }
-                                        } else if (
-                                            newBoardStatus != undefined &&
-                                            newBoardStatus ==
-                                                UtilityEnum.PUBLIC &&
-                                            newBoardname != undefined
-                                        ) {
+                                        } else {
                                             // Have to apply changes here
                                             if (
                                                 currentBoardStatus == "private"
@@ -277,25 +296,50 @@ export class ExecuteViewSubmitHandler {
                                             }
                                         }
                                     }
+                                }
 
-                                    // Only boardname is changed
-                                    else {
-                                        // Have to apply changes here
-                                        if (
-                                            newBoardStatus == undefined &&
-                                            newBoardname != undefined
-                                        ) {
+                                // Only boardname is changed
+                                else {
+                                    // Have to apply changes here
+                                    if (
+                                        newBoardStatus == undefined &&
+                                        newBoardname != undefined
+                                    ) {
+                                        // new board name is repeated(i.e., already there in the room)
+                                        if (repeatBoardName) {
+                                            const room = await this.read
+                                                .getMessageReader()
+                                                .getRoom(messageId);
+                                            if (room) {
+                                                const newMessage = this.modify
+                                                    .getCreator()
+                                                    .startMessage()
+                                                    .setSender(AppSender)
+                                                    .setRoom(room)
+                                                    .setText(
+                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
+                                                    )
+                                                    .setParseUrls(true);
+
+                                                await this.read
+                                                    .getNotifier()
+                                                    .notifyRoom(
+                                                        room,
+                                                        newMessage.getMessage()
+                                                    );
+                                            }
+                                        } else {
                                             message.setBlocks(
                                                 updateHeaderBlock
                                             );
                                         }
-                                        await this.modify
-                                            .getUpdater()
-                                            .finish(message);
                                     }
-                                } else {
-                                    console.log("Room not found");
+                                    await this.modify
+                                        .getUpdater()
+                                        .finish(message);
                                 }
+                            } else {
+                                console.log("Room not found");
                             }
                         } else {
                             console.log("MessageId not found");
@@ -307,14 +351,56 @@ export class ExecuteViewSubmitHandler {
                     return this.context
                         .getInteractionResponder()
                         .successResponse();
+                
+                case UtilityEnum.EDIT_MODAL_ID:
+                    if (view.state && appId) {
 
+                        const boardData = this.context.getInteractionData().view.submit?.value
+                        
+                        if(boardData){
+                            
+                            const messageId = boardData?.split(",")[0].trim()
+                            const boardName = boardData?.split(",")[1].trim()
+                            const boardURL =
+                                this.context.getInteractionData().view.submit
+                                    ?.url;
+
+                            if (messageId) {
+    
+                                // Message is Updated to "Deletion"
+                                const room = await this.read
+                                    .getMessageReader()
+                                    .getRoom(messageId);
+                                if (room) {
+                                    // Extracted the message to be updated
+                                    const message = await this.modify
+                                        .getUpdater()
+                                        .message(messageId, AppSender);
+                                    if(boardURL){
+                                        const headerBlock = await buildHeaderBlockAfterPermission(user.username, boardURL, appId, boardName)
+                                        message.setBlocks(headerBlock)
+                                        await this.modify.getNotifier().notifyUser(user, message.getMessage());
+                                    }
+                                }
+                            } else {
+                                console.log("MessageId not found");
+                            }
+
+                        }
+                    } else {
+                        console.log("Submit Failed");
+                    }
+
+                    return this.context
+                        .getInteractionResponder()
+                        .successResponse();
                 // Add the case for the delete modal
                 case UtilityEnum.DELETE_MODAL_ID:
                     if (view.state && appId) {
                         const messageId =
                             this.context.getInteractionData().view.submit
                                 ?.value;
-
+                        // console.log("MessageId inside Delete Modal ID", messageId)
                         if (messageId) {
                             // Board data is deleted from database
                             const boardName = await deleteBoardByMessageId(
@@ -359,6 +445,74 @@ export class ExecuteViewSubmitHandler {
                         .getInteractionResponder()
                         .successResponse();
 
+                        // case UtilityEnum.EDIT_MODAL_ID:
+                        //     const boardURL = this.context.getInteractionData().view.submit?.url
+                        //     console.log("boardURL", boardURL)
+                        //     if(boardURL){
+                        //     this.http.get(boardURL)
+                        //     }
+                        //     return this.context
+                        //     .getInteractionResponder()
+                        //     .successResponse();
+
+                        case UtilityEnum.PERMISSION_MODAL_ID:
+                            const boardMessageId =
+                            this.context.getInteractionData().view.submit
+                                ?.value;
+
+                            // console.log("MessageId inside Permission Modal ID", messageId)
+                             if(boardMessageId){
+
+                                 const room = await this.read
+                                     .getMessageReader()
+                                     .getRoom(boardMessageId);
+                                     if(room){
+                                //   console.log("Checking interaction data", this.context.getInteractionData().view.submit?.value)
+                                      const boardData = await getBoardRecordByMessageId(this.read.getPersistenceReader(), boardMessageId)
+                                        // console.log("Board data", boardData)
+                                        for(let i=0; i<boardData.boardOwner.length; i++){
+                                            const userBoardOwner = boardData.boardOwner[i]
+                                            if(userBoardOwner && appId){
+                                                const boardName = boardData.title;
+                                                // const message = await this.modify
+                                                // .getUpdater()
+                                                // .message(messageId, AppSender);
+                                                const message = this.modify.getCreator().startMessage();
+                                                const userForBoardPermission = this.context.getInteractionData().user; 
+                                                
+                                                // Some message configurations
+                                                message.setEditor(userBoardOwner).setRoom(room);
+                
+                                                // console.log("board_permission_kaun_le_rha_viewsubmithandler.ts", this.context.getInteractionData())
+                                                // Permission header block as other user is trying to edit the board
+                                                const permissionBlock =
+                                                await permissionHeaderBlock(
+                                                    userBoardOwner.username,
+                                                    userForBoardPermission.username,
+                                                    boardName,
+                                                    appId
+                                                    );
+
+                                                    message.setBlocks(permissionBlock);
+                                                    // message.removeAttachment(0);
+                                        
+                                                    await this.modify.getNotifier().notifyUser(userBoardOwner, message.getMessage());
+                    
+                                                    
+                                                // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
+                                                // this.modify.getNotifier().notifyUser(user, message)
+                                            }
+                                        }
+                                  }
+                                  
+                                
+                                    // const message:IMessage = {text:"Hello", room: room, sender: this.context.getInteractionData().user}
+                                    // this.modify.getNotifier().notifyUser(user, message)
+                             }   
+                            return this.context.getInteractionResponder().successResponse();
+
+                        // case UtilityEnum.ALLOW_MODAL_ID
+                        
                 default:
                     console.log("View Id not found");
                     return this.context
@@ -366,7 +520,7 @@ export class ExecuteViewSubmitHandler {
                         .successResponse();
             }
         } catch (err) {
-            console.log(err);
+            console.log("error is executeViewSubmitHandler",err);
             return this.context.getInteractionResponder().errorResponse();
         }
     }
@@ -571,3 +725,6 @@ export class ExecuteViewSubmitHandler {
         await this.modify.getUpdater().finish(privateMessage);
     }
 }
+
+
+// 

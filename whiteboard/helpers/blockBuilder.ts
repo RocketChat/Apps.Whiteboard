@@ -100,6 +100,18 @@ export function getButton(
     return button;
 }
 
+export function getEditBlock(
+    blockId: string,
+    elements: Array<ButtonElement> | Array<StaticSelectElement>
+) {
+    const block: ActionsBlock = {
+        type: "actions",
+        blockId,
+        elements,
+    };
+    return block;
+}
+
 export function getSectionBlock(labelText: string, accessory?: any) {
     const block: SectionBlock = {
         type: "section",
