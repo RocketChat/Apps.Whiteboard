@@ -40,4 +40,28 @@ export enum UtilityEnum {
     DELETE_ACTION_ID = "delete-action-id",
     DELETE_BLOCK_ID = "delete-block-id",
     NAME_ALREADY_EXISTS = "Name already exists. Try different name",
+
+    EDIT = "Edit",
+    EDIT_DESC = "Do you want to edit this whiteboard?",
+    EDIT_MODAL_ID = "edit-modal-id",   
+    NO_EDIT_BLOCK_ID = "no-edit-block-id",
+    NO_EDIT_ACTION_ID = "no-edit-action-id",
+    YES_EDIT_BLOCK_ID = "yes-edit-block-id",
+    YES_EDIT_ACTION_ID = "yes-edit-action-id",
+
+    PERMISSION_DESC = "You don't have permission to edit or delete this whiteboard. Do you want to request permission?",
+    PERMISSION_MODAL_ID = "permission-modal-id",
+    PERMISSION_DENIED = "Permission Denied",   
+    NO = "No",
+    NO_BLOCK_ID = "no-block-id",
+    NO_ACTION_ID = "no-action-id",
+    YES = "Yes",
+    YES_BLOCK_ID = "yes-block-id",
+    YES_ACTION_ID = "yes-action-id",
+
+    PERMISSION_BLOCK_ID = "permission-block-id",
+    ALLOW_BLOCK_ID = "allow-block-id",
+    ALLOW_BUTTON_ACTION_ID = "allow_button_action_id",
+    DENY_BLOCK_ID = "deny-block-id",
+    DENY_BUTTON_ACTION_ID = "deny_button_action_id",
 }

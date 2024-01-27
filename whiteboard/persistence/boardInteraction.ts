@@ -6,6 +6,7 @@ import {
     RocketChatAssociationModel,
     RocketChatAssociationRecord,
 } from "@rocket.chat/apps-engine/definition/metadata";
+import { IUser } from "@rocket.chat/apps-engine/definition/users";
 
 //functions needed to persist board data while modal and other UI interactions
 // Messages can be retrieved by using the messageId, privateMessageId and boardId
@@ -20,8 +21,9 @@ export const storeBoardRecord = async (
     cover: string,
     title: string,
     privateMessageId: string,
-    status: string
-): Promise<void> => {
+    status: string,
+    boardOwner?: IUser[]
+): Promise<string> => {
     const roomAssociation = new RocketChatAssociationRecord(
         RocketChatAssociationModel.ROOM,
         `${roomId}#BoardName`
@@ -47,7 +49,7 @@ export const storeBoardRecord = async (
         "board"
     );
 
-    await persistence.updateByAssociations(
+    const recordId = await persistence.updateByAssociations(
         [
             boardAssociation,
             messageAssociation,
@@ -67,9 +69,12 @@ export const storeBoardRecord = async (
             title,
             privateMessageId,
             status,
+            boardOwner,
         },
         true
     );
+
+    return recordId
 };
 
 // query all records within the "scope" - room
