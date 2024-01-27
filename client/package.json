@@ -6,7 +6,9 @@
   "scripts": {
     "dev": "webpack serve",
     "build": "webpack --mode development",
-    "build:excalidraw": "node scripts/build.js"
+    "build:excalidraw": "node scripts/build.js",
+    "lint": "eslint --ext .js,.ts,.jsx,.tsx src",
+    "lint:fix": "eslint --ext .js,.ts,.jsx,.tsx src --fix"
   },
   "dependencies": {
     "@dwelle/tunnel-rat": "^0.1.1",
