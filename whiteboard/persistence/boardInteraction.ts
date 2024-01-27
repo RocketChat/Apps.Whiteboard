@@ -111,11 +111,13 @@ export const checkBoardNameByRoomId = async (
     boardName: string
 ): Promise<any> => {
     const boardData = await getBoardRecordByRoomId(persistenceRead, roomId);
-    console.log(boardData);
+    console.log("Record: " + boardData);
     
     if (boardName == "") return false;
 
     for (const board of boardData) {
+        console.log(board.title + "/" + board.status + "/" + board.boardData + "/" + board.messageId + "/" + board.cover + "/" + board.privateMessageId);
+        
         if (board.title === boardName) {
             console.log("Board name found!");
             return true;
