@@ -129,6 +129,24 @@ Enhance your collaborative experience with diagrams, drawings, and more using th
    make deploy YOUR_USERNAME=${username} YOUR_PASSWORD=${password}
    ```
 
+## Code style
+
+We maintain a consistent code style and adhere to best practices using ESLint. Our lint rules are enforced through a pre-commit hook to ensure commits follow the established guidelines.
+
+To check for code style issues in both the client and whiteboard directories, you can use the following command:
+
+```sh
+npm run lint
+```
+
+To automatically fix some of the linting issues, you can use the following command:
+
+```sh
+npm run lint:fix
+```
+
+These commands help maintain a clean and uniform codebase, ensuring readability and adherence to coding standards.
+
 ## Gitpod Setup Guide
 
 Follow these steps to set up your development environment using Gitpod:
