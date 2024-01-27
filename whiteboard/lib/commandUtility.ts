@@ -248,7 +248,6 @@ export class CommandUtility implements ExecutorProps {
 
       
           const appId = app.getID();
-          console.log("room info ", room.slugifiedName, room.type)
         const boardURL = `/${roomType}/${room.slugifiedName}?msg=${boardData?.messageId}`
             
       
