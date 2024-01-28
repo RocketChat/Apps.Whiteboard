@@ -356,3 +356,42 @@ export async function addUsertoBoardOwner(
         return undefined
     }
 }
+
+
+// function to remove user from boardRights
+export const removeUserFromBoardOwner = async (
+    room: IRoom,
+    persistance: IPersistence,
+    userName: string,
+    board: any,
+) => {
+
+    // Add the user to the boardOwner
+    const boardOwners = board.boardOwner
+
+    console.log("name", userName)
+    // Filter the user from the boardOwner
+    const boardOwnerArray = boardOwners.filter((boardOwner) => boardOwner.username !== userName)
+    
+
+    console.log("boardOwnerArray", boardOwnerArray)
+    if(boardOwnerArray === boardOwners){
+        return undefined
+    }
+    else{
+        // Update the boardData in the database
+        await storeBoardRecord(
+            persistance,
+            room.id,
+            board.id,
+            board.boardData,
+            board.messageId,
+            board.cover,
+            board.title,
+            board.privateMessageId,
+            board.status,
+            boardOwnerArray
+            )
+        return boardOwnerArray
+    }
+}
