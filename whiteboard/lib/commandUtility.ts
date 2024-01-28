@@ -340,8 +340,6 @@ export class CommandUtility implements ExecutorProps {
             break;
             }
         }
-
-        console.log("requiredBoardData", requiredBoardData)
         // If board not found
         if(!requiredBoardData){
             const message = {room: room, sender: appSender, text: "Board not found"}
@@ -351,9 +349,7 @@ export class CommandUtility implements ExecutorProps {
         else{
             // check whether the user is admin or board Owner or not
             const match = requiredBoardData.boardOwner.find(obj => obj.id === user.id)
-            console.log("match", match)
             if(match){
-                console.log("User is admin or board Owner")
                 // if the user is admin or board Owner
                 const response = await removeUserFromBoardOwner(this.room, this.persistence, userName, requiredBoardData)
                 if(response !== undefined){

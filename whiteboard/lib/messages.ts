@@ -369,12 +369,9 @@ export const removeUserFromBoardOwner = async (
     // Add the user to the boardOwner
     const boardOwners = board.boardOwner
 
-    console.log("name", userName)
     // Filter the user from the boardOwner
     const boardOwnerArray = boardOwners.filter((boardOwner) => boardOwner.username !== userName)
     
-
-    console.log("boardOwnerArray", boardOwnerArray)
     if(boardOwnerArray === boardOwners){
         return undefined
     }
