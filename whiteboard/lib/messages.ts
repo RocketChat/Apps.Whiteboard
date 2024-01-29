@@ -9,6 +9,7 @@ import { NotificationsController } from "./notifications";
 import { Block } from "@rocket.chat/ui-kit";
 import { IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
+import { getMessagebyMessageID } from "../persistence/boardInteraction";
 import {
     getBoardRecordByMessageId,
     getBoardRecordByRoomId,
@@ -183,6 +184,10 @@ export async function helperMessage(
     appUser: IUser
 ) {
     const text = `*Whiteboard App Commands*
+    \`/whiteboard help\` - Display helper message
+    \`/whiteboard list\` - List all the whiteboard names in the room
+    \`/whiteboard delete <board name>\` - Delete a board
+    \`/whiteboard search <board name>\` - Search a board
     \`/whiteboard new <board name>\` - Create a new whiteboard
     \`/whiteboard delete <board name>\` - Delete a whiteboard
     \`/whiteboard help\` - Display helper message
@@ -203,7 +208,7 @@ export async function helperMessage(
 }
 
 // function to handle /whiteboard list command
-export async function handleListCommand(
+export async function handleList(
     read: IRead,
     modify: IModify,
     room: IRoom,
@@ -228,6 +233,8 @@ export async function handleListCommand(
                 boardDataCheck ? boardDataCheck.title : "Error here messages.ts"
             );
         }
+    
+    console.log("boardData checking list" , boardData)
 
         const text = `*All existing boards are*:
                 ${boardDataArray.join("\n")}
@@ -358,5 +365,30 @@ export async function addUsertoBoardOwner(
     else{
         console.log("Error has occured! ", read, room, userName, boardName, userNameForBoardPermission, permission)
         return undefined
+    }
+}
+
+// Function to search for a board
+
+export async function handleBoardSearch(
+    read: IRead,
+    room: IRoom,
+    boardName: string
+) {
+    try {
+        const boardData = await getBoardRecordByRoomId(read.getPersistenceReader(), room.id);
+
+        const foundBoard = boardData.find(board => board.title === boardName);
+
+        if (foundBoard) {
+            const messageInfo = await getMessagebyMessageID(read.getPersistenceReader(), foundBoard.messageId);
+
+            return { id: foundBoard.id, cover: messageInfo[0].cover, messageId: messageInfo[0].messageId };
+        }
+
+        return undefined;
+    } catch (error) {
+        console.log('Error in handleBoardSearch:', error);
+        throw error; 
     }
 }

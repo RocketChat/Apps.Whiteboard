@@ -10,17 +10,16 @@ import {
 import { ExecutorProps } from "../definitions/ExecutorProps";
 import { WhiteboardApp } from "../WhiteboardApp";
 import {
-    handleListCommand,
+    handleBoardSearch,
+    handleList,
     helperMessage,
     sendMessage,
     sendMessageWithAttachment,
 } from "./messages";
-import { buildHeaderBlock, buildHeaderBlockAfterPermission, deletionHeaderBlock } from "../blocks/UtilityBlock";
+import { buildHeaderBlock, deletionHeaderBlock, goToBoardBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
 import {
-    deleteBoards,
     getBoardName,
-    getMessageIdByRoomName,
     storeBoardRecord,
 } from "../persistence/boardInteraction";
 import { randomId } from "./utilts";
@@ -31,6 +30,7 @@ import {
     getMessageIdByBoardName,
     deleteBoardByMessageId,
 } from "../persistence/boardInteraction";
+
 import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
 //CommandUtility is used to handle the commands
 
@@ -118,7 +118,7 @@ export class CommandUtility implements ExecutorProps {
             if (room) {
                 const randomBoardId = randomId();
                 const boardURL = `${boardEndpoint.computedPath}?id=${randomBoardId}`;
-
+                console.log("boardURL ", boardURL)
                 // The variable "untitledName" stores "Untitled" if the name is not specified
                 const untitledName = await getBoardName(
                     read.getPersistenceReader(),
@@ -211,10 +211,78 @@ export class CommandUtility implements ExecutorProps {
         const appSender: IUser = (await this.read
             .getUserReader()
             .getAppUser()) as IUser;
-        await handleListCommand(this.read, this.modify, this.room, appSender);
+        await handleList(this.read, this.modify, this.room, appSender);
     }
 
-    // handleListCommand is used to handle the /whiteboard delete command
+    // handleBoardSearchCommand is used to handle the /whiteboard search {boardname} command
+
+    private async handleBoardSearchCommand(
+        name: string,
+        {
+          app,
+          context,
+          read,
+        }: WhiteboardSlashCommandContext
+      ) {
+        try {
+      
+          const appUser = (await read.getUserReader().getAppUser())!;
+          const boardData = await handleBoardSearch(
+            this.read,
+            this.room,
+            name
+          );
+      
+          const sender = context.getSender()!;
+          const room = context.getRoom();
+          let roomType = "channel"
+          if(room.type === "c"){
+            roomType = "channel"
+          }
+            else if(room.type === "p"){
+                roomType = "group"
+            }
+            else if(room.type === "d"){
+                roomType = "direct"
+            }
+
+      
+          const appId = app.getID();
+        const boardURL = `/${roomType}/${room.slugifiedName}?msg=${boardData?.messageId}`
+            
+      
+          if (room && boardData?.id) {
+ 
+            const goToBoard = await goToBoardBlock(
+              boardURL,
+              appId,
+              name
+            )
+      
+            const attachments = [
+              {
+                collapsed: true,
+                color: "#00000000",
+                imageUrl: boardData.cover !== "" ? boardData.cover : defaultPreview,
+              },
+            ];
+      
+            await sendMessageWithAttachment(
+              this.modify,
+              room,
+              appUser,
+              `Whiteboard created by @${sender.username}`,
+              attachments,
+              goToBoard
+            );
+          }
+        } catch (err) {
+          console.error(err);
+        }
+      }
+      
+
+    // deleteBoardCommand is used to handle the /whiteboard delete command
 
     private async deleteBoardCommand() {
         const appId = this.app.getID();
@@ -370,6 +438,9 @@ export class CommandUtility implements ExecutorProps {
                 break;
             case "list":
                 await this.handleListCommand();
+                break;
+            case "search":
+                await this.handleBoardSearchCommand(this.command.slice(1).join(' '), context);
                 break;
             case "delete":
                 await this.deleteBoardCommand();
