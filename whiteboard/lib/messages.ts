@@ -96,7 +96,11 @@ export async function sendMessageWithAttachment(
         .setText(message);
 
     if (attachments !== undefined) {
-        msg.setAttachments(attachments);
+        const modifiedAttachments = attachments.map(attachment => ({
+            ...attachment,
+            collapsed: false,
+        }));
+        msg.setAttachments(modifiedAttachments);
     }
     if (blocks !== undefined) {
         msg.setBlocks(blocks);
