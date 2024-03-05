@@ -189,19 +189,13 @@ export class CommandUtility implements ExecutorProps {
     // helperMessage is used to send the helper message to the user and /whiteboard help command
 
     private async helperMessage() {
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        await helperMessage(this.read, this.modify, this.room, appSender);
+        await helperMessage(this.read, this.modify, this.room, this.sender);
     }
 
     // handleListCommand is used to handle the /whiteboard list command
 
     private async handleListCommand() {
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        await handleListCommand(this.read, this.modify, this.room, appSender);
+        await handleListCommand(this.read, this.modify, this.room, this.sender);
     }
 
     // handleListCommand is used to handle the /whiteboard delete command
@@ -334,14 +328,12 @@ export class CommandUtility implements ExecutorProps {
             //     await this.checkCommand();
             //     break;
             default:
-                const appSender: IUser = (await this.read
-                    .getUserReader()
-                    .getAppUser()) as IUser;
                 await Promise.all([
-                    sendMessage(
+                    sendNotification(
+                        this.read,
                         this.modify,
+                        this.sender,
                         this.room,
-                        appSender,
                         "Please enter a valid command !!!"
                     ),
                     this.helperMessage(),
