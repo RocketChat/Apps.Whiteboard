@@ -24,7 +24,7 @@ import {
     deleteBoardByMessageId,
     checkBoardNameByRoomId,
 } from "../persistence/boardInteraction";
-import { getDirect, sendMessage, sendMessageWithAttachment } from "../lib/messages";
+import { getDirect, sendMessage, sendMessageWithAttachment, sendNotification } from "../lib/messages";
 import { IMessage, IMessageAttachment } from "@rocket.chat/apps-engine/definition/messages";
 import { AppEnum } from "../enum/App";
 
@@ -181,22 +181,7 @@ export class ExecuteViewSubmitHandler {
                                                 .getMessageReader()
                                                 .getRoom(messageId);
                                             if (room) {
-                                                const newMessage = this.modify
-                                                    .getCreator()
-                                                    .startMessage()
-                                                    .setSender(AppSender)
-                                                    .setRoom(room)
-                                                    .setText(
-                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
-                                                    )
-                                                    .setParseUrls(true);
-
-                                                await this.read
-                                                    .getNotifier()
-                                                    .notifyRoom(
-                                                        room,
-                                                        newMessage.getMessage()
-                                                    );
+                                                await sendNotification(this.read, this.modify, user, room,  `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`)
                                             }
                                         } else {
                                             // Have to apply changes here
@@ -254,22 +239,7 @@ export class ExecuteViewSubmitHandler {
                                                 .getMessageReader()
                                                 .getRoom(messageId);
                                             if (room) {
-                                                const newMessage = this.modify
-                                                    .getCreator()
-                                                    .startMessage()
-                                                    .setSender(AppSender)
-                                                    .setRoom(room)
-                                                    .setText(
-                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
-                                                    )
-                                                    .setParseUrls(true);
-
-                                                await this.read
-                                                    .getNotifier()
-                                                    .notifyRoom(
-                                                        room,
-                                                        newMessage.getMessage()
-                                                    );
+                                                await sendNotification(this.read, this.modify, user, room, `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`)
                                             }
                                         } else {
                                             // Have to apply changes here
@@ -311,22 +281,8 @@ export class ExecuteViewSubmitHandler {
                                                 .getMessageReader()
                                                 .getRoom(messageId);
                                             if (room) {
-                                                const newMessage = this.modify
-                                                    .getCreator()
-                                                    .startMessage()
-                                                    .setSender(AppSender)
-                                                    .setRoom(room)
-                                                    .setText(
-                                                        `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`
-                                                    )
-                                                    .setParseUrls(true);
+                                                await sendNotification(this.read, this.modify, user, room, `Oops! The whiteboard named *${newBoardname}* is already there in the room. Please try again with different whiteboard name`)
 
-                                                await this.read
-                                                    .getNotifier()
-                                                    .notifyRoom(
-                                                        room,
-                                                        newMessage.getMessage()
-                                                    );
                                             }
                                         } else {
                                             message.setBlocks(

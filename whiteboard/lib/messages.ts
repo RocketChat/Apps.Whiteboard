@@ -180,7 +180,7 @@ export async function helperMessage(
     read: IRead,
     modify: IModify,
     room: IRoom,
-    appUser: IUser
+    user: IUser
 ) {
     const text = `*Whiteboard App Commands*
     \`/whiteboard new <board name>\` - Create a new whiteboard
@@ -191,15 +191,7 @@ export async function helperMessage(
     Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
 
-    const msg = modify
-        .getCreator()
-        .startMessage()
-        .setSender(appUser)
-        .setRoom(room)
-        .setText(text)
-        .setParseUrls(true);
-
-    return await read.getNotifier().notifyRoom(room, msg.getMessage());
+    return await sendNotification(read, modify, user, room, text)
 }
 
 // function to handle /whiteboard list command
@@ -207,7 +199,7 @@ export async function handleListCommand(
     read: IRead,
     modify: IModify,
     room: IRoom,
-    appUser: IUser
+    user: IUser
 ) {
     const boardDataArray: string[] = [];
 
@@ -233,28 +225,12 @@ export async function handleListCommand(
                 ${boardDataArray.join("\n")}
                 `;
 
-        const msg = modify
-            .getCreator()
-            .startMessage()
-            .setSender(appUser)
-            .setRoom(room)
-            .setText(text)
-            .setParseUrls(true);
-
-        return await read.getNotifier().notifyRoom(room, msg.getMessage());
+        return await sendNotification(read, modify, user, room, text);
     }
 
     const text = `No boards found`;
 
-    const msg = modify
-        .getCreator()
-        .startMessage()
-        .setSender(appUser)
-        .setRoom(room)
-        .setText(text)
-        .setParseUrls(true);
-
-    return await read.getNotifier().notifyRoom(room, msg.getMessage());
+    return await sendNotification(read, modify, user, room, text);
 }
 
 // Function to delete a message
