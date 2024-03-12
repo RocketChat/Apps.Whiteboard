@@ -132,10 +132,8 @@ export class ExecuteViewSubmitHandler {
                                     .getUpdater()
                                     .message(messageId, AppSender);
 
-                                const url =
-                                    message.getBlocks()[1]["elements"][1][
-                                        "url"
-                                    ];
+                                const url = message.getBlocks()[1]["elements"][0]["value"].split(",")[0].trim()
+
                                 // Updating header block for new boardname
                                 const updateHeaderBlock =
                                     await buildHeaderBlock(
