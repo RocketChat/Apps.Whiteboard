@@ -14,6 +14,7 @@ import {
     helperMessage,
     sendMessage,
     sendMessageWithAttachment,
+    sendNotification,
 } from "./messages";
 import { buildHeaderBlock, buildHeaderBlockAfterPermission, deletionHeaderBlock } from "../blocks/UtilityBlock";
 import { WhiteboardSlashCommandContext } from "../commands/WhiteboardCommand";
@@ -101,19 +102,8 @@ export class CommandUtility implements ExecutorProps {
         );
         if (repeatBoardName) {
             console.log("Whiteboard name exist in the room!");
-            const message = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appUser)
-                .setRoom(room)
-                .setText(
-                    `Oops! The whiteboard named *${createBoardName}* is already there in the room. Please try again with different whiteboard name`
-                )
-                .setParseUrls(true);
 
-            await this.read
-                .getNotifier()
-                .notifyRoom(room, message.getMessage());
+            await sendNotification(this.read, this.modify, sender, room, `Oops! The whiteboard named *${createBoardName}* is already there in the room. Please try again with different whiteboard name`)
         } else {
             if (room) {
                 const randomBoardId = randomId();
@@ -199,19 +189,13 @@ export class CommandUtility implements ExecutorProps {
     // helperMessage is used to send the helper message to the user and /whiteboard help command
 
     private async helperMessage() {
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        await helperMessage(this.read, this.modify, this.room, appSender);
+        await helperMessage(this.read, this.modify, this.room, this.sender);
     }
 
     // handleListCommand is used to handle the /whiteboard list command
 
     private async handleListCommand() {
-        const appSender: IUser = (await this.read
-            .getUserReader()
-            .getAppUser()) as IUser;
-        await handleListCommand(this.read, this.modify, this.room, appSender);
+        await handleListCommand(this.read, this.modify, this.room, this.sender);
     }
 
     // handleListCommand is used to handle the /whiteboard delete command
@@ -230,36 +214,14 @@ export class CommandUtility implements ExecutorProps {
             params.length > 1 ? params.slice(1).join(" ") : "";
 
         if (deleteBoardName == "") {
-            const message = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appSender)
-                .setRoom(room)
-                .setText(
-                    "Please specify the name of the whiteboard you wish to delete"
-                )
-                .setParseUrls(true);
-
-            await this.read
-                .getNotifier()
-                .notifyRoom(room, message.getMessage());
+            await sendNotification(this.read, this.modify, user, room, "Please specify the name of the whiteboard you wish to delete")
         } 
                 
         else if (
             deleteBoardName == "untitled" ||
             deleteBoardName == "Untitled"
         ) {
-            const message = this.modify
-                .getCreator()
-                .startMessage()
-                .setSender(appSender)
-                .setRoom(room)
-                .setText("Unititled Whiteboard can not be deleted")
-                .setParseUrls(true);
-
-            await this.read
-                .getNotifier()
-                .notifyRoom(room, message.getMessage());
+            await sendNotification(this.read, this.modify, user, room, "Unititled Whiteboard can not be deleted")
         } else {
             const repeatBoardName:boolean = await checkBoardNameByRoomId(
                 this.read.getPersistenceReader(),
@@ -322,19 +284,7 @@ export class CommandUtility implements ExecutorProps {
                     console.log("MessageId not found");
                 }
             } else {
-                const message = this.modify
-                    .getCreator()
-                    .startMessage()
-                    .setSender(appSender)
-                    .setRoom(room)
-                    .setText(
-                        `Oops! The whiteboard named *${deleteBoardName}* is not found in this room. Please check the whiteboard name and try again`
-                    )
-                    .setParseUrls(true);
-
-                await this.read
-                    .getNotifier()
-                    .notifyRoom(room, message.getMessage());
+                await sendNotification(this.read, this.modify, user, room, `Oops! The whiteboard named *${deleteBoardName}* is not found in this room. Please check the whiteboard name and try again`)
             }
         }
     }
@@ -378,14 +328,12 @@ export class CommandUtility implements ExecutorProps {
             //     await this.checkCommand();
             //     break;
             default:
-                const appSender: IUser = (await this.read
-                    .getUserReader()
-                    .getAppUser()) as IUser;
                 await Promise.all([
-                    sendMessage(
+                    sendNotification(
+                        this.read,
                         this.modify,
+                        this.sender,
                         this.room,
-                        appSender,
                         "Please enter a valid command !!!"
                     ),
                     this.helperMessage(),
