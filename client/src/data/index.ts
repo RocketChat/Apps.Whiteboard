@@ -79,6 +79,7 @@ export const exportCanvas = async (
     tempCanvas.remove();
     if (appState.exportEmbedScene) {
       blob = await (
+        //here right pth from the webpack is not being imported, so export isnt working
         await import(/* webpackChunkName: "image" */ "./image")
       ).encodePngMetadata({
         blob,
@@ -104,7 +105,7 @@ export const exportCanvas = async (
         throw error;
       }
       // TypeError *probably* suggests ClipboardItem not defined, which
-      // people on Firefox can enable through a flag, so let's tell them.
+      // people on Firefox can enable through a flag, so let's tell them. 
       if (isFirefox && error.name === "TypeError") {
         throw new Error(
           `${t("alerts.couldNotCopyToClipboard")}\n\n${t(

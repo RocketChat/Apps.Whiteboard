@@ -23,7 +23,7 @@ import clsx from "clsx";
 import { KEYS } from "../keys";
 import { DEFAULT_LINK_SIZE } from "../renderer/renderElement";
 import { rotate } from "../math";
-import { EVENT, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
+import { EVENT, FONT_FAMILY, HYPERLINK_TOOLTIP_DELAY, MIME_TYPES } from "../constants";
 import { Bounds } from "./bounds";
 import { getTooltipDiv, updateTooltipPosition } from "../components/Tooltip";
 import { getSelectedElements } from "../scene";
@@ -143,6 +143,7 @@ export const Hyperlink = ({
         left: `${x}px`,
         width: CONTAINER_WIDTH,
         padding: CONTAINER_PADDING,
+        font: `${FONT_FAMILY}`,
       }}
     >
       {isEditing ? (

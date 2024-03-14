@@ -1,6 +1,9 @@
 import path from "path";
 import webpack from "webpack";
 import CopyPlugin from "copy-webpack-plugin";
+import miniCssExtractPlugin from "mini-css-extract-plugin";
+// const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin;
+import { BundleAnalyzerPlugin } from "webpack-bundle-analyzer";
 
 const isEnvDevelopment = process.env.NODE_ENV !== "production";
 const isEnvProduction = process.env.NODE_ENV === "production";
@@ -14,7 +17,9 @@ export default {
   output: {
     path: path.resolve(process.cwd(), "dist"),
     filename: "bundle.js",
-    clean: true,
+    clean: {
+      keep: /ignored\/dir\//, // Keep these assets under 'ignored/dir'.
+    },
   },
   resolve: {
     fallback: {
@@ -31,7 +36,7 @@ export default {
         test: /\.scss$/,
         use: [
           // Adds the styles to the DOM by injecting a <style> tag
-          "style-loader",
+          isEnvDevelopment ? "style-loader" : miniCssExtractPlugin.loader,
           // Translates CSS into CommonJS
           "css-loader",
           // Compiles Sass to CSS
@@ -52,9 +57,34 @@ export default {
         exclude: /node_modules/,
         use: "babel-loader",
       },
+      // Rule for media files
+      {
+        test: /\.(png|jpe?g|gif|svg)$/i,
+        type: "asset",
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8 * 1024, // 8kb
+          },
+        },
+      },
+      {
+        test: /\.(woff|woff2|eot|ttf|otf)$/i,
+        type: "asset",
+        generator: {
+          filename: "fonts/[name][ext]",
+        },
+        parser: {
+          dataUrlCondition: {
+            maxSize: 8 * 1024, // 8kb
+          },
+        },
+      },
     ],
   },
   plugins: [
+    new BundleAnalyzerPlugin({
+      generateStatsFile: true,
+    }),
     new CopyPlugin({
       patterns: [{ from: "public" }],
     }),
@@ -73,6 +103,11 @@ export default {
     new webpack.ProvidePlugin({
       process: "process/browser",
     }),
+    isEnvProduction &&
+    new miniCssExtractPlugin({
+      filename: "[name].css",
+      chunkFilename: "[id].css",
+    }), // this will extract css to a separate file during production build
   ].filter(Boolean),
   devServer: {
     static: {
