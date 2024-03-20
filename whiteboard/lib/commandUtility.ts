@@ -12,6 +12,7 @@ import { WhiteboardApp } from "../WhiteboardApp";
 import {
     handleListCommand,
     helperMessage,
+    removeUserFromBoardOwner,
     sendMessage,
     sendMessageWithAttachment,
     sendNotification,
@@ -27,12 +28,7 @@ import {
 import { randomId } from "./utilts";
 import { defaultPreview } from "../assets/defaultPreview";
 
-import {
-    checkBoardNameByRoomId,
-    getMessageIdByBoardName,
-    deleteBoardByMessageId,
-} from "../persistence/boardInteraction";
-import { IMessage } from "@rocket.chat/apps-engine/definition/messages";
+import {checkBoardNameByRoomId, getMessageIdByBoardName, deleteBoardByMessageId, getBoardRecordByRoomId} from '../persistence/boardInteraction';
 //CommandUtility is used to handle the commands
 
 export class CommandUtility implements ExecutorProps {
@@ -83,8 +79,6 @@ export class CommandUtility implements ExecutorProps {
         for(const user of users){
             if(user.roles.includes('admin') || user.roles.includes('owner') || user.roles.includes('moderator')){
                 if(sender.username != user.username){
-                
-                    // console.log("here again", user, sender.username)
                     boardOwner.push(user)
                 }
 
@@ -146,24 +140,6 @@ export class CommandUtility implements ExecutorProps {
                         attachments,
                         headerBlock
                     );
-
-                    console.log("MessageId", messageId);
-
-                    // const headerBlockAfterPermission = await buildHeaderBlockAfterPermission(
-                    //     sender.username,
-                    //     boardURL,
-                    //     appId,
-                    //     name
-                    // )
-                    // const message = await this.modify
-                    //                     .getUpdater()
-                    //                     .message(messageId, sender);
-                    // message.setBlocks(headerBlockAfterPermission)
-                    // for(let user of boardOwner){
-
-                    //     await this.modify.getNotifier().notifyUser(user, message.getMessage());
-                    //     // await this.modify.getUpdater().finish(message);
-                    // }
 
                     storeBoardRecord(
                         persistence,
@@ -289,26 +265,60 @@ export class CommandUtility implements ExecutorProps {
         }
     }
 
-    // private async checkCommand() {
-    //     const appId = this.app.getID();
-    //     const user = this.context.getSender();
-    //     const params = this.context.getArguments();
-    //     const room: IRoom = this.context.getRoom();
-    //     const appSender: IUser = (await this.read
-    //         .getUserReader()
-    //         .getAppUser()) as IUser;
-    //         const attachments = [
-    //             {
-    //                 collapsed: true,
-    //                 color: "#00000000",
-    //                 imageUrl: defaultPreview,
-    //             },
-    //         ];
+    // denyUser is used to handle the /whiteboard deny {userName} of {boardName} command
+    private async denyUser() {
 
-    //     const message:IMessage = {text:"Board Here", room:room, sender:appSender, pinned:true, attachments:attachments}
+        const user = this.context.getSender();
+        const params = this.context.getArguments();
+        const room: IRoom = this.context.getRoom();
+        const appSender: IUser = (await this.read
+            .getUserReader()
+            .getAppUser()) as IUser;
 
-    //     await this.read.getNotifier().notifyRoom(room, message);
-    // }
+        // the name specified in command "/whiteboard delete"
+        const requiredParams = params.slice(1)
+        const index = requiredParams.indexOf('of')
+        const userName = requiredParams.slice(0,index).join(" ").trim()
+        const boardName = requiredParams.slice(index+1).join(" ").trim()
+
+        // Get the board data from the database
+        const boardData = await getBoardRecordByRoomId(this.read.getPersistenceReader(), room.id)
+        let requiredBoardData;
+        for (let i = 0; i < boardData.length; i++) {
+        if (boardData[i].title == boardName) {
+            requiredBoardData = boardData[i]
+            break;
+            }
+        }
+        // If board not found
+        if(!requiredBoardData){
+            const message = {room: room, sender: appSender, text: "Board not found"}
+            return this.read.getNotifier().notifyUser(user, message);
+        }
+        // If board found
+        else{
+            // check whether the user is admin or board Owner or not
+            const match = requiredBoardData.boardOwner.find(obj => obj.id === user.id)
+            if(match){
+                // if the user is admin or board Owner
+                const response = await removeUserFromBoardOwner(this.room, this.persistence, userName, requiredBoardData)
+                if(response !== undefined){
+                    const message = {room: room, sender: appSender, text: `**${userName}** has been removed from the rights of **${boardName}**.`}
+                    return this.read.getNotifier().notifyUser(user, message);
+                }
+                else{
+                    const message = {room: room, sender: appSender, text: "Some error occured!"}
+                    return this.read.getNotifier().notifyUser(user, message);
+                }
+
+            }
+            else{
+                // if the user is not admin or board Owner
+                const message = {room: room, sender: appSender, text: "You are not authorized to perform this action"}
+                return this.read.getNotifier().notifyUser(user, message);
+            }
+        }
+    }          
 
     public async resolveCommand(context: WhiteboardSlashCommandContext) {
         switch (this.command[0]) {
@@ -324,9 +334,9 @@ export class CommandUtility implements ExecutorProps {
             case "delete":
                 await this.deleteBoardCommand();
                 break;
-            // case "check":
-            //     await this.checkCommand();
-            //     break;
+            case "deny":
+                await this.denyUser();
+                break;
             default:
                 await Promise.all([
                     sendNotification(

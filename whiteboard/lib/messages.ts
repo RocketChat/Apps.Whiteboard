@@ -187,6 +187,7 @@ export async function helperMessage(
     \`/whiteboard delete <board name>\` - Delete a whiteboard
     \`/whiteboard help\` - Display helper message
     \`/whiteboard list\` - List all the board names in the room
+    \`/whiteboard deny <user name> of <board name>\` - Deny a user to edit the board
     You can use \`Create Whiteboard\` Action Button to create a new whiteboard as well \n
     Refer https://github.com/RocketChat/Apps.Whiteboard for more details 🚀
     `;
@@ -334,5 +335,41 @@ export async function addUsertoBoardOwner(
     else{
         console.log("Error has occured! ", read, room, userName, boardName, userNameForBoardPermission, permission)
         return undefined
+    }
+}
+
+
+// function to remove user from boardRights
+export const removeUserFromBoardOwner = async (
+    room: IRoom,
+    persistance: IPersistence,
+    userName: string,
+    board: any,
+) => {
+
+    // Add the user to the boardOwner
+    const boardOwners = board.boardOwner
+
+    // Filter the user from the boardOwner
+    const boardOwnerArray = boardOwners.filter((boardOwner) => boardOwner.username !== userName)
+    
+    if(boardOwnerArray === boardOwners){
+        return undefined
+    }
+    else{
+        // Update the boardData in the database
+        await storeBoardRecord(
+            persistance,
+            room.id,
+            board.id,
+            board.boardData,
+            board.messageId,
+            board.cover,
+            board.title,
+            board.privateMessageId,
+            board.status,
+            boardOwnerArray
+            )
+        return boardOwnerArray
     }
 }

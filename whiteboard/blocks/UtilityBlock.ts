@@ -25,24 +25,6 @@ export async function buildHeaderBlock(
         ButtonStyle.PRIMARY
     );
 
-    // const settingButton = getButton(
-    //     "Settings",
-    //     UtilityEnum.PREVIEW_BLOCK_ID,
-    //     UtilityEnum.SETTINGS_BUTTON_ACTION_ID,
-    //     appId,
-    //     "Settings",
-    //     undefined
-    // );
-
-    // const deleteButton = getDeleteButton(
-    //     "Delete board",
-    //     UtilityEnum.PREVIEW_BLOCK_ID,
-    //     UtilityEnum.DELETE_BUTTON_ACTION_ID,
-    //     appId,
-    //     "Delete",
-    //     ButtonStyle.DANGER
-    // );
-
     let markdownBlock: SectionBlock;
     if (boardname == undefined) {
         markdownBlock = getMarkdownBlock(
@@ -53,9 +35,7 @@ export async function buildHeaderBlock(
     }
 
     const actionBlock = getActionsBlock(UtilityEnum.PREVIEW_BLOCK_ID, [
-        // settingButton,
-        openbutton,
-        // deleteButton,
+        openbutton
     ]);
     block.push(markdownBlock);
     block.push(actionBlock);
@@ -176,7 +156,7 @@ export async function permissionHeaderBlock(
 
     let markdownBlock: SectionBlock;
         markdownBlock = getMarkdownBlock(
-            `${userForBoardPermission} wants to edit *${boardname}*`
+            `*${userForBoardPermission}* wants to edit *${boardname}*`
         );
 
     const actionBlock = getActionsBlock(UtilityEnum.PERMISSION_BLOCK_ID, [

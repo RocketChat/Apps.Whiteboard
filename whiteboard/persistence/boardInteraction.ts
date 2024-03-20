@@ -411,7 +411,6 @@ export const getMessageIdByBoardName = async (
 
     for (const board of boardData) {
         if (board.title === boardName) {
-            console.log("Board name mil gaya!");
             let messageId = board.messageId;
             return messageId;
         }
